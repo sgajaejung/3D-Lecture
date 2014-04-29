@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SoftwareRenderer", "SoftwareRenderer\SoftwareRenderer.vcxproj", "{3AE731DA-764C-406B-8417-6AC12F079029}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SoftwareRendererLighting", "SoftwareRendererLighting\SoftwareRendererLighting.vcxproj", "{3B124F57-1E3D-4073-84DA-43AB32E58DBE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3AE731DA-764C-406B-8417-6AC12F079029}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3AE731DA-764C-406B-8417-6AC12F079029}.Debug|Win32.Build.0 = Debug|Win32
+		{3AE731DA-764C-406B-8417-6AC12F079029}.Release|Win32.ActiveCfg = Release|Win32
+		{3AE731DA-764C-406B-8417-6AC12F079029}.Release|Win32.Build.0 = Release|Win32
+		{3B124F57-1E3D-4073-84DA-43AB32E58DBE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3B124F57-1E3D-4073-84DA-43AB32E58DBE}.Debug|Win32.Build.0 = Debug|Win32
+		{3B124F57-1E3D-4073-84DA-43AB32E58DBE}.Release|Win32.ActiveCfg = Release|Win32
+		{3B124F57-1E3D-4073-84DA-43AB32E58DBE}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
