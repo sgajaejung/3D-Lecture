@@ -8,7 +8,7 @@ Vector4::Vector4(const Vector3 &v) : x(v.x), y(v.y), z(v.z), w(1)
 {
 }
 
-Vector4 Vector4::operator * ( const Matrix44& m )
+Vector4 Vector4::operator * ( const Matrix44& m ) const
 {
 	float	fRHW = 1.0F / ( x * m._14 + y * m._24 + z * m._34 + w*m._44 );	
 	if (fRHW >= FLT_MAX)
