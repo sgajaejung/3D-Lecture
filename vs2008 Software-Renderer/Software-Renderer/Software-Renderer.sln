@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SoftwareRenderer", "SoftwareRenderer\SoftwareRenderer.vcproj", "{5A5E4EB5-BF75-4E46-A433-7CBFC34A73DD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SoftwareRendererLighting", "SoftwareRendererLighting\SoftwareRendererLighting.vcproj", "{48BA0678-4449-4959-8779-2E8288016204}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5A5E4EB5-BF75-4E46-A433-7CBFC34A73DD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5A5E4EB5-BF75-4E46-A433-7CBFC34A73DD}.Debug|Win32.Build.0 = Debug|Win32
+		{5A5E4EB5-BF75-4E46-A433-7CBFC34A73DD}.Release|Win32.ActiveCfg = Release|Win32
+		{5A5E4EB5-BF75-4E46-A433-7CBFC34A73DD}.Release|Win32.Build.0 = Release|Win32
+		{48BA0678-4449-4959-8779-2E8288016204}.Debug|Win32.ActiveCfg = Debug|Win32
+		{48BA0678-4449-4959-8779-2E8288016204}.Debug|Win32.Build.0 = Debug|Win32
+		{48BA0678-4449-4959-8779-2E8288016204}.Release|Win32.ActiveCfg = Release|Win32
+		{48BA0678-4449-4959-8779-2E8288016204}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
