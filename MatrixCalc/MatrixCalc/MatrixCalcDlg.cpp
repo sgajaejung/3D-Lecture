@@ -6,6 +6,8 @@
 #include "MatrixCalc.h"
 #include "MatrixCalcDlg.h"
 #include "afxdialogex.h"
+#include "DlgCalc4x4.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -28,6 +30,7 @@ BEGIN_MESSAGE_MAP(CMatrixCalcDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -62,7 +65,12 @@ BOOL CMatrixCalcDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 큰 아이콘을 설정합니다.
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
+
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	m_pDlgCalc4x4 = new CDlgCalc4x4(this);
+	m_pDlgCalc4x4->Create(CDlgCalc4x4::IDD, this);
+	m_pDlgCalc4x4->ShowWindow(SW_SHOW);
+
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -114,3 +122,15 @@ HCURSOR CMatrixCalcDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+void CMatrixCalcDlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	if (m_pDlgCalc4x4)
+	{
+		m_pDlgCalc4x4->DestroyWindow();
+		delete m_pDlgCalc4x4;
+		m_pDlgCalc4x4 = NULL;
+	}
+}

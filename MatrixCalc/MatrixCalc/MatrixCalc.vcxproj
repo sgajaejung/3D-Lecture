@@ -99,6 +99,10 @@
     <None Include="res\MatrixCalc.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CommonDataInterface.h" />
+    <ClInclude Include="DlgCalc4x4.h" />
+    <ClInclude Include="EditMatrix4x4.h" />
+    <ClInclude Include="EditVector4.h" />
     <ClInclude Include="MatrixCalc.h" />
     <ClInclude Include="MatrixCalcDlg.h" />
     <ClInclude Include="Resource.h" />
@@ -106,6 +110,9 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DlgCalc4x4.cpp" />
+    <ClCompile Include="EditMatrix4x4.cpp" />
+    <ClCompile Include="EditVector4.cpp" />
     <ClCompile Include="MatrixCalc.cpp" />
     <ClCompile Include="MatrixCalcDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -119,4 +126,9 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="MatrixCalc.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
