@@ -12,6 +12,7 @@
 // CDlgCalc4x4 대화 상자입니다.
 CDlgCalc4x4::CDlgCalc4x4(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CDlgCalc4x4::IDD, pParent)
+	, m_Angle(0)
 {
 
 }
@@ -25,6 +26,7 @@ void CDlgCalc4x4::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_COMBO_FIRST, m_ComboFirst);
 	DDX_Control(pDX, IDC_COMBO_SECOND, m_ComboSecond);
+	DDX_Text(pDX, IDC_EDIT_ANGLE, m_Angle);
 }
 
 
@@ -35,6 +37,7 @@ BEGIN_MESSAGE_MAP(CDlgCalc4x4, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_CALC, &CDlgCalc4x4::OnBnClickedButtonCalc)
 	ON_BN_CLICKED(IDCANCEL, &CDlgCalc4x4::OnBnClickedCancel)
 	ON_BN_CLICKED(IDOK, &CDlgCalc4x4::OnBnClickedOk)
+	ON_EN_CHANGE(IDC_EDIT_ANGLE, &CDlgCalc4x4::OnEnChangeEditAngle)
 END_MESSAGE_MAP()
 
 
@@ -43,8 +46,8 @@ BOOL CDlgCalc4x4::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	const int WIDTH = 180;
-	const int HEIGHT = 130;
+	const int WIDTH = 230;
+	const int HEIGHT = 120;
 
 	const int RESULT_X = 140;
 	const int RESULT_Y = 180;
@@ -99,10 +102,14 @@ BOOL CDlgCalc4x4::OnInitDialog()
 	// Second
 	m_ComboSecond.AddString("Matrix44");
 	m_ComboSecond.AddString("Matrix44 Identity");
+	m_ComboSecond.AddString("Matrix44 Rotate X");
+	m_ComboSecond.AddString("Matrix44 Rotate Y");
+	m_ComboSecond.AddString("Matrix44 Rotate Z");
+	m_ComboSecond.AddString("Matrix44 Scale");
 	m_ComboSecond.SetCurSel(0);
 
 	{
-		const int X = 250;
+		const int X = 280;
 		const int Y = 40;
 		CRect r(X, Y, X+WIDTH, Y+HEIGHT);
 
@@ -115,14 +122,36 @@ BOOL CDlgCalc4x4::OnInitDialog()
 		pEditMat44_2->MoveWindow(r);
 		pEditMat44_2->SetIdentity();
 
+		CEditMatrix4x4 *pEditMat44_3 = new CEditMatrix4x4(this);
+		pEditMat44_3->Create(CEditMatrix4x4::IDD, this);
+		pEditMat44_3->MoveWindow(r);
+
+		CEditMatrix4x4 *pEditMat44_4 = new CEditMatrix4x4(this);
+		pEditMat44_4->Create(CEditMatrix4x4::IDD, this);
+		pEditMat44_4->MoveWindow(r);
+
+		CEditMatrix4x4 *pEditMat44_5 = new CEditMatrix4x4(this);
+		pEditMat44_5->Create(CEditMatrix4x4::IDD, this);
+		pEditMat44_5->MoveWindow(r);
+
+		CEditMatrix4x4 *pEditMat44_6 = new CEditMatrix4x4(this);
+		pEditMat44_6->Create(CEditMatrix4x4::IDD, this);
+		pEditMat44_6->MoveWindow(r);
+
 		m_Second.resize(VAR2_MAX);
 		m_Second[ VAR2_MATRIX] = pEditMat44;
 		m_Second[ VAR2_IDENTITY] = pEditMat44_2;
+		m_Second[ VAR2_MAT_ROTATEX] = pEditMat44_3;
+		m_Second[ VAR2_MAT_ROTATEY] = pEditMat44_4;
+		m_Second[ VAR2_MAT_ROTATEZ] = pEditMat44_5;
+		m_Second[ VAR2_MAT_SCALE] = pEditMat44_6;
 
 		m_Second[0]->ShowWindow(SW_SHOW);
 	}
 	//---------------------------------------------------------------------------------
 
+	GetDlgItem(IDC_EDIT_ANGLE)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC_ANGLE)->ShowWindow(SW_HIDE);
 	return TRUE;
 }
 
@@ -175,12 +204,30 @@ void CDlgCalc4x4::OnCbnSelchangeComboSecond()
 	for (int i=0; i < (int)m_Second.size(); ++i)
 		m_Second[ i]->ShowWindow(SW_HIDE);
 
-	if (VAR2_IDENTITY == m_ComboSecond.GetCurSel())
+	const SECOND_VARIABLE type = (SECOND_VARIABLE)m_ComboSecond.GetCurSel();
+	if (VAR2_IDENTITY == type)
 	{
 		CommonDataInterface *dataInterface = dynamic_cast<CommonDataInterface *>(m_Second[ m_ComboSecond.GetCurSel()]);
 		if (NULL != dataInterface)
 			dataInterface->SetIdentity();
 	}
+
+	switch (type)
+	{
+	case VAR2_MATRIX:
+	case VAR2_IDENTITY:
+		GetDlgItem(IDC_EDIT_ANGLE)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_ANGLE)->ShowWindow(SW_HIDE);
+		break;
+
+	case VAR2_MAT_ROTATEX:
+	case VAR2_MAT_ROTATEY:
+	case VAR2_MAT_ROTATEZ:
+	case VAR2_MAT_SCALE:
+		GetDlgItem(IDC_EDIT_ANGLE)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_ANGLE)->ShowWindow(SW_SHOW);
+		break;
+	}	
 
 	m_Second[ m_ComboSecond.GetCurSel()]->ShowWindow(SW_SHOW);
 }
@@ -226,13 +273,46 @@ void CDlgCalc4x4::OnBnClickedButtonCalc()
 }
 
 
-void CDlgCalc4x4::OnBnClickedCancel()
+void CDlgCalc4x4::OnEnChangeEditAngle()
 {
-	//CDialogEx::OnCancel();
+	UpdateData();
+
+	SECOND_VARIABLE second = (SECOND_VARIABLE)m_ComboSecond.GetCurSel();
+	CommonDataInterface *secondData = dynamic_cast<CommonDataInterface *>(m_Second[ m_ComboSecond.GetCurSel()]);
+	if (!secondData)
+		return;
+
+	m_Second[ m_ComboSecond.GetCurSel()]->UpdateData();
+
+	Matrix44 mat;
+	switch (second)
+	{
+	case VAR2_MAT_ROTATEX:
+		mat.SetRotationX(m_Angle);
+		break;
+
+	case VAR2_MAT_ROTATEY:
+		mat.SetRotationY(m_Angle);
+		break;
+
+	case VAR2_MAT_ROTATEZ:
+		mat.SetRotationZ(m_Angle);
+		break;
+
+	case VAR2_MAT_SCALE:
+		mat.SetScale(Vector3(m_Angle, m_Angle, m_Angle));
+		break;
+	}
+
+	secondData->SetMatrix(mat);
 }
 
+
+void CDlgCalc4x4::OnBnClickedCancel()
+{
+}
 
 void CDlgCalc4x4::OnBnClickedOk()
 {
-	//CDialogEx::OnOK();
 }
+

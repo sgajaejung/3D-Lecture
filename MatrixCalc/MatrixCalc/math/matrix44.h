@@ -21,7 +21,7 @@ struct Matrix44
 	void	SetRotationX( const float angle );
 	void	SetRotationY( const float angle );
 	void	SetRotationZ( const float angle );
-	void	Translate( const Vector3& pos );
+	void	SetTranslate( const Vector3& pos );
 	void	SetScale( const Vector3& scale);
 	Vector3 GetPosition() const;
 

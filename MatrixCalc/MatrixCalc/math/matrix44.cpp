@@ -18,31 +18,55 @@ void Matrix44::SetIdentity()
 
 void	Matrix44::SetRotationX( const float angle )
 {
-
+	float fCos = cosf( angle );
+	float fSin = sinf( angle );
+	SetIdentity();
+	_22 = fCos;
+	_23 = fSin;
+	_32 = -fSin;
+	_33 = fCos;
 }
 
 
 void	Matrix44::SetRotationY( const float angle )
 {
-
+	float fCos = cosf( angle );
+	float fSin = sinf( angle );
+	SetIdentity();
+	_11 = fCos;
+	_13 = -fSin;
+	_31 = fSin;
+	_33 = fCos;
 }
 
 
 void	Matrix44::SetRotationZ( const float angle )
 {
-
+	float fCos = cosf( angle );
+	float fSin = sinf( angle );
+	SetIdentity();
+	_11 = fCos;
+	_12 = fSin;
+	_21 = -fSin;
+	_22 = fCos;
 }
 
 
-void	Matrix44::Translate( const Vector3& pos )
+void	Matrix44::SetTranslate( const Vector3& pos )
 {
-
+	SetIdentity();
+	_41 = pos.x;
+	_42 = pos.y;
+	_43 = pos.z;
 }
 
 
 void	Matrix44::SetScale( const Vector3& scale)
 {
-
+	SetIdentity();
+	_11 = scale.x;
+	_22 = scale.y;
+	_33 = scale.z;
 }
 
 
