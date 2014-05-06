@@ -368,7 +368,7 @@ Vector3 Vector3::operator * ( const Matrix44 &m )
 	float	fRHW = 1.0F / (x * m._14 + y * m._24 + z * m._34 + m._44);
 	if (fRHW >= FLT_MAX)
 		return Vector3(0,0,0);
-	
+
 	Vector3 vDummy;
 	vDummy.x = ( x * m._11 + y * m._21 + z * m._31 + m._41 ) * fRHW;
 	vDummy.y = ( x * m._12 + y * m._22 + z * m._32 + m._42 ) * fRHW;

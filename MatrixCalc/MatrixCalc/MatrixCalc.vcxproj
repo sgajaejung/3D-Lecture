@@ -103,6 +103,10 @@
     <ClInclude Include="DlgCalc4x4.h" />
     <ClInclude Include="EditMatrix4x4.h" />
     <ClInclude Include="EditVector4.h" />
+    <ClInclude Include="math\math.h" />
+    <ClInclude Include="math\matrix44.h" />
+    <ClInclude Include="math\vector3.h" />
+    <ClInclude Include="math\vector4.h" />
     <ClInclude Include="MatrixCalc.h" />
     <ClInclude Include="MatrixCalcDlg.h" />
     <ClInclude Include="Resource.h" />
@@ -113,6 +117,9 @@
     <ClCompile Include="DlgCalc4x4.cpp" />
     <ClCompile Include="EditMatrix4x4.cpp" />
     <ClCompile Include="EditVector4.cpp" />
+    <ClCompile Include="math\matrix44.cpp" />
+    <ClCompile Include="math\vector3.cpp" />
+    <ClCompile Include="math\vector4.cpp" />
     <ClCompile Include="MatrixCalc.cpp" />
     <ClCompile Include="MatrixCalcDlg.cpp" />
     <ClCompile Include="stdafx.cpp">

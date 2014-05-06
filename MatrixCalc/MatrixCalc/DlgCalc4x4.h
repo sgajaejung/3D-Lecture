@@ -2,6 +2,7 @@
 #pragma once
 #include "afxwin.h"
 
+class CEditVector4;
 class CEditMatrix4x4;
 class CDlgCalc4x4 : public CDialogEx
 {
@@ -25,20 +26,25 @@ public:
 		VAR2_MAX
 	};
 
+
 protected:
 	virtual BOOL OnInitDialog();
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
 
 	DECLARE_MESSAGE_MAP()
-	CEditMatrix4x4 *m_pResult;
+	CEditMatrix4x4 *m_pMatrixResult;
+	CEditVector4 *m_pVectorResult;
 	vector<CDialogEx*> m_First;
 	vector<CDialogEx*> m_Second;
 	CComboBox m_ComboFirst;
 	CComboBox m_ComboSecond;
+
 
 public:
 	afx_msg void OnDestroy();
 	afx_msg void OnCbnSelchangeComboFirst();
 	afx_msg void OnCbnSelchangeComboSecond();
 	afx_msg void OnBnClickedButtonCalc();
+	afx_msg void OnBnClickedCancel();
+	afx_msg void OnBnClickedOk();
 };

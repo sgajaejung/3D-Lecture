@@ -16,30 +16,20 @@ public:
 	enum { IDD = IDD_MATRIX_4X4 };
 
 	virtual void SetIdentity() override;
+	virtual void SetMatrix(const Matrix44 &m) override;
+	virtual Matrix44 GetMatrix() override;
 
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
 
 	DECLARE_MESSAGE_MAP()
+
 public:
-	float m_11;
-	float m_12;
-	float m_13;
-	float m_14;
-
-	float m_21;
-	float m_22;
-	float m_23;
-	float m_24;
-
-	float m_31;
-	float m_32;
-	float m_33;
-	float m_34;
-
-	float m_41;
-	float m_42;
-	float m_43;
-	float m_44;
+	float m_11, m_12, m_13, m_14;
+	float m_21, m_22, m_23, m_24;
+	float m_31, m_32, m_33, m_34;
+	float m_41, m_42, m_43, m_44;
+	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedCancel();
 };

@@ -16,8 +16,14 @@ public:
 // 대화 상자 데이터입니다.
 	enum { IDD = IDD_VECTOR_4 };
 
+	virtual Vector4 GetVector4() override;
+	virtual void SetVector4(const Vector4 &v) override;
+
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
 
 	DECLARE_MESSAGE_MAP()
+public:
+	float m_x, m_y, m_z, m_w;
 };
