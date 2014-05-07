@@ -16,6 +16,10 @@ public:
 	enum FIRST_VARIABLE {
 		VAR1_MATRIX,
 		VAR1_IDENTITY,
+		VAR1_MAT_ROTATEX,
+		VAR1_MAT_ROTATEY,
+		VAR1_MAT_ROTATEZ,
+		VAR1_MAT_SCALE,
 		VAR1_VECTOR4,
 		VAR1_MAX
 	};
@@ -42,7 +46,8 @@ protected:
 	vector<CDialogEx*> m_Second;
 	CComboBox m_ComboFirst;
 	CComboBox m_ComboSecond;
-	float m_Angle;
+	float m_Angle1;
+	float m_Angle2;
 
 
 public:
@@ -52,5 +57,6 @@ public:
 	afx_msg void OnBnClickedButtonCalc();
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnBnClickedOk();
-	afx_msg void OnEnChangeEditAngle();
+	afx_msg void OnEnChangeEditAngle1();
+	afx_msg void OnEnChangeEditAngle2();
 };
