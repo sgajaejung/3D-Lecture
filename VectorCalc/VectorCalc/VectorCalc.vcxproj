@@ -100,7 +100,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3DView.h" />
+    <ClInclude Include="CrossProductView.h" />
+    <ClInclude Include="CrossControlDlg.h" />
+    <ClInclude Include="DotControlDlg.h" />
     <ClInclude Include="DotProductView.h" />
+    <ClInclude Include="math\math.h" />
+    <ClInclude Include="math\matrix44.h" />
+    <ClInclude Include="math\vector3.h" />
+    <ClInclude Include="math\vector4.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -109,7 +116,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3DView.cpp" />
+    <ClCompile Include="CrossProductView.cpp" />
+    <ClCompile Include="CrossControlDlg.cpp" />
+    <ClCompile Include="DotControlDlg.cpp" />
     <ClCompile Include="DotProductView.cpp" />
+    <ClCompile Include="math\matrix44.cpp" />
+    <ClCompile Include="math\vector3.cpp" />
+    <ClCompile Include="math\vector4.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

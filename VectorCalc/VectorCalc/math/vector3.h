@@ -12,6 +12,8 @@ struct Vector3
 	float Length() const;
 	Vector3 Normal() const;
 	void Normalize();
+	float	DotProduct( const Vector3& v ) const;
+	Vector3 CrossProduct( const Vector3& v ) const;
 	
 	Vector3 operator + () const;
 	Vector3 operator - () const;

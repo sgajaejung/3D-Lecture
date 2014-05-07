@@ -6,8 +6,9 @@
 #include "afxcmn.h"
 
 class CDotProductView;
+class CDotControlDlg;
+class CCrossControlDlg;
 
-// CVectorCalcDlg 대화 상자
 class CVectorCalcDlg : public CDialogEx
 {
 // 생성입니다.
@@ -17,7 +18,7 @@ public:
 // 대화 상자 데이터입니다.
 	enum { IDD = IDD_VECTORCALC_DIALOG };
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 지원입니다.
 
 
@@ -25,6 +26,8 @@ public:
 protected:
 	HICON m_hIcon;
 	CDotProductView *m_pView;
+	CDotControlDlg *m_pDotControl;
+	CCrossControlDlg *m_pCrossControl;
 
 	// 생성된 메시지 맵 함수
 	virtual BOOL OnInitDialog();
@@ -37,4 +40,6 @@ public:
 	CTabCtrl m_TabCtrl;
 	afx_msg void OnSelchangeTabCalc(NMHDR *pNMHDR, LRESULT *pResult);
 	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
+	afx_msg void OnEnterIdle(UINT nWhy, CWnd* pWho);
+	afx_msg void OnDestroy();
 };

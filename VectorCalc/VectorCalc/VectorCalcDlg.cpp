@@ -1,10 +1,11 @@
 
-
 #include "stdafx.h"
 #include "VectorCalc.h"
 #include "VectorCalcDlg.h"
 #include "afxdialogex.h"
 #include "DotProductView.h"
+#include "DotControlDlg.h"
+#include "CrossControlDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -13,6 +14,7 @@
 
 CVectorCalcDlg::CVectorCalcDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CVectorCalcDlg::IDD, pParent)
+,	m_pView(NULL)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -29,6 +31,8 @@ BEGIN_MESSAGE_MAP(CVectorCalcDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CVectorCalcDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDCANCEL, &CVectorCalcDlg::OnBnClickedCancel)
 	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB_CALC, &CVectorCalcDlg::OnSelchangeTabCalc)
+	ON_WM_ENTERIDLE()
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -43,9 +47,24 @@ BOOL CVectorCalcDlg::OnInitDialog()
 	m_TabCtrl.InsertItem(0, "Dot Product" );
 	m_TabCtrl.InsertItem(1, "Cross Product" );
 
+	const int WIDTH = 400;
+	const int HEIGHT = 400;
 	m_pView = new CDotProductView();
-	m_pView->Create(NULL, "CDotProductView",  WS_CHILDWINDOW, CRect(100, 100, 500, 500), this, 1000);
+	m_pView->Create(NULL, "CDotProductView",  WS_CHILDWINDOW, CRect(10, 30, 10+WIDTH, 30+HEIGHT), &m_TabCtrl, 1000);
 	m_pView->ShowWindow(SW_SHOW);
+
+	//m_pDotControl = new CDotControlDlg(&m_TabCtrl);
+	//m_pDotControl->Create(CDotControlDlg::IDD, &m_TabCtrl);
+	//m_pDotControl->MoveWindow(420, 30, 230, 180);
+	//m_pDotControl->ShowWindow(SW_SHOW);
+	//m_pDotControl->SetDotProductView(m_pView);
+
+
+	m_pCrossControl = new CCrossControlDlg(&m_TabCtrl);
+	m_pCrossControl->Create(CCrossControlDlg::IDD, &m_TabCtrl);
+	m_pCrossControl->MoveWindow(420, 30, 230, 180);
+	m_pCrossControl->ShowWindow(SW_SHOW);
+	//m_pCrossControl->SetDotProductView(m_pView);
 
 	return TRUE;
 }
@@ -105,7 +124,53 @@ void CVectorCalcDlg::OnSelchangeTabCalc(NMHDR *pNMHDR, LRESULT *pResult)
 
 BOOL CVectorCalcDlg::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
-	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	DWORD QueueStatus;
+	LRESULT resValue = 0;
+	bool OnIdleRetVal = true;
 
-	return CDialogEx::OnWndMsg(message, wParam, lParam, pResult);
+	if (message == WM_ENTERIDLE) 
+	{
+		//OnIdleRetVal = OnIdle((UINT)wParam);
+		OnEnterIdle((UINT)wParam, this);
+		//if(!OnIdleRetVal)
+		//	wParam = 0;
+	} else
+	{
+		resValue = CDialogEx::OnWndMsg(message, wParam, lParam, pResult);
+	}
+
+	QueueStatus = GetQueueStatus(QS_ALLINPUT);
+
+	if (HIWORD(QueueStatus) == 0)
+	{
+		PostMessage(WM_ENTERIDLE, wParam + (OnIdleRetVal ? 1 : 0), 0);
+	}
+
+	return resValue;
+	//return CDialogEx::OnWndMsg(message, wParam, lParam, pResult);
+}
+
+
+void CVectorCalcDlg::OnEnterIdle(UINT nWhy, CWnd* pWho)
+{
+	CDialogEx::OnEnterIdle(nWhy, pWho);
+
+	if (m_pView	)
+	{
+		m_pView->Render();
+	}		
+}
+
+
+void CVectorCalcDlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+
+	m_pView->DestroyWindow();
+	delete m_pView;
+
+	m_pDotControl->DestroyWindow();
+	delete m_pDotControl;
+
 }

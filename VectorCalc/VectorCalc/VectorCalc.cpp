@@ -41,19 +41,9 @@ BOOL CVectorCalcApp::InitInstance()
 {
 	CWinApp::InitInstance();
 
-
 	// 대화 상자에 셸 트리 뷰 또는
 	// 셸 목록 뷰 컨트롤이 포함되어 있는 경우 셸 관리자를 만듭니다.
 	CShellManager *pShellManager = new CShellManager;
-
-	// 표준 초기화
-	// 이들 기능을 사용하지 않고 최종 실행 파일의 크기를 줄이려면
-	// 아래에서 필요 없는 특정 초기화
-	// 루틴을 제거해야 합니다.
-	// 해당 설정이 저장된 레지스트리 키를 변경하십시오.
-	// TODO: 이 문자열을 회사 또는 조직의 이름과 같은
-	// 적절한 내용으로 수정해야 합니다.
-	SetRegistryKey(_T("로컬 응용 프로그램 마법사에서 생성된 응용 프로그램"));
 
 	CVectorCalcDlg dlg;
 	m_pMainWnd = &dlg;

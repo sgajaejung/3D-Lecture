@@ -114,3 +114,18 @@ Vector3& Vector3::operator *= ( Matrix44& rhs )
 	*this = v;
 	return *this;
 }
+
+
+float Vector3::DotProduct( const Vector3& v ) const
+{
+	return x * v.x + y * v.y + z * v.z;
+}
+
+
+Vector3 Vector3::CrossProduct( const Vector3& v ) const
+{
+	return Vector3( 
+		(y * v.z) - (z * v.y), 
+		(z * v.x) - (x * v.z), 
+		(x * v.y) - (y * v.x) );
+}
