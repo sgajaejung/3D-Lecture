@@ -311,7 +311,26 @@ void RenderVertices(HDC hdc, const vector<Vector3> &vertices, const Matrix44 &tm
 
 void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<int> &indices, const Matrix44 &tm)
 {
+	Vector3 camDir(0,0,1);
 
+	for (unsigned int i=0; i < indices.size(); i+=3)
+	{
+		Vector3 p1 = vertices[ indices[ i]];
+		Vector3 p2 = vertices[ indices[ i+1]];
+		Vector3 p3 = vertices[ indices[ i+2]];
+
+		p1 = p1 * tm;
+		p2 = p2 * tm;
+		p3 = p3 * tm;
+
+		// culling
+
+		Rasterizer::Color color(255,0,0,1);
+		Rasterizer::DrawLine(hdc, color, p1.x, p1.y,color, p2.x, p2.y);
+		Rasterizer::DrawLine(hdc, color, p1.x, p1.y,color, p3.x, p3.y);
+		Rasterizer::DrawLine(hdc, color, p3.x, p3.y,color, p2.x, p2.y);
+		//Rasterizer::DrawTriangle(hdc, color, p1.x, p1.y, color, p2.x, p2.y, color, p3.x, p3.y);
+	}
 }
 
 
@@ -329,7 +348,12 @@ void Paint(HWND hWnd, HDC hdc)
 	FillRect(hdcMem, &rc, hbrBkGnd);
 	DeleteObject(hbrBkGnd);
 
-	RenderIndices(hdcMem, g_vertices1, g_indices, g_matLocal1 * g_matWorld1);
+	Matrix44 mat1;
+	mat1.SetRotationX(0.5f);
+	Matrix44 mat2;
+	mat2.SetRotationY(0.5f);
+
+	RenderIndices(hdcMem, g_vertices1, g_indices, g_matLocal1 * mat1 * mat2 * g_matWorld1);
 
 	BitBlt(hdc, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top, hdcMem, 0, 0, SRCCOPY);
 	SelectObject(hdcMem, hbmOld);
