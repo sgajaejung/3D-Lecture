@@ -252,7 +252,6 @@ void RenderVertices(HDC hdc, const vector<Vector3> &vertices, const Matrix44 &tm
 	for (unsigned int i=0; i < vertices.size(); ++i)
 	{
 		Vector3 p = vertices[ i] * tm;
-		//p = p * tm;
 
 		if (0 == i)
 			MoveToEx(hdc, (int)p.x, (int)p.y, NULL);
