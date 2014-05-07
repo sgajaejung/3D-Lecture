@@ -69,7 +69,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	//       |                                                       |
 	//       (-50,-50, -50)  ----------------- (+50, -50, -50)
 
-	const float w = 30.f;
+	const float w = 80.f;
 	g_vertices1.reserve(128);
 	g_vertices1.push_back( Vector3(-w,w,w) );
 	g_vertices1.push_back( Vector3(w,w,w) );
