@@ -196,17 +196,10 @@ void CVectorCalcDlg::OnDestroy()
 {
 	CDialogEx::OnDestroy();
 
-
 	m_pDotView->DestroyWindow();
-	delete m_pDotView;
-
 	m_pDotControl->DestroyWindow();
 	delete m_pDotControl;
-
 	m_pCrossView->DestroyWindow();
-	delete m_pCrossView;
-
 	m_pCrossControl->DestroyWindow();
 	delete m_pCrossControl;
-
 }
