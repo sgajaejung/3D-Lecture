@@ -18,6 +18,15 @@ HINSTANCE hInst;								// 현재 인스턴스입니다.
 HWND g_hWnd;
 TCHAR szTitle[MAX_LOADSTRING];					// 제목 표시줄 텍스트입니다.
 TCHAR szWindowClass[MAX_LOADSTRING];			// 기본 창 클래스 이름입니다.
+vector<Vector3> g_vertices1;
+vector<Vector3> g_vertices2;
+Matrix44 g_matWorld1;
+Matrix44 g_matLocal1;
+Matrix44 g_matWorld2;
+Matrix44 g_matLocal2;
+Matrix44 g_matWorld3;
+Matrix44 g_matLocal3;
+
 
 // 이 코드 모듈에 들어 있는 함수의 정방향 선언입니다.
 ATOM				MyRegisterClass(HINSTANCE hInstance);
@@ -45,6 +54,41 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
 	LoadString(hInstance, IDC_MY2DRENDERER, szWindowClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
+
+// vertices1
+	//       (-50,-50)  ----------------- (+50, -50)
+	//       |                                                       |
+	//       |                         +                           |
+	//       |                                                       |
+	//       (-50,+50)  ----------------- (+50, +50)
+	const float w = 50.f;
+	g_vertices1.push_back( Vector3(-w,-w,1) );
+	g_vertices1.push_back( Vector3(w,-w,1) );
+	g_vertices1.push_back( Vector3(w,w,1) );
+	g_vertices1.push_back( Vector3(-w,w,1) );
+	g_vertices1.push_back( Vector3(-w,-w,1) );
+
+
+	// vertices2
+	//       +(0,0)  ----------------- (+100, 0)
+	//       |                                               |
+	//       |                                               |
+	//       |                                               |
+	//       (0,+100)  ------------- (+1-0, +100)
+	const float w2 = 100.f;
+	g_vertices2.push_back( Vector3(0,0,1) );
+	g_vertices2.push_back( Vector3(w2,0,1) );
+	g_vertices2.push_back( Vector3(w2,w2,1) );
+	g_vertices2.push_back( Vector3(0,w2,1) );
+	g_vertices2.push_back( Vector3(0,0,1) );
+
+
+	g_matWorld1.SetTranslate(Vector3(150,200,0));
+
+	g_matWorld2.SetTranslate(Vector3(400,200,0));	
+
+	g_matWorld3.SetTranslate(Vector3(600,200,0));	
+
 
 	// 응용 프로그램 초기화를 수행합니다.
 	if (!InitInstance (hInstance, nCmdShow))
@@ -82,20 +126,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 }
 
 
-
-//
-//  함수: MyRegisterClass()
-//
-//  목적: 창 클래스를 등록합니다.
-//
-//  설명:
-//
-//    Windows 95에서 추가된 'RegisterClassEx' 함수보다 먼저
-//    해당 코드가 Win32 시스템과 호환되도록
-//    하려는 경우에만 이 함수를 사용합니다. 이 함수를 호출해야
-//    해당 응용 프로그램에 연결된
-//    '올바른 형식의' 작은 아이콘을 가져올 수 있습니다.
-//
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
 	WNDCLASSEX wcex;
@@ -110,23 +140,14 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_MY2DRENDERER));
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName	= MAKEINTRESOURCE(IDC_MY2DRENDERER);
+	wcex.lpszMenuName	= NULL;//MAKEINTRESOURCE(IDC_MY2DRENDERER);
 	wcex.lpszClassName	= szWindowClass;
 	wcex.hIconSm		= LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
 	return RegisterClassEx(&wcex);
 }
 
-//
-//   함수: InitInstance(HINSTANCE, int)
-//
-//   목적: 인스턴스 핸들을 저장하고 주 창을 만듭니다.
-//
-//   설명:
-//
-//        이 함수를 통해 인스턴스 핸들을 전역 변수에 저장하고
-//        주 프로그램 창을 만든 다음 표시합니다.
-//
+
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    HWND hWnd;
@@ -147,16 +168,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    return TRUE;
 }
 
-//
-//  함수: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  목적: 주 창의 메시지를 처리합니다.
-//
-//  WM_COMMAND	- 응용 프로그램 메뉴를 처리합니다.
-//  WM_PAINT	- 주 창을 그립니다.
-//  WM_DESTROY	- 종료 메시지를 게시하고 반환합니다.
-//
-//
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int wmId, wmEvent;
@@ -181,6 +193,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return DefWindowProc(hWnd, message, wParam, lParam);
 		}
 		break;
+	case WM_ERASEBKGND:
+		return 0;
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
 		Paint(hWnd, hdc);
@@ -241,7 +255,15 @@ void	Render(HWND hWnd)
 
 void RenderVertices(HDC hdc, const vector<Vector3> &vertices, const Matrix44 &tm)
 {
+	for (unsigned int i=0; i < vertices.size(); ++i)
+	{
+		Vector3 p = vertices[ i] * tm;
 
+		if (0 == i)
+			MoveToEx(hdc, (int)p.x, (int)p.y, NULL);
+		else
+			LineTo(hdc, (int)p.x, (int)p.y);
+	}
 }
 
 
@@ -259,7 +281,8 @@ void Paint(HWND hWnd, HDC hdc)
 	FillRect(hdcMem, &rc, hbrBkGnd);
 	DeleteObject(hbrBkGnd);
 
-	//RenderVertices(hdcMem, , );
+	RenderVertices(hdcMem, g_vertices1, g_matLocal1 * g_matWorld1);
+	RenderVertices(hdcMem, g_vertices1, g_matLocal2 * g_matWorld2);
 
 	BitBlt(hdc, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top, hdcMem, 0, 0, SRCCOPY);
 	SelectObject(hdcMem, hbmOld);

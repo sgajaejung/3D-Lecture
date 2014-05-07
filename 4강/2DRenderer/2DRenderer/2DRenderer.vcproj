@@ -247,31 +247,31 @@
 			Name="math"
 			>
 			<File
-				RelativePath=".\math\Math.h"
+				RelativePath=".\math\math.h"
 				>
 			</File>
 			<File
-				RelativePath=".\math\Matrix.cpp"
+				RelativePath=".\math\matrix44.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\math\Matrix.h"
+				RelativePath=".\math\matrix44.h"
 				>
 			</File>
 			<File
-				RelativePath=".\math\Quaternion.cpp"
+				RelativePath=".\math\vector3.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\math\Quaternion.h"
+				RelativePath=".\math\vector3.h"
 				>
 			</File>
 			<File
-				RelativePath=".\math\Vector3.cpp"
+				RelativePath=".\math\vector4.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\math\Vector3.h"
+				RelativePath=".\math\vector4.h"
 				>
 			</File>
 		</Filter>
