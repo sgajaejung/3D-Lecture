@@ -8,6 +8,7 @@
 class CDotProductView;
 class CDotControlDlg;
 class CCrossControlDlg;
+class CCrossProductView;
 
 class CVectorCalcDlg : public CDialogEx
 {
@@ -25,8 +26,10 @@ protected:
 // 구현입니다.
 protected:
 	HICON m_hIcon;
-	CDotProductView *m_pView;
+	CDotProductView *m_pDotView;
 	CDotControlDlg *m_pDotControl;
+
+	CCrossProductView *m_pCrossView;
 	CCrossControlDlg *m_pCrossControl;
 
 	// 생성된 메시지 맵 함수

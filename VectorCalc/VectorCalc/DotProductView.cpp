@@ -46,8 +46,8 @@ CDotProductView::CDotProductView()
 	m_matViewPort._42 = height/2;
 	m_matViewPort._43 = 0;
 
-	m_bluePen = CreatePen(PS_SOLID, 1, RGB(0,0,255));
-	m_redPen = CreatePen(PS_SOLID, 1, RGB(255,0,0));
+	m_bluePen = CreatePen(PS_SOLID, 2, RGB(0,0,255));
+	m_redPen = CreatePen(PS_SOLID, 2, RGB(255,0,0));
 }
 
 CDotProductView::~CDotProductView()

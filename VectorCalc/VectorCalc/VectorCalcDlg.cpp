@@ -6,6 +6,7 @@
 #include "DotProductView.h"
 #include "DotControlDlg.h"
 #include "CrossControlDlg.h"
+#include "CrossProductView.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -14,7 +15,7 @@
 
 CVectorCalcDlg::CVectorCalcDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CVectorCalcDlg::IDD, pParent)
-,	m_pView(NULL)
+,	m_pDotView(NULL)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -49,22 +50,26 @@ BOOL CVectorCalcDlg::OnInitDialog()
 
 	const int WIDTH = 400;
 	const int HEIGHT = 400;
-	m_pView = new CDotProductView();
-	m_pView->Create(NULL, "CDotProductView",  WS_CHILDWINDOW, CRect(10, 30, 10+WIDTH, 30+HEIGHT), &m_TabCtrl, 1000);
-	m_pView->ShowWindow(SW_SHOW);
+	m_pDotView = new CDotProductView();
+	m_pDotView->Create(NULL, "CDotProductView",  WS_CHILDWINDOW, CRect(10, 30, 10+WIDTH, 30+HEIGHT), &m_TabCtrl, 1000);
+	m_pDotView->ShowWindow(SW_SHOW);
 
-	//m_pDotControl = new CDotControlDlg(&m_TabCtrl);
-	//m_pDotControl->Create(CDotControlDlg::IDD, &m_TabCtrl);
-	//m_pDotControl->MoveWindow(420, 30, 230, 180);
-	//m_pDotControl->ShowWindow(SW_SHOW);
-	//m_pDotControl->SetDotProductView(m_pView);
+	m_pDotControl = new CDotControlDlg(&m_TabCtrl);
+	m_pDotControl->Create(CDotControlDlg::IDD, &m_TabCtrl);
+	m_pDotControl->MoveWindow(420, 30, 240, 180);
+	m_pDotControl->ShowWindow(SW_SHOW);
+	m_pDotControl->SetDotProductView(m_pDotView);
 
+
+	m_pCrossView = new CCrossProductView();
+	m_pCrossView->Create(NULL, "CCrossProductView",  WS_CHILDWINDOW, CRect(10, 30, 10+WIDTH, 30+HEIGHT), &m_TabCtrl, 1000);
+	m_pCrossView->ShowWindow(SW_HIDE);
 
 	m_pCrossControl = new CCrossControlDlg(&m_TabCtrl);
 	m_pCrossControl->Create(CCrossControlDlg::IDD, &m_TabCtrl);
-	m_pCrossControl->MoveWindow(420, 30, 230, 180);
-	m_pCrossControl->ShowWindow(SW_SHOW);
-	//m_pCrossControl->SetDotProductView(m_pView);
+	m_pCrossControl->MoveWindow(420, 30, 240, 180);
+	m_pCrossControl->ShowWindow(SW_HIDE);
+	m_pCrossControl->SetCrossProductView(m_pCrossView);
 
 	return TRUE;
 }
@@ -117,8 +122,24 @@ void CVectorCalcDlg::OnSelchangeTabCalc(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	*pResult = 0;
 
+	const int tab = m_TabCtrl.GetCurSel();
+	switch (tab)
+	{
+	case 0:
+		m_pCrossView->ShowWindow(SW_HIDE);
+		m_pCrossControl->ShowWindow(SW_HIDE);
+		m_pDotView->ShowWindow(SW_SHOW);
+		m_pDotControl->ShowWindow(SW_SHOW);
+		break;
 
-	int n = m_TabCtrl.GetCurSel();
+	case 1:
+		m_pCrossView->ShowWindow(SW_SHOW);
+		m_pCrossControl->ShowWindow(SW_SHOW);
+		m_pDotView->ShowWindow(SW_HIDE);
+		m_pDotControl->ShowWindow(SW_HIDE);
+		break;
+	}
+
 }
 
 
@@ -155,10 +176,19 @@ void CVectorCalcDlg::OnEnterIdle(UINT nWhy, CWnd* pWho)
 {
 	CDialogEx::OnEnterIdle(nWhy, pWho);
 
-	if (m_pView	)
+	const int tab = m_TabCtrl.GetCurSel();
+	switch (tab)
 	{
-		m_pView->Render();
-	}		
+	case 0:
+		if (m_pDotView )
+			m_pDotView ->Render();
+		break;
+
+	case 1:
+		if (m_pCrossView)
+			m_pCrossView->Render();
+		break;
+	}
 }
 
 
@@ -167,10 +197,16 @@ void CVectorCalcDlg::OnDestroy()
 	CDialogEx::OnDestroy();
 
 
-	m_pView->DestroyWindow();
-	delete m_pView;
+	m_pDotView->DestroyWindow();
+	delete m_pDotView;
 
 	m_pDotControl->DestroyWindow();
 	delete m_pDotControl;
+
+	m_pCrossView->DestroyWindow();
+	delete m_pCrossView;
+
+	m_pCrossControl->DestroyWindow();
+	delete m_pCrossControl;
 
 }

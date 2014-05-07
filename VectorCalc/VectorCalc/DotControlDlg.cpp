@@ -38,7 +38,6 @@ void CDotControlDlg::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CDotControlDlg, CDialogEx)
-	ON_BN_CLICKED(IDC_BUTTON_CALC, &CDotControlDlg::OnBnClickedButtonCalc)
 	ON_BN_CLICKED(IDOK, &CDotControlDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDCANCEL, &CDotControlDlg::OnBnClickedCancel)
 	ON_EN_CHANGE(IDC_EDIT1, &CDotControlDlg::OnChangeEdit)
@@ -51,23 +50,6 @@ END_MESSAGE_MAP()
 
 
 // CDotControlDlg 메시지 처리기입니다.
-
-
-void CDotControlDlg::OnBnClickedButtonCalc()
-{
-	UpdateData();
-	Vector3 v1(m_x1, m_y1, m_z1);
-	Vector3 v2(m_x2, m_y2, m_z2);
-
-	v1.Normalize();
-	v2.Normalize();
-	const float dot = v1.DotProduct(v2);
-	m_result.Format("%f", dot);
-
-	UpdateData(FALSE);
-}
-
-
 void CDotControlDlg::OnBnClickedOk()
 {
 }
@@ -85,6 +67,14 @@ void CDotControlDlg::OnChangeEdit()
 	Vector3 v1(m_x1, m_y1, m_z1);
 	Vector3 v2(m_x2, m_y2, m_z2);
 
+	v1.Normalize();
+	v2.Normalize();
+
 	if (m_pDotView)
-		m_pDotView->UpdateVector(v1.Normal(), v2.Normal());
+		m_pDotView->UpdateVector(v1, v2);
+
+	const float dot = v1.DotProduct(v2);
+	m_result.Format("%f", dot);
+
+	UpdateData(FALSE);
 }

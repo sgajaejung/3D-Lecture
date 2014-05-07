@@ -25,7 +25,6 @@ public:
 	CDotProductView *m_pDotView; // reference
 	float m_x1, m_y1, m_z1;
 	float m_x2, m_y2, m_z2;
-	afx_msg void OnBnClickedButtonCalc();
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnChangeEdit();
