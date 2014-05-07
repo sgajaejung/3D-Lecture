@@ -52,7 +52,7 @@ BOOL CDlgCalc4x4::OnInitDialog()
 	const int WIDTH = 230;
 	const int HEIGHT = 120;
 
-	const int RESULT_X = 140;
+	const int RESULT_X = 190;
 	const int RESULT_Y = 180;
 	CRect rr(RESULT_X, RESULT_Y, RESULT_X+WIDTH, RESULT_Y+HEIGHT);
 
