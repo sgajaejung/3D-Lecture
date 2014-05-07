@@ -123,10 +123,10 @@ void Matrix44::SetView( const Vector3& pos, const Vector3& dir0, const Vector3& 
 	Vector3 vUp;
 	Vector3 vCross;
 
-	vDir = dir0.Normal();
-	vCross = up0.CrossProduct( vDir );
+	vDir = dir0.Normal(); // n (zรเ)
+	vCross = up0.CrossProduct( vDir ); //v (xรเ)
 	vCross.Normalize();
-	vUp = vDir.CrossProduct( vCross );
+	vUp = vDir.CrossProduct( vCross ); //u (yรเ)
 
 	_11 = vCross.x;
 	_12 = vUp.x;
