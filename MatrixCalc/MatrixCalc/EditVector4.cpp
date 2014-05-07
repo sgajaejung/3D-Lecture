@@ -34,6 +34,8 @@ void CEditVector4::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CEditVector4, CDialogEx)
+	ON_BN_CLICKED(IDOK, &CEditVector4::OnBnClickedOk)
+	ON_BN_CLICKED(IDCANCEL, &CEditVector4::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
 
@@ -51,4 +53,14 @@ void CEditVector4::SetVector4(const Vector4 &v)
 	m_z = v.z;
 	m_w = v.w;
 	UpdateData(FALSE);
+}
+
+
+void CEditVector4::OnBnClickedOk()
+{
+}
+
+
+void CEditVector4::OnBnClickedCancel()
+{
 }

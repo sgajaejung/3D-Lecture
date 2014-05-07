@@ -26,4 +26,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	float m_x, m_y, m_z, m_w;
+	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedCancel();
 };
