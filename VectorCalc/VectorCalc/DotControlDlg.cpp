@@ -12,12 +12,11 @@
 
 CDotControlDlg::CDotControlDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CDotControlDlg::IDD, pParent)
-	, m_x1(1), m_y1(0), m_z1(1)
-	, m_x2(-1), m_y2(0), m_z2(1)
+	, m_x1("1"), m_y1("0"), m_z1("1")
+	, m_x2("-1"), m_y2("0"), m_z2("1")
 	, m_pDotView(NULL)
 	, m_result(_T("0"))
 {
-
 }
 
 CDotControlDlg::~CDotControlDlg()
@@ -64,8 +63,8 @@ void CDotControlDlg::OnBnClickedCancel()
 void CDotControlDlg::OnChangeEdit()
 {
 	UpdateData();
-	Vector3 v1(m_x1, m_y1, m_z1);
-	Vector3 v2(m_x2, m_y2, m_z2);
+	Vector3 v1((float)atof(m_x1.GetBuffer(0)), (float)atof(m_y1.GetBuffer(0)), (float)atof(m_z1.GetBuffer(0)));
+	Vector3 v2((float)atof(m_x2.GetBuffer(0)), (float)atof(m_y2.GetBuffer(0)), (float)atof(m_z2.GetBuffer(0)));
 
 	v1.Normalize();
 	v2.Normalize();
@@ -75,6 +74,5 @@ void CDotControlDlg::OnChangeEdit()
 
 	const float dot = v1.DotProduct(v2);
 	m_result.Format("%f", dot);
-
 	UpdateData(FALSE);
 }

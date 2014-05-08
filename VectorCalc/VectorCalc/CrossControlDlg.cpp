@@ -14,9 +14,9 @@ IMPLEMENT_DYNAMIC(CCrossControlDlg, CDialogEx)
 
 CCrossControlDlg::CCrossControlDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CCrossControlDlg::IDD, pParent)
-	, m_x1(-1), m_y1(0), m_z1(1)
-	, m_x2(1), m_y2(0), m_z2(1)
-	, m_x3(0), m_y3(1), m_z3(0)
+	, m_x1("-1"), m_y1("0"), m_z1("1")
+	, m_x2("1"), m_y2("0"), m_z2("1")
+	, m_x3("0"), m_y3("1"), m_z3("0")
 	,	m_pCrossView(NULL)
 {
 
@@ -67,8 +67,8 @@ void CCrossControlDlg::OnBnClickedCancel()
 void CCrossControlDlg::OnChangeEdit()
 {
 	UpdateData();
-	Vector3 v1(m_x1, m_y1, m_z1);
-	Vector3 v2(m_x2, m_y2, m_z2);
+	Vector3 v1((float)atof(m_x1.GetBuffer(0)), (float)atof(m_y1.GetBuffer(0)), (float)atof(m_z1.GetBuffer(0)));
+	Vector3 v2((float)atof(m_x2.GetBuffer(0)), (float)atof(m_y2.GetBuffer(0)), (float)atof(m_z2.GetBuffer(0)));
 	Vector3 v3 = v1.Normal().CrossProduct(v2.Normal());
 
 	v1.Normalize();
@@ -77,8 +77,8 @@ void CCrossControlDlg::OnChangeEdit()
 	if (m_pCrossView)
 		m_pCrossView->UpdateVector(v1, v2, v3);
 
-	m_x3 = v3.x;
-	m_y3 = v3.y;
-	m_z3 = v3.z;
+	m_x3.Format("%f", v3.x);
+	m_y3.Format("%f", v3.y);
+	m_z3.Format("%f", v3.z);
 	UpdateData(FALSE);
 }

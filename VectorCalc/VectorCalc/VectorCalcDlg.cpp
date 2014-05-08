@@ -45,6 +45,9 @@ BOOL CVectorCalcDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);
 	SetIcon(m_hIcon, FALSE);
 
+	::SetWindowPos(m_hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+
+
 	m_TabCtrl.InsertItem(0, "Dot Product" );
 	m_TabCtrl.InsertItem(1, "Cross Product" );
 

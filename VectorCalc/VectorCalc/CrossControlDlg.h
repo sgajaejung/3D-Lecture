@@ -25,9 +25,9 @@ protected:
 
 protected:
 	CCrossProductView *m_pCrossView;
-	float m_x1, m_y1, m_z1;
-	float m_x2, m_y2, m_z2;
-	float m_x3, m_y3, m_z3;
+	CString m_x1, m_y1, m_z1;
+	CString m_x2, m_y2, m_z2;
+	CString m_x3, m_y3, m_z3;
 public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedCancel();
