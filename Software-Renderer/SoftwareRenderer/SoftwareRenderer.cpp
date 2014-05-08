@@ -298,11 +298,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				Vector3 dir = g_cameraLookat - g_cameraPos;
 				dir.Normalize();
-				Vector3 left = Vector3(0,1,0).CrossProduct(dir);
-				left.Normalize();
-				const bool isLeft = 'A' == wParam;
-				g_cameraPos += left * (isLeft? 10.f : -10.f);
-				g_cameraLookat += left * (isLeft? 10.f : -10.f);
+				Vector3 right = Vector3(0,1,0).CrossProduct(dir);
+				right.Normalize();
+				const bool isRight = 'A' == wParam;
+				g_cameraPos += right * (isRight? 10.f : -10.f);
+				g_cameraLookat += right * (isRight? 10.f : -10.f);
 
 				Vector3 dir2 = g_cameraLookat - g_cameraPos;
 				dir2.Normalize();
