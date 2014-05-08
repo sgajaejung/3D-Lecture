@@ -131,13 +131,21 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	g_matWorld1.SetTranslate(Vector3(0,0,0));
 
+	// 응용 프로그램 초기화를 수행합니다.
+	if (!InitInstance (hInstance, nCmdShow))
+	{
+		return FALSE;
+	}
+
 	Vector3 dir = g_cameraLookat - g_cameraPos;
 	dir.Normalize();
 	g_matView.SetView(g_cameraPos, dir, Vector3(0,1,0));
 	g_matProjection.SetProjection( MATH_PI / 4.f, 1.0f, 1.0f, 100.0f );
 
-	const float width = 800.f;
-	const float height = 600.f;
+	RECT cr;
+	::GetClientRect(g_hWnd, &cr);
+	const float width = (float)(cr.right-cr.left);
+	const float height = (float)(cr.bottom - cr.top);
 	g_matViewPort._11 = width/2;
 	g_matViewPort._22 = -height/2;
 	g_matViewPort._33 = 0;
@@ -145,12 +153,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	g_matViewPort._42 = height/2;
 	g_matViewPort._43 = 0;
 
-
-	// 응용 프로그램 초기화를 수행합니다.
-	if (!InitInstance (hInstance, nCmdShow))
-	{
-		return FALSE;
-	}
 
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_MY2DRENDERER));
 
