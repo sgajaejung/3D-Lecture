@@ -24,6 +24,8 @@ vector<int> g_indices;
 Matrix44 g_matWorld1;
 Matrix44 g_matLocal1;
 Matrix44 g_matView;
+Matrix44 g_matProjection;
+Matrix44 g_matViewPort;
 Vector3 g_cameraPos(0,200,-200);
 Vector3 g_cameraLookat(0,0,0);
 
@@ -69,8 +71,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	//       |                                                       |
 	//       (-50,-50, -50)  ----------------- (+50, -50, -50)
 
-	const float w = 80.f;
-	g_vertices1.reserve(128);
+	const float w = 30.f;
+	g_vertices1.reserve(16);
 	g_vertices1.push_back( Vector3(-w,w,w) );
 	g_vertices1.push_back( Vector3(w,w,w) );
 	g_vertices1.push_back( Vector3(w,w,-w) );
@@ -127,11 +129,21 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	g_indices.push_back(5);
 
 
-	g_matWorld1.SetTranslate(Vector3(400,300,0));
+	g_matWorld1.SetTranslate(Vector3(0,0,0));
 
 	Vector3 dir = g_cameraLookat - g_cameraPos;
 	dir.Normalize();
 	g_matView.SetView(g_cameraPos, dir, Vector3(0,1,0));
+	g_matProjection.SetProjection( MATH_PI / 4.f, 1.0f, 1.0f, 100.0f );
+
+	const float width = 800.f;
+	const float height = 600.f;
+	g_matViewPort._11 = width/2;
+	g_matViewPort._22 = -height/2;
+	g_matViewPort._33 = 0;
+	g_matViewPort._41 = width/2;
+	g_matViewPort._42 = height/2;
+	g_matViewPort._43 = 0;
 
 
 	// 응용 프로그램 초기화를 수행합니다.
@@ -335,7 +347,7 @@ void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<int> &
 		Rasterizer::DrawLine(hdc, color, p1.x, p1.y,color, p2.x, p2.y);
 		Rasterizer::DrawLine(hdc, color, p1.x, p1.y,color, p3.x, p3.y);
 		Rasterizer::DrawLine(hdc, color, p3.x, p3.y,color, p2.x, p2.y);
-		//Rasterizer::DrawTriangle(hdc, color, p1.x, p1.y, color, p2.x, p2.y, color, p3.x, p3.y);
+//		Rasterizer::DrawTriangle(hdc, color, p1.x, p1.y, color, p2.x, p2.y, color, p3.x, p3.y);
 	}
 }
 

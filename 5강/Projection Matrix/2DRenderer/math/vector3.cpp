@@ -86,14 +86,14 @@ Vector3& Vector3::operator /= ( const Vector3& rhs )
 
 Vector3 Vector3::operator * ( const Matrix44& rhs ) const
 {
-	float	RHW = 1.0f / (x * rhs._14 + y * rhs._24 + z * rhs._34 + rhs._44);
+	float	RHW = 1.0f / (x*rhs._14 + y*rhs._24 + z*rhs._34 + rhs._44);
 	if (RHW >= FLT_MAX)
 		return Vector3(0,0,0);
 
 	Vector3 v;
-	v.x = (x * rhs._11 + y * rhs._21 + z * rhs._31 + rhs._41 ) * RHW;
-	v.y = (x * rhs._12 + y * rhs._22 + z * rhs._32 + rhs._42 ) * RHW;
-	v.z = (x * rhs._13 + y * rhs._23 + z * rhs._33 + rhs._43 ) * RHW;
+	v.x = (x*rhs._11 + y*rhs._21 + z*rhs._31 + rhs._41 ) * RHW;
+	v.y = (x*rhs._12 + y*rhs._22 + z*rhs._32 + rhs._42 ) * RHW;
+	v.z = (x*rhs._13 + y*rhs._23 + z*rhs._33 + rhs._43 ) * RHW;
 	return v;
 }
 
