@@ -446,6 +446,9 @@ void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<Vector
 	Vector3 camDir = g_cameraLookat - g_cameraPos;
 	camDir.Normalize();
 
+	Matrix44 dirTm = tm;	
+	dirTm._41 = dirTm._42 = dirTm._43 = 0.f;
+
 	for (unsigned int i=0; i < indices.size(); i+=3)
 	{
 		Vector3 p1 = vertices[ indices[ i]];
@@ -457,13 +460,7 @@ void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<Vector
 		p3 = p3 * tm;
 
 		// culling
-		Vector3 n = normals[ indices[ i]];
-		//n = n * tm;
-
-		Matrix44 tm2 = tm;
-		tm2._41 = tm2._42 = tm2._43 = 0.f;
-		n = n * tm2;
-		n.Normalize();
+		Vector3 n = normals[ indices[ i]] * dirTm;
 
 		const float dot = n.DotProduct(camDir);
 		if (dot > 0.f)
@@ -473,7 +470,6 @@ void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<Vector
 		p2 = p2 * vpv;
 		p3 = p3 * vpv;
 
-		//Vector3 n = v3;
 		Rasterizer::Color color(0,255,0,1);
 		Rasterizer::DrawTriangle(hdc, color, p1.x, p1.y, n, color, p2.x, p2.y, n, color, p3.x, p3.y, n);
 	}

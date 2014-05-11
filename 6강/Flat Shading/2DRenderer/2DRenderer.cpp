@@ -144,8 +144,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	RECT cr;
 	::GetClientRect(g_hWnd, &cr);
-	const float width = (float)(cr.right-cr.left);
-	const float height = (float)(cr.bottom - cr.top);
+	const float width = 800;//(float)(cr.right-cr.left);
+	const float height = 600;//(float)(cr.bottom - cr.top);
 	g_matViewPort._11 = width/2;
 	g_matViewPort._22 = -height/2;
 	g_matViewPort._33 = 0;
@@ -213,7 +213,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
    g_hWnd = hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
+      0, 0, 800, 600, NULL, NULL, hInstance, NULL);
 
    if (!hWnd)
    {
@@ -258,6 +258,45 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		Paint(hWnd, hdc);
 		EndPaint(hWnd, &ps);
 		break;
+
+	case WM_KEYDOWN:
+		{
+			switch (wParam)
+			{
+			case VK_UP:
+			case VK_DOWN:
+				{
+					Matrix44 mat;
+					mat.SetRotationX((wParam==VK_UP)? 0.1f : -0.1f);
+					g_matLocal1 *= mat;
+				}
+				break;
+
+			case VK_LEFT:
+			case VK_RIGHT:
+				{
+					Matrix44 mat;
+					mat.SetRotationY((wParam==VK_LEFT)? 0.1f : -0.1f);
+					g_matLocal1 *= mat;
+				}
+				break;
+
+			case 'E':
+			case 'C':
+				{
+					Matrix44 mat;
+					mat.SetRotationY((wParam=='E')? 0.1f : -0.1f);
+					g_cameraPos = g_cameraPos * mat;
+
+					Vector3 dir2 = g_cameraLookat - g_cameraPos;
+					dir2.Normalize();
+					g_matView.SetView(g_cameraPos, dir2, Vector3(0,1,0));
+				}
+				break;
+			}
+		}
+		break;
+
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
@@ -294,9 +333,9 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
  */
 void	MainLoop(int elapse_time)
 {
-	Matrix44 mat;
-	mat.SetRotationY(elapse_time/500.f);
-	g_matLocal1 *= mat;
+//	Matrix44 mat;
+//	mat.SetRotationY(elapse_time/1000.f);
+//	g_matLocal1 *= mat;
 
 	// Render
 	Render(g_hWnd);
@@ -329,9 +368,11 @@ void RenderVertices(HDC hdc, const vector<Vector3> &vertices, const Matrix44 &tm
 }
 
 
-void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<int> &indices, const Matrix44 &tm)
+void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<int> &indices, const Matrix44 &tm,
+				   const Matrix44 &vpv)
 {
-	Vector3 camDir(0,0,1);
+	Vector3 camDir = g_cameraLookat - g_cameraPos;
+	camDir.Normalize();
 
 	for (unsigned int i=0; i < indices.size(); i+=3)
 	{
@@ -344,12 +385,29 @@ void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<int> &
 		p3 = p3 * tm;
 
 		// culling
+		Vector3 v1 = p2 - p1;
+		Vector3 v2 = p3 - p1;
+		v1.Normalize();
+		v2.Normalize();
+		Vector3 n = v1.CrossProduct(v2);
+		n.Normalize();
+
+		const float dot = n.DotProduct(camDir);
+		if (dot > 0.f)
+			continue;
+
+		p1 = p1 * vpv;
+		p2 = p2 * vpv;
+		p3 = p3 * vpv;
 
 		Rasterizer::Color color(255,0,0,1);
-		Rasterizer::DrawLine(hdc, color, p1.x, p1.y,color, p2.x, p2.y);
-		Rasterizer::DrawLine(hdc, color, p1.x, p1.y,color, p3.x, p3.y);
-		Rasterizer::DrawLine(hdc, color, p3.x, p3.y,color, p2.x, p2.y);
-//		Rasterizer::DrawTriangle(hdc, color, p1.x, p1.y, color, p2.x, p2.y, color, p3.x, p3.y);
+//		Rasterizer::DrawLine(hdc, color, p1.x, p1.y,color, p2.x, p2.y);
+//		Rasterizer::DrawLine(hdc, color, p1.x, p1.y,color, p3.x, p3.y);
+//		Rasterizer::DrawLine(hdc, color, p3.x, p3.y,color, p2.x, p2.y);
+		Rasterizer::DrawTriangle(hdc, 
+			color, p1.x, p1.y, n, 
+			color, p2.x, p2.y, n,
+			color, p3.x, p3.y, n);
 	}
 }
 
@@ -368,7 +426,8 @@ void Paint(HWND hWnd, HDC hdc)
 	FillRect(hdcMem, &rc, hbrBkGnd);
 	DeleteObject(hbrBkGnd);
 
-	RenderIndices(hdcMem, g_vertices1, g_indices, g_matLocal1 * g_matWorld1 * g_matView);
+	Matrix44 vpv = g_matView * g_matProjection * g_matViewPort;
+	RenderIndices(hdcMem, g_vertices1, g_indices, g_matLocal1 * g_matWorld1, vpv);
 
 	BitBlt(hdc, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top, hdcMem, 0, 0, SRCCOPY);
 	SelectObject(hdcMem, hbmOld);

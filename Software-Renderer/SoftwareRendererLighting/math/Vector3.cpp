@@ -363,7 +363,7 @@ Vector3 Vector3::Interpolate( Vector3& v, float f ) const
 //-------------------------------
 //
 //-------------------------------
-Vector3 Vector3::operator * ( const Matrix44 &m )
+Vector3 Vector3::operator * ( const Matrix44 &m ) const
 {
 	float	fRHW = 1.0F / (x * m._14 + y * m._24 + z * m._34 + m._44);
 	if (fRHW >= FLT_MAX)
