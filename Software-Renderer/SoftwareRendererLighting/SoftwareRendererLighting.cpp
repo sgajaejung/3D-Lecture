@@ -3,6 +3,8 @@
 #include "SoftwareRendererLighting.h"
 #include "math/Math.h"
 #include <vector>
+#include <string>
+#include <fstream>
 #include "DrawTriangle.h"
 
 
@@ -24,7 +26,7 @@ Matrix44 g_matProjection;
 Matrix44 g_matView;
 Matrix44 g_matViewPort;
 bool g_WireFrame = false;
-Vector3 g_cameraPos(0,200,-200);
+Vector3 g_cameraPos(0,1000,-1000);
 Vector3 g_cameraLookat(0,0,0);
 
 ATOM				MyRegisterClass(HINSTANCE hInstance);
@@ -34,7 +36,7 @@ void					MainLoop(int elapse_time);
 void					Render(HWND hWnd);
 void					Paint(HWND hWnd, HDC hdc);
 void					ComputeNormals(const vector<Vector3> &vertices, const vector<int> &indices, vector<Vector3> &normals);
-
+bool					ReadModelFile( const string &fileName );
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR  lpCmdLine, int nCmdShow)
 {
@@ -71,7 +73,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR  lpC
 	//       |                         +                           |
 	//       |                                                       |
 	//       (-50,-50, -50)  ----------------- (+50, -50, -50)
-
+/*
 	const float w = 30.f;
 	vector<Vector3> vertices;
 	vertices.reserve(8);
@@ -121,9 +123,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR  lpC
 	g_vertices.push_back( vertices[ 4] );
 	g_vertices.push_back( vertices[ 7] );
 
-	g_normals.resize(g_vertices.size());
-
-
 	g_indices.reserve(128);
 	for (int i=0; i < 6; ++i)
 	{
@@ -134,9 +133,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR  lpC
 		g_indices.push_back(1 + (i*4));
 		g_indices.push_back(2 + (i*4));
 	}
+/**/
 
-	ComputeNormals(g_vertices, g_indices, g_normals);
+	ReadModelFile("sphere.dat");
 
+	if (!g_vertices.empty())
+	{
+		g_normals.resize(g_vertices.size());
+		ComputeNormals(g_vertices, g_indices, g_normals);
+	}
 	 
 	g_matWorld.SetIdentity();
 	g_matWorld.Translate(Vector3(0,0,0));
@@ -370,6 +375,54 @@ void	Render(HWND hWnd)
 	::ReleaseDC(hWnd, hdc);
 }
 
+
+bool ReadModelFile( const string &fileName )
+{
+	using namespace std;
+	ifstream fin(fileName);
+	if (!fin.is_open())
+		return false;
+
+	string vtx, vtx_eq;
+	int numVertices;
+	fin >> vtx >> vtx_eq >> numVertices;
+
+	if (numVertices <= 0)
+		return  false;
+
+	g_vertices.resize(numVertices);
+
+	float num1, num2, num3;
+	for (int i = 0; i < numVertices; i++)
+	{
+		fin >> num1 >> num2 >> num3;
+		g_vertices[i] = Vector3(num1, num2, num3);
+		//m_normals[ i] = Vertex( 0, 0, 0 );
+	}
+
+	string idx, idx_eq;
+	int numIndices;
+	fin >> idx >> idx_eq >> numIndices;
+
+	if (numIndices <= 0)
+		return false;
+
+	g_indices.resize(numIndices*3);
+
+	int num4, num5, num6;
+	for (int i = 0; i < numIndices*3; i+=3)
+	{
+		fin >> num4 >> num5 >> num6;
+		g_indices[ i] = num4;
+		g_indices[ i+1] = num5;
+		g_indices[ i+2] = num6;	
+	}
+
+	return true;
+}
+
+
+
 /**
  @brief 
  @date 2014-04-07
@@ -460,7 +513,14 @@ void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<Vector
 		p3 = p3 * tm;
 
 		// culling
-		Vector3 n = normals[ indices[ i]] * dirTm;
+		Vector3 v1 = p2 - p1;
+		Vector3 v2 = p3 - p1;
+		v1.Normalize();
+		v2.Normalize();
+		Vector3 n = v1.CrossProduct(v2);
+		n.Normalize();
+		//Vector3 n = normals[ indices[ i]] * tm;
+		//n.Normalize();
 
 		const float dot = n.DotProduct(camDir);
 		if (dot > 0.f)
@@ -493,9 +553,15 @@ void RenderWire(HDC hdc, const vector<Vector3> &vertices, const vector<Vector3> 
 		p3 = p3 * tm;
 
 		// culling
-		Vector3 n = normals[ indices[ i]];
-		n = n * tm;
+		Vector3 v1 = p2 - p1;
+		Vector3 v2 = p3 - p1;
+		v1.Normalize();
+		v2.Normalize();
+		Vector3 n = v1.CrossProduct(v2);
 		n.Normalize();
+		//Vector3 n = normals[ indices[ i]];
+		//n = n * tm;
+		//n.Normalize();
 
 		const float dot = n.DotProduct(camDir);
 		if (dot > 0.1f)

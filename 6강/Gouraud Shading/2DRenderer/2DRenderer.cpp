@@ -6,6 +6,8 @@
 #include "math/Math.h"
 #include "DrawTriangle.h"
 #include <vector>
+#include <fstream>
+#include <string>
 #include <algorithm>
 
 using namespace std;
@@ -38,6 +40,7 @@ INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 void					MainLoop(int elapse_time);
 void					Render(HWND hWnd);
 void					Paint(HWND hWnd, HDC hdc);
+bool					ReadModelFile( const string &fileName );
 
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
@@ -57,76 +60,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	LoadString(hInstance, IDC_MY2DRENDERER, szWindowClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
 
-	// vertices1
-	//       (-50,+50, +50)  ----------------- (+50, +50, +50)
-	//       |                                                       |
-	//       |                         +                           |
-	//       |                                                       |
-	//       (-50,+50, -50)  ----------------- (+50, +50, -50)
-	//
-	//       (-50,-50, +50)  ----------------- (+50, -50, +50)
-	//       |                                                       |
-	//       |                         +                           |
-	//       |                                                       |
-	//       (-50,-50, -50)  ----------------- (+50, -50, -50)
-
-	const float w = 30.f;
-	g_vertices.reserve(16);
-	g_vertices.push_back( Vector3(-w,w,w) );
-	g_vertices.push_back( Vector3(w,w,w) );
-	g_vertices.push_back( Vector3(w,w,-w) );
-	g_vertices.push_back( Vector3(-w,w,-w) );
-
-	g_vertices.push_back( Vector3(-w,-w,w) );
-	g_vertices.push_back( Vector3(w,-w,w) );
-	g_vertices.push_back( Vector3(w,-w,-w) );
-	g_vertices.push_back( Vector3(-w,-w,-w) );
-
-
-	g_indices.reserve(128);
-	// top
-	g_indices.push_back(0);
-	g_indices.push_back(2);
-	g_indices.push_back(3);
-	g_indices.push_back(0);
-	g_indices.push_back(1);
-	g_indices.push_back(2);
-	// front
-	g_indices.push_back(3);
-	g_indices.push_back(2);
-	g_indices.push_back(7);
-	g_indices.push_back(2);
-	g_indices.push_back(6);
-	g_indices.push_back(7);
-	// back
-	g_indices.push_back(1);
-	g_indices.push_back(4);
-	g_indices.push_back(5);
-	g_indices.push_back(1);
-	g_indices.push_back(0);
-	g_indices.push_back(4);
-	// left
-	g_indices.push_back(3);
-	g_indices.push_back(4);
-	g_indices.push_back(0);
-	g_indices.push_back(7);
-	g_indices.push_back(4);
-	g_indices.push_back(3);
-	// right
-	g_indices.push_back(2);
-	g_indices.push_back(5);
-	g_indices.push_back(6);
-	g_indices.push_back(2);
-	g_indices.push_back(1);
-	g_indices.push_back(5);
-	// bottom
-	g_indices.push_back(4);
-	g_indices.push_back(7);
-	g_indices.push_back(6);
-	g_indices.push_back(4);
-	g_indices.push_back(6);
-	g_indices.push_back(5);
-
+	ReadModelFile("sphere.dat");
 
 	g_matWorld.SetTranslate(Vector3(0,0,0));
 
@@ -307,6 +241,21 @@ void	Render(HWND hWnd)
 	HDC hdc = GetDC(hWnd);
 	Paint(hWnd, hdc);
 	::ReleaseDC(hWnd, hdc);
+}
+
+
+bool ReadModelFile( const string &fileName )
+{
+	using namespace std;
+	ifstream fin(fileName.c_str());
+
+	string vtx, vtx_eq;
+	int numVertices;
+
+	fin >> vtx >> vtx_eq >> numVertices;
+
+
+	return true;
 }
 
 
