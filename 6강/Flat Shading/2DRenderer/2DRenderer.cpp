@@ -258,45 +258,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		Paint(hWnd, hdc);
 		EndPaint(hWnd, &ps);
 		break;
-
-	case WM_KEYDOWN:
-		{
-			switch (wParam)
-			{
-			case VK_UP:
-			case VK_DOWN:
-				{
-					Matrix44 mat;
-					mat.SetRotationX((wParam==VK_UP)? 0.1f : -0.1f);
-					g_matLocal1 *= mat;
-				}
-				break;
-
-			case VK_LEFT:
-			case VK_RIGHT:
-				{
-					Matrix44 mat;
-					mat.SetRotationY((wParam==VK_LEFT)? 0.1f : -0.1f);
-					g_matLocal1 *= mat;
-				}
-				break;
-
-			case 'E':
-			case 'C':
-				{
-					Matrix44 mat;
-					mat.SetRotationY((wParam=='E')? 0.1f : -0.1f);
-					g_cameraPos = g_cameraPos * mat;
-
-					Vector3 dir2 = g_cameraLookat - g_cameraPos;
-					dir2.Normalize();
-					g_matView.SetView(g_cameraPos, dir2, Vector3(0,1,0));
-				}
-				break;
-			}
-		}
-		break;
-
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
@@ -333,10 +294,6 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
  */
 void	MainLoop(int elapse_time)
 {
-//	Matrix44 mat;
-//	mat.SetRotationY(elapse_time/1000.f);
-//	g_matLocal1 *= mat;
-
 	// Render
 	Render(g_hWnd);
 	::InvalidateRect(g_hWnd, NULL, TRUE);
@@ -401,9 +358,6 @@ void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<int> &
 		p3 = p3 * vpv;
 
 		Rasterizer::Color color(255,0,0,1);
-//		Rasterizer::DrawLine(hdc, color, p1.x, p1.y,color, p2.x, p2.y);
-//		Rasterizer::DrawLine(hdc, color, p1.x, p1.y,color, p3.x, p3.y);
-//		Rasterizer::DrawLine(hdc, color, p3.x, p3.y,color, p2.x, p2.y);
 		Rasterizer::DrawTriangle(hdc, 
 			color, p1.x, p1.y, n, 
 			color, p2.x, p2.y, n,

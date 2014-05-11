@@ -213,13 +213,10 @@ void Rasterizer::DrawSpan(HDC hdc, const Span &span, int y)
 
 	// draw each pixel in the span
 	for (int x = span.X1; x < span.X2; x++) {
-		//SetPixel(x, y, span.Color1 + (colordiff * factor));
-		Color c = span.Color1 + (colordiff * factor);
-		Vector3 c0(c.R, c.G, c.B);
-		c0 = c0 * max(0, span.N1.DotProduct(-g_LightDir));
 
-		//COLORREF color = RGB(c.R, c.G, c.B);
-		COLORREF color = RGB((int)c0.x, (int)c0.y, (int)c0.z);
+		Color c = span.Color1 + (colordiff * factor);
+		COLORREF color = RGB(c.R, c.G, c.B);
+
 		SetPixel(hdc, x, y, color);
 		factor += factorStep;
 	}
