@@ -3,6 +3,11 @@
 #include "math.h"
 
 
+bool Vector3::IsEmpty() const
+{
+	return (x==0) && (y==0) && (z==0);
+}
+
 float Vector3::Length() const
 {
 	return sqrt(x*x + y*y + z*z);

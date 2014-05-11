@@ -21,13 +21,14 @@ HWND g_hWnd;
 TCHAR szTitle[MAX_LOADSTRING];					// 제목 표시줄 텍스트입니다.
 TCHAR szWindowClass[MAX_LOADSTRING];			// 기본 창 클래스 이름입니다.
 vector<Vector3> g_vertices;
+vector<Vector3> g_normals;
 vector<int> g_indices;
 Matrix44 g_matWorld;
 Matrix44 g_matLocal;
 Matrix44 g_matView;
 Matrix44 g_matProjection;
 Matrix44 g_matViewPort;
-Vector3 g_cameraPos(0,200,-200);
+Vector3 g_cameraPos(0,1000,-1000);
 Vector3 g_cameraLookat(0,0,0);
 
 
@@ -40,6 +41,7 @@ INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 void					MainLoop(int elapse_time);
 void					Render(HWND hWnd);
 void					Paint(HWND hWnd, HDC hdc);
+void					ComputeNormals(const vector<Vector3> &vertices, const vector<int> &indices, vector<Vector3> &normals);
 bool					ReadModelFile( const string &fileName );
 
 
@@ -244,16 +246,76 @@ void	Render(HWND hWnd)
 }
 
 
+/**
+ @brief 
+ @date 2014-04-07
+*/
+void ComputeNormals(const vector<Vector3> &vertices, const vector<int> &indices, vector<Vector3> &normals)
+{
+	g_normals.resize(vertices.size());
+
+	for (unsigned int i=0; i < indices.size(); i+=3)
+	{
+		Vector3 p1 = vertices[ indices[ i]];
+		Vector3 p2 = vertices[ indices[ i+1]];
+		Vector3 p3 = vertices[ indices[ i+2]];
+
+		Vector3 v1 = p2 - p1;
+		Vector3 v2 = p3 - p1;
+		v1.Normalize();
+		v2.Normalize();
+		Vector3 n = v1.CrossProduct(v2);
+		n.Normalize();
+
+		g_normals[ indices[ i]] = n;
+		g_normals[ indices[ i+1]] = n;
+		g_normals[ indices[ i+2]] = n;
+	}
+}
+
+
 bool ReadModelFile( const string &fileName )
 {
 	using namespace std;
 	ifstream fin(fileName.c_str());
+	if (!fin.is_open())
+		return false;
 
 	string vtx, vtx_eq;
 	int numVertices;
-
 	fin >> vtx >> vtx_eq >> numVertices;
 
+	if (numVertices <= 0)
+		return  false;
+
+	g_vertices.resize(numVertices);
+
+	float num1, num2, num3;
+	for (int i = 0; i < numVertices; i++)
+	{
+		fin >> num1 >> num2 >> num3;
+		g_vertices[i] = Vector3(num1, num2, num3);
+	}
+
+	string idx, idx_eq;
+	int numIndices;
+	fin >> idx >> idx_eq >> numIndices;
+
+	if (numIndices <= 0)
+		return false;
+
+	g_indices.resize(numIndices*3);
+
+	int num4, num5, num6;
+	for (int i = 0; i < numIndices*3; i+=3)
+	{
+		fin >> num4 >> num5 >> num6;
+		g_indices[ i] = num4;
+		g_indices[ i+1] = num5;
+		g_indices[ i+2] = num6;	
+	}
+
+	ComputeNormals(g_vertices, g_indices, g_normals);
 
 	return true;
 }
@@ -273,8 +335,8 @@ void RenderVertices(HDC hdc, const vector<Vector3> &vertices, const Matrix44 &tm
 }
 
 
-void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<int> &indices, const Matrix44 &tm,
-				   const Matrix44 &vpv)
+void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<int> &indices, 
+				   const vector<Vector3> &normals, const Matrix44 &tm, const Matrix44 &vpv)
 {
 	Vector3 camDir = g_cameraLookat - g_cameraPos;
 	camDir.Normalize();
@@ -290,24 +352,24 @@ void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<int> &
 		p3 = p3 * tm;
 
 		// culling
-		Vector3 v1 = p2 - p1;
-		Vector3 v2 = p3 - p1;
-		v1.Normalize();
-		v2.Normalize();
-		Vector3 n = v1.CrossProduct(v2);
-		n.Normalize();
-
+		Vector3 n = normals[  indices[ i]] * tm;
 		const float dot = n.DotProduct(camDir);
-		if (dot > 0.f)
+		if (dot > 0)
 			continue;
 
 		p1 = p1 * vpv;
 		p2 = p2 * vpv;
 		p3 = p3 * vpv;
 
-		Rasterizer::Color color(255,0,0,1);
+		Rasterizer::Color c0(0,255,0,1);
+		Vector3 lightDir(0,-1,0);
+		Rasterizer::Color color = c0 * max(0, n.DotProduct(-lightDir));
+
+//		Rasterizer::DrawLine(hdc, color, p1.x, p1.y, color, p2.x, p2.y);
+//		Rasterizer::DrawLine(hdc, color, p1.x, p1.y, color, p3.x, p3.y);
+//		Rasterizer::DrawLine(hdc, color, p3.x, p3.y, color, p2.x, p2.y);
 		Rasterizer::DrawTriangle(hdc, 
-			color, p1.x, p1.y, n, 
+			color, p1.x, p1.y, n,
 			color, p2.x, p2.y, n,
 			color, p3.x, p3.y, n);
 	}
@@ -329,7 +391,7 @@ void Paint(HWND hWnd, HDC hdc)
 	DeleteObject(hbrBkGnd);
 
 	Matrix44 vpv = g_matView * g_matProjection * g_matViewPort;
-	RenderIndices(hdcMem, g_vertices, g_indices, g_matLocal * g_matWorld, vpv);
+	RenderIndices(hdcMem, g_vertices, g_indices, g_normals, g_matLocal * g_matWorld, vpv);
 
 	BitBlt(hdc, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top, hdcMem, 0, 0, SRCCOPY);
 	SelectObject(hdcMem, hbmOld);

@@ -9,6 +9,7 @@ struct Vector3
 	Vector3() : x(0), y(0), z(0) {}
 	Vector3(float x0, float y0, float z0) : x(x0), y(y0), z(z0) {}
 
+	bool IsEmpty() const;
 	float Length() const;
 	Vector3 Normal() const;
 	void Normalize();

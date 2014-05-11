@@ -135,14 +135,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR  lpC
 	}
 /**/
 
-	ReadModelFile("sphere.dat");
+	ReadModelFile("vase.dat");
 
-	if (!g_vertices.empty())
-	{
-		g_normals.resize(g_vertices.size());
-		ComputeNormals(g_vertices, g_indices, g_normals);
-	}
-	 
 	g_matWorld.SetIdentity();
 	g_matWorld.Translate(Vector3(0,0,0));
 	g_matLocal.SetIdentity();
@@ -361,7 +355,6 @@ void	MainLoop(int elapse_time)
 {
 	// Render
 	Render(g_hWnd);
-	//::InvalidateRect(g_hWnd, NULL, TRUE);
 }
 
 
@@ -397,7 +390,6 @@ bool ReadModelFile( const string &fileName )
 	{
 		fin >> num1 >> num2 >> num3;
 		g_vertices[i] = Vector3(num1, num2, num3);
-		//m_normals[ i] = Vertex( 0, 0, 0 );
 	}
 
 	string idx, idx_eq;
@@ -418,6 +410,8 @@ bool ReadModelFile( const string &fileName )
 		g_indices[ i+2] = num6;	
 	}
 
+	ComputeNormals(g_vertices, g_indices, g_normals);
+
 	return true;
 }
 
@@ -429,6 +423,8 @@ bool ReadModelFile( const string &fileName )
 */
 void ComputeNormals(const vector<Vector3> &vertices, const vector<int> &indices, vector<Vector3> &normals)
 {
+	g_normals.resize(vertices.size());
+
 	for (unsigned int i=0; i < indices.size(); i+=3)
 	{
 		Vector3 p1 = vertices[ indices[ i]];
@@ -442,9 +438,39 @@ void ComputeNormals(const vector<Vector3> &vertices, const vector<int> &indices,
 		Vector3 n = v1.CrossProduct(v2);
 		n.Normalize();
 
-		normals[ indices[ i]] = n;
-		normals[ indices[ i+1]] = n;
-		normals[ indices[ i+2]] = n;
+		if (Vector3(0,0,0) == g_normals[ indices[ i]])
+		{
+			 g_normals[ indices[ i]] = n;
+		}
+		else
+		{
+			 g_normals[ indices[ i]] += n;
+			 g_normals[ indices[ i]] /= 2.f;
+		}
+
+		if (Vector3(0,0,0) == g_normals[ indices[ i+1]])
+		{
+			g_normals[ indices[ i+1]] = n;
+		}
+		else
+		{
+			g_normals[ indices[ i+1]] += n;
+			g_normals[ indices[ i+1]] /= 2.f;
+		}
+
+		if (Vector3(0,0,0) == g_normals[ indices[ i+2]])
+		{
+			g_normals[ indices[ i+2]] = n;
+		}
+		else
+		{
+			g_normals[ indices[ i+2]] += n;
+			g_normals[ indices[ i+2]] /= 2.f;
+		}
+
+		//normals[ i] = n;
+		//normals[ i+1] = n;
+		//normals[ i+2] = n;
 	}
 }
 
@@ -496,9 +522,78 @@ void RenderVertices(HDC hdc, const vector<Vector3> &vertices, const Matrix44 &tm
 void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<Vector3> &normals, 
 	const vector<int> &indices, const Matrix44 &tm, const Matrix44 &vpv)
 {
+	Vector3 lightDir(0,-1,0);
+
 	Vector3 camDir = g_cameraLookat - g_cameraPos;
 	camDir.Normalize();
 
+	Matrix44 dirTm = tm;	
+	dirTm._41 = dirTm._42 = dirTm._43 = 0.f;
+
+	Vector3 H = -camDir - lightDir;
+	H.Normalize();
+
+	for (unsigned int i=0; i < indices.size(); i+=3)
+	{
+		Vector3 p1 = vertices[ indices[ i]];
+		Vector3 p2 = vertices[ indices[ i+1]];
+		Vector3 p3 = vertices[ indices[ i+2]];
+
+		p1 = p1 * tm;
+		p2 = p2 * tm;
+		p3 = p3 * tm;
+
+		// culling
+		//Vector3 v1 = p2 - p1;
+		//Vector3 v2 = p3 - p1;
+		//v1.Normalize();
+		//v2.Normalize();
+		//Vector3 n = v1.CrossProduct(v2);
+		//n.Normalize();
+		Vector3 n1 = normals[  indices[ i]] * dirTm;
+		Vector3 n2 = normals[  indices[ i+1]] * dirTm;
+		Vector3 n3 = normals[  indices[ i+2]] * dirTm;
+		//n.Normalize();
+
+		const float dot1 = n1.DotProduct(camDir);
+		const float dot2 = n2.DotProduct(camDir);
+		const float dot3 = n3.DotProduct(camDir);
+		if ((dot1 > 0.f) && (dot2 > 0.f) && (dot3 > 0.f))
+			continue;
+
+		p1 = p1 * vpv;
+		p2 = p2 * vpv;
+		p3 = p3 * vpv;
+
+		Rasterizer::Color c0(0,255,0,1);
+		Rasterizer::Color c1 = c0 * max(0, n1.DotProduct(-lightDir));
+		Rasterizer::Color c2 = c0 * max(0, n2.DotProduct(-lightDir));
+		Rasterizer::Color c3 = c0 * max(0, n3.DotProduct(-lightDir));
+
+		const float s1 = max(0, n1.DotProduct(H));
+		const float s2 = max(0, n2.DotProduct(H));
+		const float s3 = max(0, n3.DotProduct(H));
+		c1 = c1 + c0 * pow(s1, 32);
+		c2 = c2 + c0 * pow(s2, 32);
+		c3 = c3 + c0 * pow(s3, 32);
+
+		c1 = c1 + Rasterizer::Color(0,10,0,1);
+		c2 = c2 + Rasterizer::Color(0,10,0,1);
+		c3 = c3 + Rasterizer::Color(0,0,0,1);
+
+		Rasterizer::DrawTriangle(hdc, 
+			c1, p1.x, p1.y, n1, 
+			c2, p2.x, p2.y, n2, 
+			c3, p3.x, p3.y, n3);
+	}
+}
+
+
+void RenderWire(HDC hdc, const vector<Vector3> &vertices, const vector<Vector3> &normals, const vector<int> &indices, 
+	const Matrix44 &tm, const Matrix44 &vpv)
+{
+	Vector3 camDir = g_cameraLookat - g_cameraPos;
+	camDir.Normalize();
 	Matrix44 dirTm = tm;	
 	dirTm._41 = dirTm._42 = dirTm._43 = 0.f;
 
@@ -513,55 +608,14 @@ void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<Vector
 		p3 = p3 * tm;
 
 		// culling
-		Vector3 v1 = p2 - p1;
-		Vector3 v2 = p3 - p1;
-		v1.Normalize();
-		v2.Normalize();
-		Vector3 n = v1.CrossProduct(v2);
-		n.Normalize();
-		//Vector3 n = normals[ indices[ i]] * tm;
+		//Vector3 v1 = p2 - p1;
+		//Vector3 v2 = p3 - p1;
+		//v1.Normalize();
+		//v2.Normalize();
+		//Vector3 n = v1.CrossProduct(v2);
 		//n.Normalize();
-
-		const float dot = n.DotProduct(camDir);
-		if (dot > 0.f)
-			continue;
-
-		p1 = p1 * vpv;
-		p2 = p2 * vpv;
-		p3 = p3 * vpv;
-
-		Rasterizer::Color color(0,255,0,1);
-		Rasterizer::DrawTriangle(hdc, color, p1.x, p1.y, n, color, p2.x, p2.y, n, color, p3.x, p3.y, n);
-	}
-}
-
-
-void RenderWire(HDC hdc, const vector<Vector3> &vertices, const vector<Vector3> &normals, const vector<int> &indices, 
-	const Matrix44 &tm, const Matrix44 &vpv)
-{
-	Vector3 camDir = g_cameraLookat - g_cameraPos;
-	camDir.Normalize();
-
-	for (unsigned int i=0; i < indices.size(); i+=3)
-	{
-		Vector3 p1 = vertices[ indices[ i]];
-		Vector3 p2 = vertices[ indices[ i+1]];
-		Vector3 p3 = vertices[ indices[ i+2]];
-
-		p1 = p1 * tm;
-		p2 = p2 * tm;
-		p3 = p3 * tm;
-
-		// culling
-		Vector3 v1 = p2 - p1;
-		Vector3 v2 = p3 - p1;
-		v1.Normalize();
-		v2.Normalize();
-		Vector3 n = v1.CrossProduct(v2);
-		n.Normalize();
-		//Vector3 n = normals[ indices[ i]];
-		//n = n * tm;
-		//n.Normalize();
+		Vector3 n = normals[  indices[ i]];
+		n = n * dirTm;
 
 		const float dot = n.DotProduct(camDir);
 		if (dot > 0.1f)
@@ -572,9 +626,9 @@ void RenderWire(HDC hdc, const vector<Vector3> &vertices, const vector<Vector3> 
 		p3 = p3 * vpv;
 
 		Rasterizer::Color color(0,0,0,1);
-		Rasterizer::DrawLine(hdc, color, p1.x, p1.y,color, p2.x, p2.y);
-		Rasterizer::DrawLine(hdc, color, p1.x, p1.y,color, p3.x, p3.y);
-		Rasterizer::DrawLine(hdc, color, p3.x, p3.y,color, p2.x, p2.y);
+		Rasterizer::DrawLine(hdc, color, p1.x, p1.y, color, p2.x, p2.y);
+		Rasterizer::DrawLine(hdc, color, p1.x, p1.y, color, p3.x, p3.y);
+		Rasterizer::DrawLine(hdc, color, p3.x, p3.y, color, p2.x, p2.y);
 	}
 }
 

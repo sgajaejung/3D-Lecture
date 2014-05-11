@@ -16,6 +16,7 @@
 //-------------------------------
 Vector3::Vector3()
 {
+	x = y = z = 0;
 } //Vector3::Vector3
 
 Vector3::Vector3( float fX, float fY, float fZ )
