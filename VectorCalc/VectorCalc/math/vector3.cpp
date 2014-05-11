@@ -118,7 +118,7 @@ Vector3& Vector3::operator *= ( Matrix44& rhs )
 
 float Vector3::DotProduct( const Vector3& v ) const
 {
-	return x * v.x + y * v.y + z * v.z;
+	return x*v.x + y*v.y + z*v.z;
 }
 
 
