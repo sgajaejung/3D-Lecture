@@ -18,11 +18,10 @@ HINSTANCE hInst;								// 현재 인스턴스입니다.
 HWND g_hWnd;
 TCHAR szTitle[MAX_LOADSTRING];					// 제목 표시줄 텍스트입니다.
 TCHAR szWindowClass[MAX_LOADSTRING];			// 기본 창 클래스 이름입니다.
-vector<Vector3> g_vertices1;
-vector<Vector3> g_vertices2;
+vector<Vector3> g_vertices;
 vector<int> g_indices;
-Matrix44 g_matWorld1;
-Matrix44 g_matLocal1;
+Matrix44 g_matWorld;
+Matrix44 g_matLocal;
 Matrix44 g_matView;
 Matrix44 g_matProjection;
 Matrix44 g_matViewPort;
@@ -72,16 +71,16 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	//       (-50,-50, -50)  ----------------- (+50, -50, -50)
 
 	const float w = 30.f;
-	g_vertices1.reserve(16);
-	g_vertices1.push_back( Vector3(-w,w,w) );
-	g_vertices1.push_back( Vector3(w,w,w) );
-	g_vertices1.push_back( Vector3(w,w,-w) );
-	g_vertices1.push_back( Vector3(-w,w,-w) );
+	g_vertices.reserve(16);
+	g_vertices.push_back( Vector3(-w,w,w) );
+	g_vertices.push_back( Vector3(w,w,w) );
+	g_vertices.push_back( Vector3(w,w,-w) );
+	g_vertices.push_back( Vector3(-w,w,-w) );
 
-	g_vertices1.push_back( Vector3(-w,-w,w) );
-	g_vertices1.push_back( Vector3(w,-w,w) );
-	g_vertices1.push_back( Vector3(w,-w,-w) );
-	g_vertices1.push_back( Vector3(-w,-w,-w) );
+	g_vertices.push_back( Vector3(-w,-w,w) );
+	g_vertices.push_back( Vector3(w,-w,w) );
+	g_vertices.push_back( Vector3(w,-w,-w) );
+	g_vertices.push_back( Vector3(-w,-w,-w) );
 
 
 	g_indices.reserve(128);
@@ -129,7 +128,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	g_indices.push_back(5);
 
 
-	g_matWorld1.SetTranslate(Vector3(0,0,0));
+	g_matWorld.SetTranslate(Vector3(0,0,0));
 
 	// 응용 프로그램 초기화를 수행합니다.
 	if (!InitInstance (hInstance, nCmdShow))
@@ -381,7 +380,7 @@ void Paint(HWND hWnd, HDC hdc)
 	DeleteObject(hbrBkGnd);
 
 	Matrix44 vpv = g_matView * g_matProjection * g_matViewPort;
-	RenderIndices(hdcMem, g_vertices1, g_indices, g_matLocal1 * g_matWorld1, vpv);
+	RenderIndices(hdcMem, g_vertices, g_indices, g_matLocal * g_matWorld, vpv);
 
 	BitBlt(hdc, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top, hdcMem, 0, 0, SRCCOPY);
 	SelectObject(hdcMem, hbmOld);
