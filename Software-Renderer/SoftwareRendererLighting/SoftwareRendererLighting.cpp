@@ -137,7 +137,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR  lpC
 
 	ComputeNormals(g_vertices, g_indices, g_normals);
 
-
+	 
 	g_matWorld.SetIdentity();
 	g_matWorld.Translate(Vector3(0,0,0));
 	g_matLocal.SetIdentity();
@@ -457,14 +457,14 @@ void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<Vector
 		p3 = p3 * tm;
 
 		// culling
-		//Vector3 v1 = p2 - p1;
-		//Vector3 v2 = p3 - p1;
-		//v1.Normalize();
-		//v2.Normalize();
-		//Vector3 n = v1.CrossProduct(v2);
-		//n.Normalize();
 		Vector3 n = normals[ indices[ i]];
-		n = n * tm;
+		//n = n * tm;
+
+		Matrix44 tm2 = tm;
+		tm2._41 = tm2._42 = tm2._43 = 0.f;
+		n = n * tm2;
+		n.Normalize();
+
 		const float dot = n.DotProduct(camDir);
 		if (dot > 0.f)
 			continue;
@@ -499,8 +499,10 @@ void RenderWire(HDC hdc, const vector<Vector3> &vertices, const vector<Vector3> 
 		// culling
 		Vector3 n = normals[ indices[ i]];
 		n = n * tm;
+		n.Normalize();
+
 		const float dot = n.DotProduct(camDir);
-		if (dot > 0.f)
+		if (dot > 0.1f)
 			continue;
 
 		p1 = p1 * vpv;
