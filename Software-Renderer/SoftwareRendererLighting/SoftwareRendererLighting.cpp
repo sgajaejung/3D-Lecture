@@ -544,16 +544,9 @@ void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<Vector
 		p3 = p3 * tm;
 
 		// culling
-		//Vector3 v1 = p2 - p1;
-		//Vector3 v2 = p3 - p1;
-		//v1.Normalize();
-		//v2.Normalize();
-		//Vector3 n = v1.CrossProduct(v2);
-		//n.Normalize();
 		Vector3 n1 = normals[  indices[ i]] * dirTm;
 		Vector3 n2 = normals[  indices[ i+1]] * dirTm;
 		Vector3 n3 = normals[  indices[ i+2]] * dirTm;
-		//n.Normalize();
 
 		const float dot1 = n1.DotProduct(camDir);
 		const float dot2 = n2.DotProduct(camDir);
@@ -608,17 +601,14 @@ void RenderWire(HDC hdc, const vector<Vector3> &vertices, const vector<Vector3> 
 		p3 = p3 * tm;
 
 		// culling
-		//Vector3 v1 = p2 - p1;
-		//Vector3 v2 = p3 - p1;
-		//v1.Normalize();
-		//v2.Normalize();
-		//Vector3 n = v1.CrossProduct(v2);
-		//n.Normalize();
-		Vector3 n = normals[  indices[ i]];
-		n = n * dirTm;
+		Vector3 n1 = normals[  indices[ i]] * dirTm;
+		Vector3 n2 = normals[  indices[ i+1]] * dirTm;
+		Vector3 n3 = normals[  indices[ i+2]] * dirTm;
 
-		const float dot = n.DotProduct(camDir);
-		if (dot > 0.1f)
+		const float dot1 = n1.DotProduct(camDir);
+		const float dot2 = n2.DotProduct(camDir);
+		const float dot3 = n3.DotProduct(camDir);
+		if ((dot1 > 0.f) && (dot2 > 0.f) && (dot3 > 0.f))
 			continue;
 
 		p1 = p1 * vpv;
