@@ -135,7 +135,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR  lpC
 	}
 /**/
 
-	ReadModelFile("vase.dat");
+	ReadModelFile("data.dat");
 
 	g_matWorld.SetIdentity();
 	g_matWorld.Translate(Vector3(0,0,0));
