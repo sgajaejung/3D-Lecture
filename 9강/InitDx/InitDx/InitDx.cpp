@@ -146,7 +146,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    //3. D3DPRESENT_PARAMETERS 구조체 정보를 생성
    //내가 이러한 Device 를 만들겟다라는 정보
 
-
    D3DPRESENT_PARAMETERS d3dpp;		
    d3dpp.AutoDepthStencilFormat		= D3DFMT_D24S8;				//뎁스 버퍼와 스테실 버퍼 크기 뎁스 24bit 스텐실 버퍼 8 비트
    d3dpp.BackBufferCount				= 1;						//백버퍼 갯수 그냥 1개
