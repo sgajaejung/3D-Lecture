@@ -74,11 +74,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	MSG msg;		
 	ZeroMemory( &msg, sizeof( MSG ) );
 
-	while( msg.message != WM_QUIT )
+	while (msg.message != WM_QUIT)
 	{
 		//PeekMessage 는 메시지 큐에 메시지가 없어도 프로그램이 멈추기 않고 진행이 된다.
 		//이때 메시지큐에 메시지가 없으면 false 가 리턴되고 메시지가 있으면 true 가 리턴이된다.
-		if( PeekMessage( &msg, 0, 0, 0, PM_REMOVE ) )
+		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage( &msg ); //눌린 키보드 의 문자를 번역하여 WM_CHAR 메시지를 발생시킨다.
 			DispatchMessage( &msg );  //받아온 메시지 정보로 윈도우 프로시져 함수를 실행시킨다.
@@ -112,7 +112,7 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
 bool InitDirectX(HWND hWnd)
 {
-   LPDIRECT3D9			d3d9;
+   LPDIRECT3D9 d3d9;
    d3d9 = Direct3DCreate9( D3D_SDK_VERSION );
 
    //2. 하드웨어 정보를 가지고 와서 자신의 정점 프로세스 타입을 정하자
@@ -129,7 +129,7 @@ bool InitDirectX(HWND hWnd)
    int vertexProcessing = 0;
 
    //정점 위치와 광원 계산시 하드웨어 사용이 가능한가
-   if( caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT )
+   if (caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT)
 	   vertexProcessing = D3DCREATE_HARDWARE_VERTEXPROCESSING;
    else
 	   vertexProcessing = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
@@ -157,14 +157,14 @@ bool InitDirectX(HWND hWnd)
 
 
    //4. Device 생성
-   if( FAILED( d3d9->CreateDevice(
+   if (FAILED(d3d9->CreateDevice(
 	   D3DADAPTER_DEFAULT,					//주 디스플레이 그래픽 카드 그냥 D3DADAPTER_DEFAULT
 	   D3DDEVTYPE_HAL,						//디바이스타입 설정 그냥 D3DDEVTYPE_HAL
 	   hWnd,								//디바이스를 사용할 윈도우 핸들
 	   vertexProcessing,					//정점 처리 방식에 대한 플레그
 	   &d3dpp,								//앞에서 정의한 D3DPRESENT_PARAMETERS 구조체 포인터
 	   &g_pDevice							//얻어올 디바이스 더블포인터
-	   ) ) )
+	   )))
    {
 	   //디바이스 생성 실패
 
@@ -187,14 +187,14 @@ bool InitDirectX(HWND hWnd)
 void Render()
 {
 	//화면 청소
-	if( SUCCEEDED( g_pDevice->Clear( 
+	if (SUCCEEDED(g_pDevice->Clear( 
 		0,			//청소할 영역의 D3DRECT 배열 갯수		( 전체 클리어 0 )
 		NULL,		//청소할 영역의 D3DRECT 배열 포인터		( 전체 클리어 NULL )
 		D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL,	//청소될 버퍼 플레그 ( D3DCLEAR_TARGET 컬러버퍼, D3DCLEAR_ZBUFFER 깊이버퍼, D3DCLEAR_STENCIL 스텐실버퍼
 		0xffffff00,			//컬러버퍼를 청소하고 채워질 색상( 0xAARRGGBB )
 		1.0f,				//깊이버퍼를 청소할값 ( 0 ~ 1 0 이 카메라에서 제일가까운 1 이 카메라에서 제일 먼 )
 		0					//스텐실 버퍼를 채울값
-		) ) )
+		)))
 	{
 		//화면 청소가 성공적으로 이루어 졌다면... 랜더링 시작
 		g_pDevice->BeginScene();
