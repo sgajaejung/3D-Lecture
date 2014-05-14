@@ -112,18 +112,15 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
    g_hWnd = hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
+      0, 0, 800, 600, NULL, NULL, hInstance, NULL);
 
    if (!hWnd)
    {
       return FALSE;
    }
 
-
    LPDIRECT3D9			d3d9;
    d3d9 = Direct3DCreate9( D3D_SDK_VERSION );
-
-
 
    //2. 하드웨어 정보를 가지고 와서 자신의 정점 프로세스 타입을 정하자
    D3DCAPS9 caps;
