@@ -245,12 +245,20 @@ void Render(int timeDelta)
 
 		// 회전율 결합한다 .
 		D3DXMATRIX P = Rx * Ry ;
-		g_pDevice->SetTransform(D3DTS_WORLD, &P);
+//		g_pDevice->SetTransform(D3DTS_WORLD, &P);
+
+		Matrix44 rx, ry, r;
+		rx.SetRotationX(MATH_PI/4.f);
+		ry.SetRotationY(y);
+		r = rx * ry;
+		g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&r);
+
 
 		g_pDevice->SetStreamSource( 0, g_pVB, 0, sizeof(Vertex) );
 		g_pDevice->SetIndices(g_pIB);
 		g_pDevice->SetFVF( Vertex::FVF );
 		g_pDevice->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, 8, 0, 12);
+
 
 		//랜더링 끝
 		g_pDevice->EndScene();
