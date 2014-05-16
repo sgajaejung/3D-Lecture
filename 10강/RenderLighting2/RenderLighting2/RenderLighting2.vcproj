@@ -166,23 +166,41 @@
 	</References>
 	<Files>
 		<Filter
-			Name="소스 파일"
-			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			Name="math"
 			>
+			<File
+				RelativePath=".\math\Math.h"
+				>
+			</File>
+			<File
+				RelativePath=".\math\matrix44.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\math\matrix44.h"
+				>
+			</File>
+			<File
+				RelativePath=".\math\vector3.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\math\vector3.h"
+				>
+			</File>
+			<File
+				RelativePath=".\math\vector4.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\math\vector4.h"
+				>
+			</File>
 		</Filter>
-		<Filter
-			Name="헤더 파일"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+		<File
+			RelativePath=".\RenderLighting2.cpp"
 			>
-		</Filter>
-		<Filter
-			Name="리소스 파일"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
-		</Filter>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
