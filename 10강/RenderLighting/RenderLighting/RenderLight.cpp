@@ -24,13 +24,14 @@ int g_FaceSize = 0;
 struct Vertex
 {
 	Vertex() {}
-	Vertex(float x0, float y0, float z0, DWORD color0) : x(x0), y(y0), z(z0), color(color0) {}
-	float x, y, z; // The transformed position for the vertex
+	Vertex(float x0, float y0, float z0, DWORD color0) : p(Vector3(x0, y0, z0)), n(Vector3(0,0,0)), color(color0) {}
+	Vector3 p;
+	Vector3 n;
 	DWORD color;
 	static const DWORD FVF;
 };
 //버텍스 구조체 포맷.
-const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_DIFFUSE;
+const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE;
 
 
 
@@ -40,6 +41,7 @@ bool InitDirectX(HWND hWnd);
 bool InitVertexBuffer();
 void Render(int timeDelta);
 bool ReadModelFile( const string &fileName, LPDIRECT3DVERTEXBUFFER9 &vtxBuff, int &vtxSize,  LPDIRECT3DINDEXBUFFER9 &idxBuff, int &faceSize );
+void ComputeNormals(LPDIRECT3DVERTEXBUFFER9 vtxBuff, int vtxSize,  LPDIRECT3DINDEXBUFFER9 idxBuff, int faceSize);
 
 
 int APIENTRY WinMain(HINSTANCE hInstance, 
@@ -281,8 +283,12 @@ bool InitVertexBuffer()
 	proj.SetProjection(D3DX_PI * 0.5f, (float)WINSIZE_X / (float) WINSIZE_Y, 1.f, 1000.0f) ;
 	g_pDevice->SetTransform(D3DTS_PROJECTION, (D3DXMATRIX*)&proj) ;
 
-	g_pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-//	g_pDevice->SetRenderState(D3DRS_LIGHTING, false);
+//	g_pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+//	g_pDevice->SetRenderState(D3DRS_LIGHTING, true);
+	g_pDevice->LightEnable (
+		0, // 활성화/ 비활성화 하려는 광원 리스트 내의 요소
+		true); // true = 활성화 ， false = 비활성화
+
 	return true;
 }
 
@@ -354,7 +360,62 @@ bool ReadModelFile( const string &fileName, LPDIRECT3DVERTEXBUFFER9 &vtxBuff, in
 	}
 	idxBuff->Unlock();
 
-//	ComputeNormals(g_vertices, g_indices, g_normals);
-
+	ComputeNormals(vtxBuff, vtxSize, idxBuff, faceSize);
 	return true;
+}
+
+
+void ComputeNormals(LPDIRECT3DVERTEXBUFFER9 vtxBuff, int vtxSize,  LPDIRECT3DINDEXBUFFER9 idxBuff, int faceSize)
+{
+	Vertex* vertices;
+	vtxBuff->Lock( 0, sizeof(Vertex), (void**)&vertices, 0);
+	WORD *indices = NULL;
+	idxBuff->Lock(0, 0, (void**)&indices, 0);
+
+	for (int i=0; i < faceSize*3; i+=3)
+	{
+		Vector3 p1 = vertices[ indices[ i]].p;
+		Vector3 p2 = vertices[ indices[ i+1]].p;
+		Vector3 p3 = vertices[ indices[ i+2]].p;
+
+		Vector3 v1 = p2 - p1;
+		Vector3 v2 = p3 - p1;
+		v1.Normalize();
+		v2.Normalize();
+		Vector3 n = v1.CrossProduct(v2);
+		n.Normalize();
+
+		if (vertices[ indices[ i]].n.IsEmpty())
+		{
+			vertices[ indices[ i]].n = n;
+		}
+		else
+		{
+			vertices[ indices[ i]].n += n;
+			vertices[ indices[ i]].n /= 2.f;
+		}
+
+		if (vertices[ indices[ i+1]].n.IsEmpty())
+		{
+			vertices[ indices[ i+1]].n = n;
+		}
+		else
+		{
+			vertices[ indices[ i+1]].n += n;
+			vertices[ indices[ i+1]].n /= 2.f;
+		}
+
+		if (vertices[ indices[ i+2]].n.IsEmpty())
+		{
+			vertices[ indices[ i+2]].n = n;
+		}
+		else
+		{
+			vertices[ indices[ i+2]].n += n;
+			vertices[ indices[ i+2]].n /= 2.f;
+		}
+	}
+
+	vtxBuff->Unlock();
+	idxBuff->Unlock();
 }
