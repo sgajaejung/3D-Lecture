@@ -11,5 +11,9 @@ namespace framework
 		cGameMain();
 		virtual ~cGameMain();
 
+		virtual void Run();
+		virtual void Update();
+		virtual void Render();
+
 	};
 }
