@@ -18,6 +18,11 @@ float Vector3::Length() const
 	return sqrt(x*x + y*y + z*z);
 }
 
+float Vector3::LengthRoughly(const Vector3 &rhs) const
+{
+	Vector3 v = *this - rhs;
+	return v.x*v.x + v.y*v.y + v.z*v.z;
+}
 
 Vector3 Vector3::Normal() const
 {

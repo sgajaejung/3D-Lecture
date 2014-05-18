@@ -1,11 +1,13 @@
 #include <windows.h>
 #include "math/Math.h"
 #include "DrawTriangle.h"
+#include "Renderer.h"
 #include <vector>
 #include <fstream>
 #include <string>
 #include <time.h>
 #include <algorithm>
+#include "particle.h"
 
 using namespace std;
 
@@ -21,7 +23,7 @@ vector<int> g_indices;
 Matrix44 g_matWorld;
 Matrix44 g_matLocal;
 Vector3 g_PenguinPos(0,0,-300);
-Vector3 g_PenguinVel(0, 0, 3000.f);
+Vector3 g_PenguinVel(0, 0, 2000.f);
 
 const int MAX_GROUND = 6;
 vector<Vector3> g_groundVtx;
@@ -34,8 +36,8 @@ vector<Vector3> g_obstructNormals;
 vector<int> g_obstructdIdx;
 vector<Matrix44> g_matObstructs(MAX_GROUND);
 
-//vector<Vector3> g_
-
+Box g_obstructBox;
+Box g_penguinBox;
 
 bool g_Stop = false;
 
@@ -44,6 +46,8 @@ Matrix44 g_matProjection;
 Matrix44 g_matViewPort;
 Vector3 g_cameraPos(0,300,-1000);
 Vector3 g_cameraLookat(0,0,1000);
+
+cParticleManager g_particleMng;
 
 
 
@@ -55,6 +59,8 @@ void	Paint(HWND hWnd, HDC hdc);
 void	ComputeNormals(const vector<Vector3> &vertices, const vector<int> &indices, vector<Vector3> &normals);
 bool ReadModelFile( const string &fileName, vector<Vector3> &vertices, vector<int> &indices, vector<Vector3> &normals );
 bool Init();
+void GetVerticesMinMax( const vector<Vector3> &vertices, OUT Vector3 &vMin, OUT Vector3 &vMax);
+
 
 int APIENTRY WinMain(HINSTANCE hInstance, 
 	HINSTANCE hPrevInstance, 
@@ -178,26 +184,6 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 				}
 				break;
 
-			case VK_UP:
-			case VK_DOWN:
-				{
-					//Matrix44 mat;
-					//mat.SetRotationX((wParam==VK_UP)? 0.1f : -0.1f);
-					//g_matLocal *= mat;
-				}
-				break;
-
-			case VK_LEFT:
-			case VK_RIGHT:
-				{
-					//Matrix44 mat;
-					//mat.SetRotationY((wParam==VK_LEFT)? 0.1f : -0.1f);
-					//g_matLocal *= mat;
-
-					//g_PenguinPos.x += (wParam==VK_LEFT)? -10.f : 10.f;
-				}
-				break;
-
 			case 'P':
 				g_Stop = !g_Stop;
 				break;
@@ -220,6 +206,29 @@ void	MainLoop(int elapse_time)
 {
 	float static incT = (elapse_time * 0.001f);
 
+	// 충돌 체크.
+	g_penguinBox.SetWorldTM(g_matLocal * g_matWorld);
+	g_penguinBox.Update();
+	for (int i=0; i < (int)g_matObstructs.size(); ++i)
+	{
+		g_obstructBox.SetWorldTM(g_matObstructs[ i]);
+		g_obstructBox.Update();
+		if (g_penguinBox.Collision(g_obstructBox))
+		{
+			Vector3 dispPos = g_PenguinPos * (g_matLocal * g_matWorld *  g_matView * g_matProjection * g_matViewPort);
+
+			// 충돌.
+			POINT pos = {(int)dispPos.x, 600-(int)dispPos.y};
+			g_particleMng.AddParticle(new cParticle(pos));
+			g_particleMng.AddParticle(new cParticle(pos));
+			g_particleMng.AddParticle(new cParticle(pos));
+			g_particleMng.AddParticle(new cParticle(pos));
+			g_particleMng.AddParticle(new cParticle(pos));
+			g_particleMng.AddParticle(new cParticle(pos));
+		}
+	}
+
+
 	// keyboard
 	const float movOffset = 20.f;
 	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
@@ -231,12 +240,15 @@ void	MainLoop(int elapse_time)
 		g_PenguinPos.x += movOffset;
 	}
 	
+
+	// 펭귄 이동
 	const Vector3 mov = (g_Stop)? Vector3(0,0,0) : g_PenguinVel * incT;
 	g_PenguinPos += mov;
 	Matrix44 matMov;
 	matMov.SetTranslate(g_PenguinPos);
 	g_matWorld  = matMov;
 
+	// 카메라 이동
 	g_cameraLookat += mov;
 	g_cameraPos += mov;
 	Vector3 dir = g_cameraLookat - g_cameraPos;
@@ -259,6 +271,8 @@ void	MainLoop(int elapse_time)
 	}
 	
 
+	g_particleMng.Move(elapse_time);
+
 	// Render
 	Render(g_hWnd);
 	::InvalidateRect(g_hWnd, NULL, TRUE);
@@ -280,12 +294,22 @@ bool Init()
 {
 	srand((int)time(NULL));
 
+	// 모델 생성.
 	ReadModelFile("cube.dat", g_vertices, g_indices, g_normals);
 	ReadModelFile("plane.dat", g_groundVtx, g_groundIdx, g_groundNormals);
 	ReadModelFile("cone.dat", g_obstructVtx, g_obstructdIdx, g_obstructNormals);
 
 	g_matLocal.SetScale(Vector3(0.25f, 0.4f, 0.25f));
 
+	// 충돌 박스 생성
+	Vector3 vMin, vMax;
+	GetVerticesMinMax(g_vertices, vMin, vMax);
+	g_penguinBox.SetBox(vMin, vMax);
+
+	GetVerticesMinMax(g_obstructVtx, vMin, vMax);
+	g_obstructBox.SetBox(vMin, vMax);
+
+	
 	for (int i=0; i < (int)g_matGrounds.size(); ++i)
 	{
 		Matrix44 matS;
@@ -324,6 +348,33 @@ bool Init()
 	g_matViewPort._43 = 0;
 
 	return true;
+}
+
+
+// vertices의 최대,최소 정점위치를 리턴한다.
+void GetVerticesMinMax( const vector<Vector3> &vertices, OUT Vector3 &vMin, OUT Vector3 &vMax)
+{
+	vMax = Vector3(FLT_MIN, FLT_MIN, FLT_MIN);
+	vMin = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+
+	for (int i=0; i < (int)vertices.size(); ++i)
+	{
+		const Vector3 &v = vertices[i];
+
+		if (vMax.x < v.x)
+			vMax.x = v.x;
+		if (vMax.y < v.y)
+			vMax.y = v.y;
+		if (vMax.z < v.z)
+			vMax.z = v.z;
+
+		if (vMin.x > v.x)
+			vMin.x = v.x;
+		if (vMin.y > v.y)
+			vMin.y = v.y;
+		if (vMin.z > v.z)
+			vMin.z = v.z;
+	}
 }
 
 
@@ -427,85 +478,6 @@ bool ReadModelFile( const string &fileName, vector<Vector3> &vertices, vector<in
 }
 
 
-void RenderVertices(HDC hdc, const vector<Vector3> &vertices, const Matrix44 &tm)
-{
-	for (unsigned int i=0; i < vertices.size(); ++i)
-	{
-		Vector3 p = vertices[ i] * tm;
-
-		if (0 == i)
-			MoveToEx(hdc, (int)p.x, (int)p.y, NULL);
-		else
-			LineTo(hdc, (int)p.x, (int)p.y);
-	}
-}
-
-
-void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<int> &indices, 
-				   const vector<Vector3> &normals, const Matrix44 &tm, const Matrix44 &vpv)
-{
-	Vector3 camDir = g_cameraLookat - g_cameraPos;
-	camDir.Normalize();
-
-	Rasterizer::Color c0(0,0,255,1);
-	Rasterizer::Color c1(255,255,255,1);
-	Vector3 lightDir(0,-1,0);
-	Vector3 H = -(camDir + lightDir);
-	H.Normalize();
-	Rasterizer::Color ambient(0,20,0,1);
-
-	for (unsigned int i=0; i < indices.size(); i+=3)
-	{
-		Vector3 p1 = vertices[ indices[ i]];
-		Vector3 p2 = vertices[ indices[ i+1]];
-		Vector3 p3 = vertices[ indices[ i+2]];
-
-		p1 = p1 * tm;
-		p2 = p2 * tm;
-		p3 = p3 * tm;
-
-		// culling
-		Vector3 n1 = normals[ indices[i]].MultiplyNormal(tm);
-		Vector3 n2 = normals[ indices[i+1]].MultiplyNormal(tm);
-		Vector3 n3 = normals[ indices[i+2]].MultiplyNormal(tm);
-		const float dot1 = n1.DotProduct(camDir);
-		const float dot2 = n2.DotProduct(camDir);
-		const float dot3 = n3.DotProduct(camDir);
-		if ((dot1 > 0) && (dot2 > 0) && (dot3 > 0))
-			continue;
-
-		p1 = p1 * vpv;
-		p2 = p2 * vpv;
-		p3 = p3 * vpv;
-
-		Rasterizer::Color color1, color2, color3;
-		{
-			Rasterizer::Color diffuse = c0 * max(0, n1.DotProduct(-lightDir));
-			Rasterizer::Color specular = 0;//c1*pow(n1.DotProduct(H), 16);
-			color1 = ambient + diffuse + specular;
-		}
-		{
-			Rasterizer::Color diffuse = c0 * max(0, n2.DotProduct(-lightDir));
-			Rasterizer::Color specular = c1*pow(n2.DotProduct(H), 16);
-			color2 = ambient + diffuse + specular;
-		}
-		{
-			Rasterizer::Color diffuse = c0 * max(0, n3.DotProduct(-lightDir));
-			Rasterizer::Color specular = c1*pow(n3.DotProduct(H), 16);
-			color3 = ambient + diffuse + specular;
-		}
-
-		Rasterizer::DrawLine(hdc, color1, p1.x, p1.y, color1, p2.x, p2.y);
-		Rasterizer::DrawLine(hdc, color1, p1.x, p1.y, color1, p3.x, p3.y);
-		Rasterizer::DrawLine(hdc, color1, p3.x, p3.y, color1, p2.x, p2.y);
-		//Rasterizer::DrawTriangle(hdc, 
-		//	color1, p1.x, p1.y, n1,
-		//	color2, p2.x, p2.y, n2,
-		//	color3, p3.x, p3.y, n3);
-	}
-}
-
-
 /**
  @brief 
  */
@@ -529,10 +501,15 @@ void Paint(HWND hWnd, HDC hdc)
 	for (int i=0; i < (int)g_matObstructs.size(); ++i)
 		RenderIndices(hdcMem, g_obstructVtx, g_obstructdIdx, g_obstructNormals, g_matObstructs[ i], vpv);
 
+	// 충돌 박스 출력.
+	//RenderVertices(hdcMem, g_penguinBox.m_box, g_matLocal * g_matWorld * vpv);
+	//for (int i=0; i < (int)g_matObstructs.size(); ++i)
+	//	RenderVertices(hdcMem, g_obstructBox.m_box, g_matObstructs[ i] * vpv);
+	
+	g_particleMng.Render(hdcMem);
 
 	BitBlt(hdc, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top, hdcMem, 0, 0, SRCCOPY);
 	SelectObject(hdcMem, hbmOld);
 	DeleteObject(hbmMem);
 	DeleteDC(hdcMem);
 }
-

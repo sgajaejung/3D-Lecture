@@ -12,6 +12,11 @@
       <Filter>math</Filter>
     </ClCompile>
     <ClCompile Include="DrawTriangle.cpp" />
+    <ClCompile Include="math\box.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="particle.cpp" />
+    <ClCompile Include="Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -32,5 +37,10 @@
       <Filter>math</Filter>
     </ClInclude>
     <ClInclude Include="DrawTriangle.h" />
+    <ClInclude Include="math\box.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="particle.h" />
+    <ClInclude Include="Renderer.h" />
   </ItemGroup>
 </Project>
