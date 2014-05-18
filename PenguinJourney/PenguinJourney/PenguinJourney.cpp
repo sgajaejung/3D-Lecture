@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <time.h>
 #include <algorithm>
 
 using namespace std;
@@ -32,6 +33,9 @@ vector<Vector3> g_obstructVtx;
 vector<Vector3> g_obstructNormals;
 vector<int> g_obstructdIdx;
 vector<Matrix44> g_matObstructs(MAX_GROUND);
+
+//vector<Vector3> g_
+
 
 bool g_Stop = false;
 
@@ -248,7 +252,7 @@ void	MainLoop(int elapse_time)
 		g_matGrounds[ groundFront]._43 = g_matGrounds[ backIdx]._43 + 600.F;
 		
 		g_matObstructs[ groundFront]._43 = g_matGrounds[ backIdx]._43 + 600.F;
-		g_matObstructs[ groundFront]._41 = (rand() % 500) - 250;
+		g_matObstructs[ groundFront]._41 = (rand() % 500) - 250.f;
 
 		++groundFront;
 		groundFront %= g_matGrounds.size();
@@ -274,6 +278,8 @@ void	Render(HWND hWnd)
 
 bool Init()
 {
+	srand((int)time(NULL));
+
 	ReadModelFile("cube.dat", g_vertices, g_indices, g_normals);
 	ReadModelFile("plane.dat", g_groundVtx, g_groundIdx, g_groundNormals);
 	ReadModelFile("cone.dat", g_obstructVtx, g_obstructdIdx, g_obstructNormals);
@@ -295,7 +301,7 @@ bool Init()
 		matS.SetScale(Vector3(3, 3, 3));
 
 		Vector3 pos;
-		pos.x = (rand() % 500) - 250;
+		pos.x = (rand() % 500) - 250.f;
 		pos.z = 550.f * i;
 		Matrix44 matT;
 		matT.SetTranslate(pos);
