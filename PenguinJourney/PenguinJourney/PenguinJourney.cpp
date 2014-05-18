@@ -501,8 +501,8 @@ void Paint(HWND hWnd, HDC hdc)
 
 	// 충돌 박스 출력.
 	//RenderVertices(hdcMem, g_penguinBox.m_box, g_matLocal * g_matWorld * vpv);
-	for (int i=0; i < (int)g_matObstructs.size(); ++i)
-		RenderVertices(hdcMem, g_obstructBox.m_box, g_matObstructs[ i] * vpv);
+	//for (int i=0; i < (int)g_matObstructs.size(); ++i)
+	//	RenderVertices(hdcMem, g_obstructBox.m_box, g_matObstructs[ i] * vpv);
 	
 	g_particleMng.Render(hdcMem);
 
