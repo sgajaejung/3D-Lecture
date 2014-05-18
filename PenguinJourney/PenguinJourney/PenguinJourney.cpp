@@ -19,25 +19,27 @@ vector<Vector3> g_normals;
 vector<int> g_indices;
 Matrix44 g_matWorld;
 Matrix44 g_matLocal;
-Vector3 g_PenguinPos(0,0,-400);
-Vector3 g_PenguinVel(0, 0, 1000.f);
+Vector3 g_PenguinPos(0,0,-300);
+Vector3 g_PenguinVel(0, 0, 3000.f);
 
+const int MAX_GROUND = 6;
 vector<Vector3> g_groundVtx;
 vector<Vector3> g_groundNormals;
 vector<int> g_groundIdx;
-vector<Matrix44> g_matGrounds(5);
+vector<Matrix44> g_matGrounds(MAX_GROUND);
 
 vector<Vector3> g_obstructVtx;
 vector<Vector3> g_obstructNormals;
 vector<int> g_obstructdIdx;
-vector<Matrix44> g_matObstructs(5);
+vector<Matrix44> g_matObstructs(MAX_GROUND);
 
+bool g_Stop = false;
 
 Matrix44 g_matView;
 Matrix44 g_matProjection;
 Matrix44 g_matViewPort;
 Vector3 g_cameraPos(0,300,-1000);
-Vector3 g_cameraLookat(0,0,0);
+Vector3 g_cameraLookat(0,0,1000);
 
 
 
@@ -191,6 +193,10 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 					//g_PenguinPos.x += (wParam==VK_LEFT)? -10.f : 10.f;
 				}
 				break;
+
+			case 'P':
+				g_Stop = !g_Stop;
+				break;
 			}
 
 		}
@@ -221,7 +227,7 @@ void	MainLoop(int elapse_time)
 		g_PenguinPos.x += movOffset;
 	}
 	
-	const Vector3 mov = g_PenguinVel * incT;
+	const Vector3 mov = (g_Stop)? Vector3(0,0,0) : g_PenguinVel * incT;
 	g_PenguinPos += mov;
 	Matrix44 matMov;
 	matMov.SetTranslate(g_PenguinPos);
@@ -234,16 +240,20 @@ void	MainLoop(int elapse_time)
 	g_matView.SetView(g_cameraPos, dir, Vector3(0,1,0));
 
 
-	// scroll
+	// scroll & generate obstacle
 	static int groundFront = 0;
 	if (g_matGrounds[ groundFront]._43 < g_cameraPos.z)
 	{
 		const int backIdx = (groundFront + g_matGrounds.size() - 1) % g_matGrounds.size();
 		g_matGrounds[ groundFront]._43 = g_matGrounds[ backIdx]._43 + 600.F;
+		
+		g_matObstructs[ groundFront]._43 = g_matGrounds[ backIdx]._43 + 600.F;
+		g_matObstructs[ groundFront]._41 = (rand() % 500) - 250;
+
 		++groundFront;
 		groundFront %= g_matGrounds.size();
 	}
-
+	
 
 	// Render
 	Render(g_hWnd);
@@ -281,9 +291,16 @@ bool Init()
 
 	for (int i=0; i < (int)g_matObstructs.size(); ++i)
 	{
+		Matrix44 matS;
+		matS.SetScale(Vector3(3, 3, 3));
+
 		Vector3 pos;
 		pos.x = (rand() % 500) - 250;
-		g_matObstructs[ i].SetTranslate(pos);
+		pos.z = 550.f * i;
+		Matrix44 matT;
+		matT.SetTranslate(pos);
+
+		g_matObstructs[ i] = matS * matT;
 	}
 
 	Vector3 dir = g_cameraLookat - g_cameraPos;
@@ -424,6 +441,13 @@ void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<int> &
 	Vector3 camDir = g_cameraLookat - g_cameraPos;
 	camDir.Normalize();
 
+	Rasterizer::Color c0(0,0,255,1);
+	Rasterizer::Color c1(255,255,255,1);
+	Vector3 lightDir(0,-1,0);
+	Vector3 H = -(camDir + lightDir);
+	H.Normalize();
+	Rasterizer::Color ambient(0,20,0,1);
+
 	for (unsigned int i=0; i < indices.size(); i+=3)
 	{
 		Vector3 p1 = vertices[ indices[ i]];
@@ -435,25 +459,18 @@ void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<int> &
 		p3 = p3 * tm;
 
 		// culling
-		Vector3 n1 = normals[ indices[i]] * tm;
-		Vector3 n2 = normals[ indices[i+1]] * tm;
-		Vector3 n3 = normals[ indices[i+2]] * tm;
+		Vector3 n1 = normals[ indices[i]].MultiplyNormal(tm);
+		Vector3 n2 = normals[ indices[i+1]].MultiplyNormal(tm);
+		Vector3 n3 = normals[ indices[i+2]].MultiplyNormal(tm);
 		const float dot1 = n1.DotProduct(camDir);
 		const float dot2 = n2.DotProduct(camDir);
 		const float dot3 = n3.DotProduct(camDir);
-		//if ((dot1 > 0) && (dot2 > 0) && (dot3 > 0))
-		//	continue;
+		if ((dot1 > 0) && (dot2 > 0) && (dot3 > 0))
+			continue;
 
 		p1 = p1 * vpv;
 		p2 = p2 * vpv;
 		p3 = p3 * vpv;
-
-		Rasterizer::Color c0(0,0,255,1);
-		Rasterizer::Color c1(255,255,255,1);
-		Vector3 lightDir(0,-1,0);
-		Vector3 H = -(camDir + lightDir);
-		H.Normalize();
-		Rasterizer::Color ambient(0,20,0,1);
 
 		Rasterizer::Color color1, color2, color3;
 		{

@@ -2,6 +2,12 @@
 #include "math.h"
 
 
+
+Vector3::Vector3(const Vector4 &rhs) :
+	x(rhs.x), y(rhs.y), z(rhs.z)
+{
+}
+
 bool Vector3::IsEmpty() const
 {
 	return (x==0) && (y==0) && (z==0);
@@ -102,7 +108,7 @@ Vector3 Vector3::operator * ( const Matrix44& rhs ) const
 }
 
 
-Vector3& Vector3::operator *= ( Matrix44& rhs )
+Vector3& Vector3::operator *= ( const Matrix44& rhs )
 {
 	float	RHW = 1.0f / (x * rhs._14 + y * rhs._24 + z * rhs._34 + rhs._44);
 	if (RHW >= FLT_MAX)
@@ -117,6 +123,17 @@ Vector3& Vector3::operator *= ( Matrix44& rhs )
 	v.z = (x * rhs._13 + y * rhs._23 + z * rhs._33 + rhs._43 ) * RHW;
 	*this = v;
 	return *this;
+}
+
+
+Vector3 Vector3::MultiplyNormal( const Matrix44& rhs ) const
+{
+	Vector3 v;
+	v.x = x * rhs._11 + y * rhs._21 + z * rhs._31;
+	v.y = x * rhs._12 + y * rhs._22 + z * rhs._32;
+	v.z = x * rhs._13 + y * rhs._23 + z * rhs._33;
+	v.Normalize();
+	return v;
 }
 
 

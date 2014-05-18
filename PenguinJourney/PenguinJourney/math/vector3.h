@@ -1,6 +1,6 @@
 #pragma once
 
-
+struct Vector4;
 struct Matrix44;
 struct Vector3
 {
@@ -8,6 +8,7 @@ struct Vector3
 
 	Vector3() : x(0), y(0), z(0) {}
 	Vector3(float x0, float y0, float z0) : x(x0), y(y0), z(z0) {}
+	Vector3(const Vector4 &rhs);
 
 	bool IsEmpty() const;
 	float Length() const;
@@ -15,6 +16,7 @@ struct Vector3
 	void Normalize();
 	float	DotProduct( const Vector3& v ) const;
 	Vector3 CrossProduct( const Vector3& v ) const;
+	Vector3 MultiplyNormal( const Matrix44& rhs ) const;
 	
 	Vector3 operator + () const;
 	Vector3 operator - () const;
@@ -26,7 +28,7 @@ struct Vector3
 	Vector3& operator /= ( const Vector3& rhs );
 
 	Vector3 operator * ( const Matrix44& rhs ) const;
-	Vector3& operator *= ( Matrix44& rhs );
+	Vector3& operator *= ( const Matrix44& rhs );
 
 	template <class T>
 	Vector3 operator * ( T t ) const {
