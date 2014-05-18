@@ -23,7 +23,7 @@ vector<int> g_indices;
 Matrix44 g_matWorld;
 Matrix44 g_matLocal;
 Vector3 g_PenguinPos(0,0,-300);
-Vector3 g_PenguinVel(0, 0, 2000.f);
+Vector3 g_PenguinVel(0, 0, 3000.f);
 
 const int MAX_GROUND = 6;
 vector<Vector3> g_groundVtx;
@@ -211,7 +211,9 @@ void	MainLoop(int elapse_time)
 	g_penguinBox.Update();
 	for (int i=0; i < (int)g_matObstructs.size(); ++i)
 	{
-		g_obstructBox.SetWorldTM(g_matObstructs[ i]);
+		Matrix44 matS;
+		matS.SetScale(Vector3(1,1,4)); // 충돌박스를 Z축으로 좀더 키운다. 프레임속도가 느리면, 충돌 폭이 좁아지기 때문.
+		g_obstructBox.SetWorldTM(matS * g_matObstructs[ i]);
 		g_obstructBox.Update();
 		if (g_penguinBox.Collision(g_obstructBox))
 		{
@@ -219,12 +221,8 @@ void	MainLoop(int elapse_time)
 
 			// 충돌.
 			POINT pos = {(int)dispPos.x, 600-(int)dispPos.y};
-			g_particleMng.AddParticle(new cParticle(pos));
-			g_particleMng.AddParticle(new cParticle(pos));
-			g_particleMng.AddParticle(new cParticle(pos));
-			g_particleMng.AddParticle(new cParticle(pos));
-			g_particleMng.AddParticle(new cParticle(pos));
-			g_particleMng.AddParticle(new cParticle(pos));
+			for (int k=0; k < 6; ++k)
+				g_particleMng.AddParticle(new cParticle(pos));
 		}
 	}
 
@@ -258,7 +256,7 @@ void	MainLoop(int elapse_time)
 
 	// scroll & generate obstacle
 	static int groundFront = 0;
-	if (g_matGrounds[ groundFront]._43 < g_cameraPos.z)
+	if (g_matGrounds[ groundFront]._43 < g_cameraPos.z+600)
 	{
 		const int backIdx = (groundFront + g_matGrounds.size() - 1) % g_matGrounds.size();
 		g_matGrounds[ groundFront]._43 = g_matGrounds[ backIdx]._43 + 600.F;
@@ -503,8 +501,8 @@ void Paint(HWND hWnd, HDC hdc)
 
 	// 충돌 박스 출력.
 	//RenderVertices(hdcMem, g_penguinBox.m_box, g_matLocal * g_matWorld * vpv);
-	//for (int i=0; i < (int)g_matObstructs.size(); ++i)
-	//	RenderVertices(hdcMem, g_obstructBox.m_box, g_matObstructs[ i] * vpv);
+	for (int i=0; i < (int)g_matObstructs.size(); ++i)
+		RenderVertices(hdcMem, g_obstructBox.m_box, g_matObstructs[ i] * vpv);
 	
 	g_particleMng.Render(hdcMem);
 

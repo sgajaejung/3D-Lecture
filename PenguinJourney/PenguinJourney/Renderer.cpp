@@ -99,7 +99,7 @@ void RenderIndices(HDC hdc, const vector<Vector3> &vertices, const vector<int> &
 		p3 = p3 * tm;
 
 		Vector3 n;
-		Rasterizer::Color color(0,255,0,1);
+		Rasterizer::Color color(255,0,0,1);
 		Rasterizer::DrawTriangle(hdc, 
 			color, p1.x, p1.y, n,
 			color, p2.x, p2.y, n,
