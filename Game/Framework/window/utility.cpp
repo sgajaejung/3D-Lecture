@@ -1,11 +1,11 @@
 
 #include "stdafx.h"
-#include "InitWindow.h"
+#include "utility.h"
 
 using namespace framework;
 
 
-bool InitWindow(HINSTANCE hInstance, const string &windowName2, const RECT &windowRect, WNDPROC WndProc)
+HWND framework::InitWindow(HINSTANCE hInstance, const string &windowName2, const RECT &windowRect, int nCmdShow, WNDPROC WndProc)
 {
 	wchar_t className[32] = L"Sample";
 	wchar_t windowName[32] = L"Sample";
@@ -55,5 +55,7 @@ bool InitWindow(HINSTANCE hInstance, const string &windowName2, const RECT &wind
 	SetWindowPos( hWnd, NULL, 0, 0, rcClient.right - rcClient.left, rcClient.bottom - rcClient.top, 
 		SWP_NOZORDER | SWP_NOMOVE );
 
-	return true;
+	ShowWindow( hWnd, nCmdShow );
+
+	return hWnd;
 }

@@ -3,21 +3,21 @@
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="window\InitWindow.h">
-      <Filter>window</Filter>
-    </ClInclude>
     <ClInclude Include="framework.h" />
     <ClInclude Include="gamemain\GameMain.h">
       <Filter>gamemain</Filter>
     </ClInclude>
+    <ClInclude Include="window\utility.h">
+      <Filter>window</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="window\InitWindow.cpp">
-      <Filter>window</Filter>
-    </ClCompile>
     <ClCompile Include="gamemain\GameMain.cpp">
       <Filter>gamemain</Filter>
+    </ClCompile>
+    <ClCompile Include="window\utility.cpp">
+      <Filter>window</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

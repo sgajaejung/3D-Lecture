@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "DxInit.h"
 
-using namespace std;
+using namespace graphic;
 
 
 bool InitDirectX(HWND hWnd, const int width, const int height, OUT LPDIRECT3DDEVICE9 &pDevice )

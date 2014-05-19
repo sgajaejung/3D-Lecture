@@ -1,6 +1,6 @@
 #pragma once
 
-namespace engine
+namespace graphic
 {
 
 	// 다이렉트 X 초기화.
