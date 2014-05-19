@@ -3,7 +3,7 @@
 #include <fstream>
 #include <d3d9.h>
 #include <d3dx9.h>
-#include "math/Math.h"
+#include "../math/Math.h"
 #pragma comment( lib, "d3d9.lib" )
 #pragma comment( lib, "d3dx9.lib" )
 
@@ -49,9 +49,9 @@ void ComputeNormals(LPDIRECT3DVERTEXBUFFER9 vtxBuff, int vtxSize,  LPDIRECT3DIND
 
 
 int APIENTRY WinMain(HINSTANCE hInstance, 
-					 HINSTANCE hPrevInstance, 
-					 LPSTR lpCmdLine, 
-					 int nCmdShow)
+	HINSTANCE hPrevInstance, 
+	LPSTR lpCmdLine, 
+	int nCmdShow)
 {
 	wchar_t className[32] = L"Sample";
 	wchar_t windowName[32] = L"Sample";
@@ -132,14 +132,14 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		}
 	}
 
-	if (g_pDevice)
-		g_pDevice->Release();
 	if (g_pVB)
 		g_pVB->Release();
 	if (g_pIB)
 		g_pIB->Release();
 	if (g_Texture1)
 		g_Texture1->Release();
+	if (g_pDevice)
+		g_pDevice->Release();
 	return 0;
 }
 
@@ -282,9 +282,8 @@ void Render(int timeDelta)
 
 bool InitVertexBuffer()
 {
-	ReadModelFile("cube.dat", g_pVB, g_VtxSize, g_pIB, g_FaceSize);
-
-	D3DXCreateTextureFromFileA(g_pDevice, "강소라2.jpg", &g_Texture1);
+	ReadModelFile("../media/cube.dat", g_pVB, g_VtxSize, g_pIB, g_FaceSize);
+	D3DXCreateTextureFromFileA(g_pDevice, "../media/강소라2.jpg", &g_Texture1);
 
 
 	ZeroMemory(&g_Mtrl, sizeof(g_Mtrl));
@@ -372,7 +371,7 @@ bool ReadModelFile( const string &fileName, LPDIRECT3DVERTEXBUFFER9 &vtxBuff, in
 	vertices[6].u = 1;
 	vertices[6].v = 0;
 	vertices[7].u = 0;
-	vertices[8].v = 0;
+	vertices[7].v = 0;
 
 	vtxBuff->Unlock();
 
@@ -393,7 +392,7 @@ bool ReadModelFile( const string &fileName, LPDIRECT3DVERTEXBUFFER9 &vtxBuff, in
 		vertices[i].n.Normalize();
 	}
 	vtxBuff->Unlock();
-/**/
+	/**/
 
 	string idx, idx_eq;
 	int numIndices;

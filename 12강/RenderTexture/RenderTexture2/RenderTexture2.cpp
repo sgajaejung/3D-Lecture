@@ -3,7 +3,7 @@
 #include <fstream>
 #include <d3d9.h>
 #include <d3dx9.h>
-#include "math/Math.h"
+#include "../math/Math.h"
 #pragma comment( lib, "d3d9.lib" )
 #pragma comment( lib, "d3dx9.lib" )
 
@@ -49,9 +49,9 @@ void ComputeNormals(LPDIRECT3DVERTEXBUFFER9 vtxBuff, int vtxSize,  LPDIRECT3DIND
 
 
 int APIENTRY WinMain(HINSTANCE hInstance, 
-					 HINSTANCE hPrevInstance, 
-					 LPSTR lpCmdLine, 
-					 int nCmdShow)
+	HINSTANCE hPrevInstance, 
+	LPSTR lpCmdLine, 
+	int nCmdShow)
 {
 	wchar_t className[32] = L"Sample";
 	wchar_t windowName[32] = L"Sample";
@@ -132,14 +132,14 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		}
 	}
 
-	if (g_pDevice)
-		g_pDevice->Release();
 	if (g_pVB)
 		g_pVB->Release();
 	if (g_pIB)
 		g_pIB->Release();
 	if (g_Texture1)
 		g_Texture1->Release();
+	if (g_pDevice)
+		g_pDevice->Release();
 	return 0;
 }
 
@@ -255,11 +255,11 @@ void Render(int timeDelta)
 		if (y >= 6.28f)
 			y = 0;
 
-		Matrix44 rx, ry, r;
-		rx.SetRotationX(MATH_PI/4.f); 	// x축으로 45도 회전시킨다.
-		ry.SetRotationY(y); // y축으로 회전
-		r = rx*ry;
-		g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&r);
+		//Matrix44 rx, ry, r;
+		//rx.SetRotationX(MATH_PI/2.f); 	// x축으로 45도 회전시킨다.
+		//ry.SetRotationY(y); // y축으로 회전
+		//r = rx*ry;
+		//g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&r);
 
 		g_pDevice->SetTexture(0, g_Texture1);
 		g_pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
@@ -282,9 +282,8 @@ void Render(int timeDelta)
 
 bool InitVertexBuffer()
 {
-	ReadModelFile("cube.dat", g_pVB, g_VtxSize, g_pIB, g_FaceSize);
-
-	D3DXCreateTextureFromFileA(g_pDevice, "강소라2.jpg", &g_Texture1);
+	ReadModelFile("../media/cube1.dat", g_pVB, g_VtxSize, g_pIB, g_FaceSize);
+	D3DXCreateTextureFromFileA(g_pDevice, "../media/강소라2.jpg", &g_Texture1);
 
 
 	ZeroMemory(&g_Mtrl, sizeof(g_Mtrl));
@@ -300,7 +299,7 @@ bool InitVertexBuffer()
 	g_Light.Ambient = color * 0.4f;
 	g_Light.Diffuse = color;
 	g_Light.Specular = color * 0.6f;
-	g_Light.Direction = *(D3DXVECTOR3*)&Vector3(1,0,0);	
+	g_Light.Direction = *(D3DXVECTOR3*)&Vector3(0,0,1);	
 
 	Matrix44 V;
 	Vector3 dir = Vector3(0,0,0)-Vector3(0,0,-5);
@@ -357,23 +356,13 @@ bool ReadModelFile( const string &fileName, LPDIRECT3DVERTEXBUFFER9 &vtxBuff, in
 	}
 
 	vertices[0].u = 0;
-	vertices[0].v = 1;
+	vertices[0].v = 0;
 	vertices[1].u = 1;
-	vertices[1].v = 1;
+	vertices[1].v = 0;
 	vertices[2].u = 1;
-	vertices[2].v = 0;
+	vertices[2].v = 1;
 	vertices[3].u = 0;
-	vertices[3].v = 0;
-
-	vertices[4].u = 0;
-	vertices[4].v = 1;
-	vertices[5].u = 1;
-	vertices[5].v = 1;
-	vertices[6].u = 1;
-	vertices[6].v = 0;
-	vertices[7].u = 0;
-	vertices[8].v = 0;
-
+	vertices[3].v = 1;
 	vtxBuff->Unlock();
 
 
@@ -393,7 +382,7 @@ bool ReadModelFile( const string &fileName, LPDIRECT3DVERTEXBUFFER9 &vtxBuff, in
 		vertices[i].n.Normalize();
 	}
 	vtxBuff->Unlock();
-/**/
+	/**/
 
 	string idx, idx_eq;
 	int numIndices;
