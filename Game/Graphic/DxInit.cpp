@@ -5,7 +5,7 @@
 using namespace graphic;
 
 
-bool InitDirectX(HWND hWnd, const int width, const int height, OUT LPDIRECT3DDEVICE9 &pDevice )
+bool graphic::InitDirectX(HWND hWnd, const int width, const int height, OUT LPDIRECT3DDEVICE9 &pDevice )
 {
 	LPDIRECT3D9 d3d9;
 	d3d9 = Direct3DCreate9( D3D_SDK_VERSION );

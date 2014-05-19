@@ -8,7 +8,7 @@ public:
 	cGameApp();
 	virtual ~cGameApp();
 
-	virtual void OnInit() override;
+	virtual bool OnInit() override;
 	virtual void OnUpdate(const float elapseT) override;
 	virtual void OnRender(const float elapseT) override;
 	virtual void OnShutdown() override;

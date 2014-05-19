@@ -5,10 +5,8 @@
 using namespace framework;
 
 
-HWND framework::InitWindow(HINSTANCE hInstance, const string &windowName2, const RECT &windowRect, int nCmdShow, WNDPROC WndProc)
+HWND framework::InitWindow(HINSTANCE hInstance, const wstring &windowName, const RECT &windowRect, int nCmdShow, WNDPROC WndProc)
 {
-	wchar_t className[32] = L"Sample";
-	wchar_t windowName[32] = L"Sample";
 	const int X = windowRect.left;
 	const int Y = windowRect.top;
 	const int WIDTH = windowRect.right - windowRect.left;
@@ -25,7 +23,7 @@ HWND framework::InitWindow(HINSTANCE hInstance, const string &windowName2, const
 	WndClass.hInstance = hInstance;				//프로그램인스턴스핸들 
 	WndClass.lpfnWndProc = (WNDPROC)WndProc;			//윈도우 프로시져 함수 포인터
 	WndClass.lpszMenuName = NULL;						//메뉴이름 없으면 NULL
-	WndClass.lpszClassName = className;				//지금 작성하고 있는 윈도우 클레스의 이름
+	WndClass.lpszClassName = windowName.c_str();				//지금 작성하고 있는 윈도우 클레스의 이름
 	WndClass.style	 = CS_HREDRAW | CS_VREDRAW;	//윈도우 그리기 방식 설정 ( 사이즈가 변경될때 화면갱신 CS_HREDRAW | CS_VREDRAW )
 
 	//위에서 작성한 윈도우 클레스정보 등록
@@ -34,8 +32,8 @@ HWND framework::InitWindow(HINSTANCE hInstance, const string &windowName2, const
 	//윈도우 생성
 	//생성된 윈도우 핸들을 전역변수 g_hWnd 가 받는다.
 	HWND hWnd = CreateWindow(
-		className,				//생성되는 윈도우의 클래스이름
-		windowName,				//윈도우 타이틀바에 출력되는 이름
+		windowName.c_str(),				//생성되는 윈도우의 클래스이름
+		windowName.c_str(),				//윈도우 타이틀바에 출력되는 이름
 		WS_OVERLAPPEDWINDOW,	//윈도우 스타일 WS_OVERLAPPEDWINDOW
 		X,				//윈도우 시작 위치 X 
 		Y,				//윈도우 시작 위치 Y

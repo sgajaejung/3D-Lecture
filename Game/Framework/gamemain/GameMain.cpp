@@ -27,7 +27,9 @@ int framework::FrameWorkWinMain(HINSTANCE hInstance,
 	if (hWnd == NULL)
 		return 0;
 
-	cGameMain::Get()->Init(hWnd);
+	if (!cGameMain::Get()->Init(hWnd))
+		return 0;
+
 	cGameMain::Get()->Run();
 	cGameMain::Get()->ShutDown();
 	return 0;
@@ -52,7 +54,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_DESTROY:
-		cGameMain::Get()->ShutDown();
+		cGameMain::Get()->Exit();
 		PostQuitMessage(0);
 		break;
 	default:
@@ -66,7 +68,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 cGameMain *cGameMain::m_pInstance = NULL;
-cGameMain::cGameMain()
+
+cGameMain::cGameMain() :
+	m_DxDevice(NULL)
 {
 
 }
@@ -86,17 +90,28 @@ cGameMain* cGameMain::Get()
 }
 
 
-void cGameMain::Init(HWND hWnd)
+bool cGameMain::Init(HWND hWnd)
 {
 	m_state = INIT;
 	m_hWnd = hWnd;
-	OnInit();
+
+	if (!graphic::InitDirectX(hWnd, 
+		m_windowRect.right-m_windowRect.left,
+		m_windowRect.bottom-m_windowRect.top,
+		m_DxDevice))
+		return false;
+
+	if (!OnInit())
+		return false;
+
+	return true;
 }
 
 
 void cGameMain::ShutDown()
 {
-	m_state = SHUTDOWN;
+	m_DxDevice->Release();
+	m_DxDevice = NULL;
 	OnShutdown();
 }
 
@@ -145,7 +160,12 @@ void	cGameMain::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 
-const string& cGameMain::GetWindowName()
+void cGameMain::Exit()
+{
+	m_state = SHUTDOWN;
+}
+
+const wstring& cGameMain::GetWindowName()
 {
 	return m_windowName;
 }

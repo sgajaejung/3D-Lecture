@@ -18,19 +18,20 @@ namespace framework
 			SHUTDOWN,			
 		};
 
-		virtual void Init(HWND hWnd);
+		virtual bool Init(HWND hWnd);
 		virtual void ShutDown();
 		virtual void Run();
 		virtual void Update(const float elapseT);
 		virtual void Render(const float elapseT);
+		virtual void Exit();
 
-		const string& GetWindowName();
-		const RECT& GetWindowRect();
+		const wstring& GetWindowName();
+		const RECT& GetWindowRect();		
 		virtual void MessageProc( UINT message, WPARAM wParam, LPARAM lParam);
 
 
 	protected:
-		virtual void OnInit() {}
+		virtual bool OnInit() { return true; }
 		virtual void OnUpdate(const float elapseT) {}
 		virtual void OnRender(const float elapseT) {}
 		virtual void OnShutdown() {}
@@ -39,8 +40,9 @@ namespace framework
 	protected:
 		STATE m_state;
 		HWND m_hWnd;
-		string m_windowName;
+		wstring m_windowName;
 		RECT m_windowRect;
+		LPDIRECT3DDEVICE9 m_DxDevice;
 
 
 	// singleton

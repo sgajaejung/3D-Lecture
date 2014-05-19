@@ -7,7 +7,7 @@ INIT_FRAMEWORK(cGameApp)
 
 cGameApp::cGameApp()
 {
-	m_windowName = "test";
+	m_windowName = L"GameApp";
 	const RECT r = {0, 0, 800, 600};
 	m_windowRect = r;
 }
@@ -18,9 +18,10 @@ cGameApp::~cGameApp()
 }
 
 
-void cGameApp::OnInit()
+bool cGameApp::OnInit()
 {
 
+	return true;
 }
 
 
