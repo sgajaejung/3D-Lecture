@@ -90,12 +90,14 @@ void cGameMain::Init(HWND hWnd)
 {
 	m_state = INIT;
 	m_hWnd = hWnd;
+	OnInit();
 }
 
 
 void cGameMain::ShutDown()
 {
 	m_state = SHUTDOWN;
+	OnShutdown();
 }
 
 
@@ -127,13 +129,13 @@ void cGameMain::Run()
 
 void cGameMain::Update(const float elapseT)
 {
-
+	OnUpdate(elapseT);
 }
 
 
 void cGameMain::Render(const float elapseT)
 {
-
+	OnRender(elapseT);
 }
 
 

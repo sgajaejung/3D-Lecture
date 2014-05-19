@@ -17,3 +17,32 @@ cGameApp::~cGameApp()
 
 }
 
+
+void cGameApp::OnInit()
+{
+
+}
+
+
+void cGameApp::OnUpdate(const float elapseT)
+{
+
+}
+
+
+void cGameApp::OnRender(const float elapseT)
+{
+
+}
+
+
+void cGameApp::OnShutdown()
+{
+
+}
+
+
+void cGameApp::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
+{
+
+}

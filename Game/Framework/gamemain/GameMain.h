@@ -30,6 +30,13 @@ namespace framework
 
 
 	protected:
+		virtual void OnInit() {}
+		virtual void OnUpdate(const float elapseT) {}
+		virtual void OnRender(const float elapseT) {}
+		virtual void OnShutdown() {}
+
+
+	protected:
 		STATE m_state;
 		HWND m_hWnd;
 		string m_windowName;
