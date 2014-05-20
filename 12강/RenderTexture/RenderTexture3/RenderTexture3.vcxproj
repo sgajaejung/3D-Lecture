@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{E0ABBCD6-22E6-47E7-BE6B-BF147D3B91AF}</ProjectGuid>
+    <ProjectGuid>{FE038B75-9D77-4142-91D2-94AAAB427F26}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>My2DRenderer</RootNamespace>
+    <RootNamespace>RenderTexture3</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -45,7 +45,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -58,7 +59,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -72,34 +74,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="2DRenderer.ico" />
-    <None Include="ReadMe.txt" />
-    <None Include="small.ico" />
+    <ClCompile Include="..\math\matrix44.cpp" />
+    <ClCompile Include="..\math\vector3.cpp" />
+    <ClCompile Include="..\math\vector4.cpp" />
+    <ClCompile Include="RenderTexture3.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="2DRenderer.h" />
-    <ClInclude Include="DrawTriangle.h" />
-    <ClInclude Include="math\Math.h" />
-    <ClInclude Include="math\matrix44.h" />
-    <ClInclude Include="math\vector3.h" />
-    <ClInclude Include="math\vector4.h" />
-    <ClInclude Include="Resource.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="2DRenderer.cpp" />
-    <ClCompile Include="DrawTriangle.cpp" />
-    <ClCompile Include="math\matrix44.cpp" />
-    <ClCompile Include="math\vector3.cpp" />
-    <ClCompile Include="math\vector4.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="2DRenderer.rc" />
+    <ClInclude Include="..\math\Math.h" />
+    <ClInclude Include="..\math\matrix44.h" />
+    <ClInclude Include="..\math\vector3.h" />
+    <ClInclude Include="..\math\vector4.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

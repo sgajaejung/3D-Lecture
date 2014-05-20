@@ -39,20 +39,20 @@
     <ClInclude Include="2DRenderer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="math\Math.h">
-      <Filter>math</Filter>
-    </ClInclude>
-    <ClInclude Include="math\Quaternion.h">
-      <Filter>math</Filter>
-    </ClInclude>
-    <ClInclude Include="math\Matrix.h">
-      <Filter>math</Filter>
-    </ClInclude>
-    <ClInclude Include="math\Vector3.h">
-      <Filter>math</Filter>
-    </ClInclude>
     <ClInclude Include="DrawTriangle.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="math\matrix44.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="math\vector3.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="math\vector4.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="math\Math.h">
+      <Filter>math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -62,17 +62,17 @@
     <ClCompile Include="2DRenderer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="math\Matrix.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
-    <ClCompile Include="math\Quaternion.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
-    <ClCompile Include="math\Vector3.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
     <ClCompile Include="DrawTriangle.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="math\matrix44.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="math\vector3.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="math\vector4.cpp">
+      <Filter>math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
