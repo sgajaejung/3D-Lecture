@@ -35,9 +35,9 @@ struct Vertex
 const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_NORMAL;
 
 
-cGameApp::cGameApp() :
+cGameApp::cGameApp()
 	//m_pVB(NULL),
-	m_pIB(NULL)
+	//m_pIB(NULL)
 {
 	m_windowName = L"GameApp";
 	const RECT r = {0, 0, 800, 600};
@@ -51,7 +51,7 @@ cGameApp::~cGameApp()
 
 bool cGameApp::OnInit()
 {
-	ReadModelFile("vase.dat", m_vtxBuff, m_VtxSize, m_pIB, m_FaceSize);
+	ReadModelFile("vase.dat", m_vtxBuff, m_VtxSize, m_idxBuff, m_FaceSize);
 
 	m_mtrl.InitRed();
 
@@ -124,9 +124,7 @@ void cGameApp::OnRender(const float elapseT)
 		graphic::GetDevice()->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&r);
 
 		m_mtrl.Bind();
-		//graphic::GetDevice()->SetStreamSource( 0, m_pVB, 0, sizeof(Vertex) );
-		graphic::GetDevice()->SetIndices(m_pIB);
-		//graphic::GetDevice()->SetFVF( Vertex::FVF );
+		m_idxBuff.Bind();
 		m_vtxBuff.Bind();
 		graphic::GetDevice()->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, m_VtxSize, 0, m_FaceSize);
 
@@ -141,10 +139,7 @@ void cGameApp::OnRender(const float elapseT)
 
 void cGameApp::OnShutdown()
 {
-	//if (m_pVB)
-	//	m_pVB->Release();
-	if (m_pIB)
-		m_pIB->Release();
+
 }
 
 
@@ -155,7 +150,7 @@ void cGameApp::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 
 
 bool cGameApp::ReadModelFile( const string &fileName, graphic::cVertexBuffer &vtxBuff, int &vtxSize,  
-	LPDIRECT3DINDEXBUFFER9 &idxBuff, int &faceSize )
+	graphic::cIndexBuffer &idxBuff, int &faceSize )
 {
 	using namespace std;
 	ifstream fin(fileName.c_str());
@@ -171,28 +166,18 @@ bool cGameApp::ReadModelFile( const string &fileName, graphic::cVertexBuffer &vt
 
 	vtxSize = numVertices;
 
+	// 버텍스 버퍼 생성.
 	if (!vtxBuff.Create(vtxSize, sizeof(Vertex), Vertex::FVF))
 		return false;
 
-	// 버텍스 버퍼 생성.
-	//if (FAILED(graphic::GetDevice()->CreateVertexBuffer( numVertices * sizeof(Vertex),
-	//	D3DUSAGE_WRITEONLY, Vertex::FVF,
-	//	D3DPOOL_MANAGED, &vtxBuff, NULL)))
-	//{
-	//	return false;
-	//}
-
 	// 버텍스 버퍼 초기화.
 	Vertex* vertices = (Vertex*)vtxBuff.Lock();
-	//if (FAILED(vtxBuff->Lock( 0, sizeof(Vertex), (void**)&vertices, 0)))
-	//	return false;
 	float num1, num2, num3;
 	for (int i = 0; i < numVertices; i++)
 	{
 		fin >> num1 >> num2 >> num3;
 		vertices[i] = Vertex(num1, num2, num3);
 	}
-	//vtxBuff->Unlock();
 	vtxBuff.Unlock();
 
 
@@ -205,17 +190,9 @@ bool cGameApp::ReadModelFile( const string &fileName, graphic::cVertexBuffer &vt
 
 	faceSize = numIndices;
 
-	if (FAILED(graphic::GetDevice()->CreateIndexBuffer(numIndices*3*sizeof(WORD), 
-		D3DUSAGE_WRITEONLY,
-		D3DFMT_INDEX16,
-		D3DPOOL_MANAGED,
-		&idxBuff, NULL)))
-	{
-		return false;
-	}
+	idxBuff.Create(numIndices);
 
-	WORD *indices = NULL;
-	idxBuff->Lock(0, 0, (void**)&indices, 0);
+	WORD *indices = (WORD*)idxBuff.Lock();
 	int num4, num5, num6;
 	for (int i = 0; i < numIndices*3; i+=3)
 	{
@@ -224,7 +201,7 @@ bool cGameApp::ReadModelFile( const string &fileName, graphic::cVertexBuffer &vt
 		indices[ i+1] = num5;
 		indices[ i+2] = num6;	
 	}
-	idxBuff->Unlock();
+	idxBuff.Unlock();
 
 	ComputeNormals(vtxBuff, vtxSize, idxBuff, faceSize);
 	return true;
@@ -232,14 +209,10 @@ bool cGameApp::ReadModelFile( const string &fileName, graphic::cVertexBuffer &vt
 
 
 void cGameApp::ComputeNormals(graphic::cVertexBuffer &vtxBuff, int vtxSize,  
-	LPDIRECT3DINDEXBUFFER9 idxBuff, int faceSize)
+	graphic::cIndexBuffer &idxBuff, int faceSize)
 {
-	//Vertex* vertices;
-	//vtxBuff->Lock( 0, sizeof(Vertex), (void**)&vertices, 0);
 	Vertex* vertices = (Vertex*)vtxBuff.Lock();
-
-	WORD *indices = NULL;
-	idxBuff->Lock(0, 0, (void**)&indices, 0);
+	WORD *indices = (WORD*)idxBuff.Lock();
 
 	for (int i=0; i < faceSize*3; i+=3)
 	{
@@ -285,7 +258,6 @@ void cGameApp::ComputeNormals(graphic::cVertexBuffer &vtxBuff, int vtxSize,
 		}
 	}
 
-	//vtxBuff->Unlock();
 	vtxBuff.Unlock();
-	idxBuff->Unlock();
+	idxBuff.Unlock();
 }

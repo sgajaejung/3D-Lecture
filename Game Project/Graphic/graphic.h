@@ -12,6 +12,7 @@ using namespace common;
 #include "material.h"
 #include "light.h"
 #include "vertexbuffer.h"
+#include "indexbuffer.h"
 
 
 #pragma comment( lib, "d3d9.lib" )

@@ -18,16 +18,17 @@ public:
 protected:
 	bool ReadModelFile( const string &fileName, 
 		graphic::cVertexBuffer &vtxBuff, int &vtxSize,  
-		LPDIRECT3DINDEXBUFFER9 &idxBuff, int &faceSize );
+		graphic::cIndexBuffer &idxBuff, int &faceSize );
 
 	void ComputeNormals(graphic::cVertexBuffer &vtxBuff, int vtxSize,  
-		LPDIRECT3DINDEXBUFFER9 idxBuff, int faceSize);
+		graphic::cIndexBuffer &idxBuff, int faceSize);
 
 
 private:
 	//LPDIRECT3DVERTEXBUFFER9 m_pVB; // 버텍스 버퍼
 	graphic::cVertexBuffer m_vtxBuff;
-	LPDIRECT3DINDEXBUFFER9 m_pIB; // 인덱스 버퍼
+	//LPDIRECT3DINDEXBUFFER9 m_pIB; // 인덱스 버퍼
+	graphic::cIndexBuffer m_idxBuff;
 	int m_VtxSize;
 	int m_FaceSize;
 	graphic::cMaterial m_mtrl;
