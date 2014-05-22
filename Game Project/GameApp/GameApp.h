@@ -17,10 +17,10 @@ public:
 
 protected:
 	bool ReadModelFile( const string &fileName, 
-		LPDIRECT3DVERTEXBUFFER9 &vtxBuff, int &vtxSize,  
+		graphic::cVertexBuffer &vtxBuff, int &vtxSize,  
 		LPDIRECT3DINDEXBUFFER9 &idxBuff, int &faceSize );
 
-	void ComputeNormals(LPDIRECT3DVERTEXBUFFER9 vtxBuff, int vtxSize,  
+	void ComputeNormals(graphic::cVertexBuffer &vtxBuff, int vtxSize,  
 		LPDIRECT3DINDEXBUFFER9 idxBuff, int faceSize);
 
 

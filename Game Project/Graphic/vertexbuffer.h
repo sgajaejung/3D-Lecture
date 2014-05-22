@@ -13,8 +13,11 @@ namespace graphic
 		bool Create(int vertexCount, int sizeofVertex, int fvf);
 		void* Lock();
 		void Unlock();
-		void Bind();
+		void Bind() const;
 
+		int GetFVF() const;
+		int GetSizeOfVertex() const;
+		int GetVertexCount() const;
 
 	private:
 		LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;
@@ -22,4 +25,9 @@ namespace graphic
 		int m_sizeOfVertex;
 		int m_vertexCount;
 	};
+
+	
+	inline int cVertexBuffer::GetFVF() const { return m_fvf; }
+	inline int cVertexBuffer::GetSizeOfVertex() const { return m_sizeOfVertex; }
+	inline int cVertexBuffer::GetVertexCount() const { return m_vertexCount; }
 }

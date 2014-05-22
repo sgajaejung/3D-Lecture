@@ -60,7 +60,7 @@ void cVertexBuffer::Unlock()
 }
 
 
-void cVertexBuffer::Bind()
+void cVertexBuffer::Bind() const
 {
 	GetDevice()->SetStreamSource( 0, m_pVtxBuff, 0, m_sizeOfVertex );
 	GetDevice()->SetFVF( m_fvf );
