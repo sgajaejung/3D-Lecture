@@ -13,11 +13,7 @@ cVertexBuffer::cVertexBuffer() :
 
 cVertexBuffer::~cVertexBuffer()
 {
-	if (m_pVtxBuff)
-	{
-		m_pVtxBuff->Release();
-		m_pVtxBuff = NULL;
-	}
+	SAFE_RELEASE(m_pVtxBuff);
 }
 
 

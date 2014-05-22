@@ -13,11 +13,7 @@ cIndexBuffer::cIndexBuffer() :
 
 cIndexBuffer::~cIndexBuffer()
 {
-	if (m_pIdxBuff)
-	{
-		m_pIdxBuff->Release();
-		m_pIdxBuff = NULL;
-	}
+	SAFE_RELEASE(m_pIdxBuff);
 }
 
 
