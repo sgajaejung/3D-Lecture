@@ -8,6 +8,7 @@
     <ClInclude Include="material.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="vertexbuffer.h" />
+    <ClInclude Include="light.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -15,5 +16,6 @@
     <ClCompile Include="material.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="vertexbuffer.cpp" />
+    <ClCompile Include="light.cpp" />
   </ItemGroup>
 </Project>

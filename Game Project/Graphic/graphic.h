@@ -10,6 +10,7 @@ using namespace common;
 
 #include "Renderer.h"
 #include "material.h"
+#include "light.h"
 #include "vertexbuffer.h"
 
 
