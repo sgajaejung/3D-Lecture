@@ -35,3 +35,8 @@ void cLight::Bind(int lightIndex)
 {
 	GetDevice()->SetLight(lightIndex, &m_light); // ±¤¿ø ¼³Á¤.
 }
+
+void cLight::SetDirection( const Vector3 &direction )
+{
+	m_light.Direction = *(D3DXVECTOR3*)&direction;
+}

@@ -32,5 +32,6 @@ private:
 	int m_FaceSize;
 	graphic::cMaterial m_mtrl;
 
-	D3DLIGHT9 m_Light;
+	//D3DLIGHT9 m_Light;
+	graphic::cLight m_light;
 };

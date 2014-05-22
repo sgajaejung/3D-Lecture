@@ -55,13 +55,19 @@ bool cGameApp::OnInit()
 
 	m_mtrl.InitRed();
 
-	D3DXCOLOR color(1,1,1,1);
-	ZeroMemory(&m_Light, sizeof(m_Light));
-	m_Light.Type = D3DLIGHT_DIRECTIONAL;
-	m_Light.Ambient = color * 0.4f;
-	m_Light.Diffuse = color;
-	m_Light.Specular = color * 0.6f;
-	m_Light.Direction = *(D3DXVECTOR3*)&Vector3(1,0,0);	
+	Vector4 color(1,1,1,1);
+	m_light.Init( graphic::cLight::LIGHT_DIRECTIONAL, 
+		color * 0.4f,
+		color,
+		color * 0.6f,
+		Vector3(1,0,0));
+	
+	//ZeroMemory(&m_Light, sizeof(m_Light));
+	//m_Light.Type = D3DLIGHT_DIRECTIONAL;
+	//m_Light.Ambient = color * 0.4f;
+	//m_Light.Diffuse = color;
+	//m_Light.Specular = color * 0.6f;
+	//m_Light.Direction = *(D3DXVECTOR3*)&Vector3(1,0,0);	
 
 	Matrix44 V;
 	Vector3 dir = Vector3(0,0,0)-Vector3(0,0,-5);
@@ -73,7 +79,9 @@ bool cGameApp::OnInit()
 	proj.SetProjection(D3DX_PI * 0.5f, (float)WINSIZE_X / (float) WINSIZE_Y, 1.f, 1000.0f) ;
 	graphic::GetDevice()->SetTransform(D3DTS_PROJECTION, (D3DXMATRIX*)&proj) ;
 
-	graphic::GetDevice()->SetLight(0, &m_Light); // 광원 설정.
+	//graphic::GetDevice()->SetLight(0, &m_Light); // 광원 설정.
+	m_light.Bind(0);
+
 	graphic::GetDevice()->LightEnable (
 		0, // 활성화/ 비활성화 하려는 광원 리스트 내의 요소
 		true); // true = 활성화 ， false = 비활성화

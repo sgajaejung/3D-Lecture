@@ -5,6 +5,11 @@
 using namespace common;
 
 
+Vector4 Vector4::operator * ( const float & rhs ) const
+{
+	return Vector4(x*rhs, y*rhs, z*rhs, w*rhs);
+}
+
 Vector4 Vector4::operator * ( const Matrix44& rhs ) const
 {
 	float	RHW = 1.0f / (x*rhs._14 + y*rhs._24 + z*rhs._34 + w*rhs._44);

@@ -23,6 +23,7 @@ namespace graphic
 			const Vector4 &specular,
 			const Vector3 &direction);
 
+		void SetDirection( const Vector3 &direction );
 		void Bind(int lightIndex);
 
 		D3DLIGHT9 m_light;
