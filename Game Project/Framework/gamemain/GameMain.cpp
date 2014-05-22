@@ -70,8 +70,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 /////////////////////////////////////////////////////////////////////////////////////////////
 cGameMain *cGameMain::m_pInstance = NULL;
 
-cGameMain::cGameMain() :
-	m_DxDevice(NULL)
+cGameMain::cGameMain()
 {
 
 }
@@ -105,10 +104,9 @@ bool cGameMain::Init(HWND hWnd)
 	m_state = INIT;
 	m_hWnd = hWnd;
 
-	if (!graphic::InitDirectX(hWnd, 
+	if (!graphic::InitRenderer(hWnd, 
 		m_windowRect.right-m_windowRect.left,
-		m_windowRect.bottom-m_windowRect.top,
-		m_DxDevice))
+		m_windowRect.bottom-m_windowRect.top))
 		return false;
 
 	if (!OnInit())
@@ -120,9 +118,8 @@ bool cGameMain::Init(HWND hWnd)
 
 void cGameMain::ShutDown()
 {
-	m_DxDevice->Release();
-	m_DxDevice = NULL;
 	OnShutdown();
+	graphic::ReleaseRenderer();
 }
 
 

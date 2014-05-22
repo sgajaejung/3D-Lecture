@@ -19,6 +19,9 @@
       <Filter>math</Filter>
     </ClInclude>
     <ClInclude Include="common.h" />
+    <ClInclude Include="etc\singleton.h">
+      <Filter>Etc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -38,6 +41,9 @@
   <ItemGroup>
     <Filter Include="math">
       <UniqueIdentifier>{09e41562-7a55-4d7d-b787-1e97e14beb8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Etc">
+      <UniqueIdentifier>{c61673fa-04bb-421e-ad9e-ad682ac30936}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -68,6 +68,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />
+    <ClInclude Include="etc\singleton.h" />
     <ClInclude Include="math\box.h" />
     <ClInclude Include="math\Math.h" />
     <ClInclude Include="math\matrix44.h" />

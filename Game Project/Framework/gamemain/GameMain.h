@@ -42,7 +42,6 @@ namespace framework
 		HWND m_hWnd;
 		wstring m_windowName;
 		RECT m_windowRect;
-		LPDIRECT3DDEVICE9 m_DxDevice;
 
 
 	// singleton

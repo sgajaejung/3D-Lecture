@@ -15,3 +15,4 @@
 #include "../Common/common.h"
 #include "graphic.h"
 
+using namespace common;
