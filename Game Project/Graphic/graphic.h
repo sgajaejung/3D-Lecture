@@ -10,6 +10,7 @@ using namespace common;
 
 #include "Renderer.h"
 #include "material.h"
+#include "vertexbuffer.h"
 
 
 #pragma comment( lib, "d3d9.lib" )

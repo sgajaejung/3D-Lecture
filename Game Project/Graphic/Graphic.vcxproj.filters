@@ -7,11 +7,13 @@
     <ClInclude Include="DxInit.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="vertexbuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="DxInit.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="vertexbuffer.cpp" />
   </ItemGroup>
 </Project>
