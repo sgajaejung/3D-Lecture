@@ -19,6 +19,7 @@ namespace graphic
 		int GetSizeOfVertex() const;
 		int GetVertexCount() const;
 
+
 	private:
 		LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;
 		int m_fvf;

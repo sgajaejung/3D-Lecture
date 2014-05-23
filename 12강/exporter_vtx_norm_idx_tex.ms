@@ -33,6 +33,19 @@ fn ConvertToD3D_INDEX max_index =
 	d3d_index
 )
 
+-- MAXÀÇ ÅØ½ºÃÄ ÁÂÇ¥¸¦ D3DÀÇ uvÁÂÇ¥·Î ¹Ù²ãÁØ´Ù.
+fn ConvertToD3D_UV max_pos =
+(
+	if max_pos == undefined then return undefined
+	local d3d_uv = [0,0]
+
+	d3d_uv.x = max_pos.x
+	d3d_uv.y = 1.0 - max_pos.y
+
+	d3d_uv
+)
+
+
 
 fn CollectObject = 
 (
@@ -94,12 +107,13 @@ fn CollectVtxNormTex obj =
 	print obj.numtverts
 	print "vertex face count: "
 	print obj.faces.count
-	
---	buildTVFaces obj
-	
-	if (obj.numTVerts >= obj.numVerts) then
+
+	if (obj.numTVerts > obj.numVerts) then
 	(
+		print "obj.numTVerts > obj.numVerts"
+		
 		for i=1 to obj.numTVerts do
+		--for i=1 to obj.numVerts do
 		(
 			local vnt = VtxNormTex #()
 			vnt.tex = getTvert obj i
@@ -111,30 +125,15 @@ fn CollectVtxNormTex obj =
 			local tvfaceidx = getTVFace obj i
 			local faceidx = getFace obj i
 
-			varSetVtxNormTex[ tvfaceidx[ 1]].vtx = copy (getvert obj faceidx[ 1])
-			--varSetVtxNormTex[ tvfaceidx[ 1]].nrm = getnormal obj faceidx[ 1]
+			varSetVtxNormTex[ faceidx[ 1]].vtx = copy (getvert obj faceidx[ 1])
+			varSetVtxNormTex[ faceidx[ 2]].vtx = copy (getvert obj faceidx[ 2])
+			varSetVtxNormTex[ faceidx[ 3]].vtx = copy (getvert obj faceidx[ 3])
 
-			varSetVtxNormTex[ tvfaceidx[ 2]].vtx = copy (getvert obj faceidx[ 2])
-			--varSetVtxNormTex[ tvfaceidx[ 2]].nrm = getnormal obj faceidx[ 2]
-
-			varSetVtxNormTex[ tvfaceidx[ 3]].vtx = copy (getvert obj faceidx[ 3])
-			--varSetVtxNormTex[ tvfaceidx[ 3]].nrm = getnormal obj faceidx[ 3]
-
-			
-			--varSetVtxNormTex[ faceidx[ 1]].vtx = copy (getvert obj faceidx[ 1])
-			--varSetVtxNormTex[ faceidx[ 1]].nrm = getnormal obj faceidx[ 1]
-
-			--varSetVtxNormTex[ faceidx[ 2]].vtx = copy (getvert obj faceidx[ 2])
-			--varSetVtxNormTex[ faceidx[ 2]].nrm = getnormal obj faceidx[ 2]
-
-			--varSetVtxNormTex[ faceidx[ 3]].vtx = copy (getvert obj faceidx[ 3])
-			--varSetVtxNormTex[ faceidx[ 3]].nrm = getnormal obj faceidx[ 3]
 			
 			local normal = normalize (getFaceNormal obj i)
-			varSetVtxNormTex[ tvfaceidx[ 1]].nrm = normal
-			varSetVtxNormTex[ tvfaceidx[ 2]].nrm = normal
-			varSetVtxNormTex[ tvfaceidx[ 3]].nrm = normal
-			
+			varSetVtxNormTex[ faceidx[ 1]].nrm = normal
+			varSetVtxNormTex[ faceidx[ 2]].nrm = normal
+			varSetVtxNormTex[ faceidx[ 3]].nrm = normal
 		)
 	)
 	else
@@ -195,6 +194,7 @@ fn WriteIndex obj =
 fn WriteVtxNormTex obj = 
 (
 	varSetVertice = CollectVtxNormTex obj
+	
 	format "VERTEX = %\n" varSetVertice.count to:Outfile
 	for i=1 to varSetVertice.count do
 	(
@@ -220,6 +220,7 @@ fn WriteVtxNormTex obj =
 	for i=1 to obj.faces.count do
 	(
 		local tvfaceidx = getTVFace obj i
+		--local tvfaceidx = getFace obj i
 		index = (ConvertToD3D_INDEX tvfaceidx)
 		format "% % %\n" (index.x as integer) (index.y as integer) (index.z as integer) to:Outfile
 	)

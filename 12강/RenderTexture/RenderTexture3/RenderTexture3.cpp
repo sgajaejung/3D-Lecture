@@ -287,7 +287,6 @@ bool InitVertexBuffer()
 	ReadModelFile("../media/cube3.dat", g_pVB, g_VtxSize, g_pIB, g_FaceSize);
 	D3DXCreateTextureFromFileA(g_pDevice, "../media/강소라2.jpg", &g_Texture1);
 
-
 	ZeroMemory(&g_Mtrl, sizeof(g_Mtrl));
 	g_Mtrl.Ambient = D3DXCOLOR(1,1,1,1);
 	g_Mtrl.Diffuse = D3DXCOLOR(1,1,1,1);
@@ -313,8 +312,8 @@ bool InitVertexBuffer()
 	proj.SetProjection(D3DX_PI * 0.5f, (float)WINSIZE_X / (float) WINSIZE_Y, 1.f, 1000.0f) ;
 	g_pDevice->SetTransform(D3DTS_PROJECTION, (D3DXMATRIX*)&proj) ;
 
-	g_pDevice->SetRenderState(D3DRS_CULLMODE, false);
-	g_pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+	//g_pDevice->SetRenderState(D3DRS_CULLMODE, false);
+	//g_pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 	g_pDevice->SetLight(0, &g_Light); // 광원 설정.
 	g_pDevice->LightEnable (
 		0, // 활성화/ 비활성화 하려는 광원 리스트 내의 요소

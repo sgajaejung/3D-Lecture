@@ -15,7 +15,7 @@ namespace framework
 		{
 			INIT,
 			RUN,
-			SHUTDOWN,			
+			SHUTDOWN,
 		};
 
 		virtual bool Init(HWND hWnd);
