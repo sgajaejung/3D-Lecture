@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RenderTexture", "RenderTexture\RenderTexture.vcxproj", "{B3968083-CAFD-4CB3-BC59-0554A062617C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RenderTexture2", "RenderTexture2\RenderTexture2.vcxproj", "{BF79000B-F876-4787-B2D1-F569640C13CE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RenderTexture3", "RenderTexture3\RenderTexture3.vcxproj", "{FE038B75-9D77-4142-91D2-94AAAB427F26}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B3968083-CAFD-4CB3-BC59-0554A062617C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B3968083-CAFD-4CB3-BC59-0554A062617C}.Debug|Win32.Build.0 = Debug|Win32
+		{B3968083-CAFD-4CB3-BC59-0554A062617C}.Release|Win32.ActiveCfg = Release|Win32
+		{B3968083-CAFD-4CB3-BC59-0554A062617C}.Release|Win32.Build.0 = Release|Win32
+		{BF79000B-F876-4787-B2D1-F569640C13CE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BF79000B-F876-4787-B2D1-F569640C13CE}.Debug|Win32.Build.0 = Debug|Win32
+		{BF79000B-F876-4787-B2D1-F569640C13CE}.Release|Win32.ActiveCfg = Release|Win32
+		{BF79000B-F876-4787-B2D1-F569640C13CE}.Release|Win32.Build.0 = Release|Win32
+		{FE038B75-9D77-4142-91D2-94AAAB427F26}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FE038B75-9D77-4142-91D2-94AAAB427F26}.Debug|Win32.Build.0 = Debug|Win32
+		{FE038B75-9D77-4142-91D2-94AAAB427F26}.Release|Win32.ActiveCfg = Release|Win32
+		{FE038B75-9D77-4142-91D2-94AAAB427F26}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
