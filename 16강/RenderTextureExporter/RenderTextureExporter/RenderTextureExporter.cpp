@@ -110,8 +110,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	InitVertexBuffer();
 	ShowWindow( hWnd, nCmdShow );
 
-	DragAcceptFiles(hWnd, TRUE);
-
 
 	//메시지 구조체
 	MSG msg;		
@@ -290,7 +288,7 @@ void Render(int timeDelta)
 
 bool InitVertexBuffer()
 {
-	ReadModelFile("../media/data.dat", g_pVB, g_VtxSize, g_pIB, g_FaceSize);
+	ReadModelFile("../media/cube.dat", g_pVB, g_VtxSize, g_pIB, g_FaceSize);
 	D3DXCreateTextureFromFileA(g_pDevice, "../media/강소라2.jpg", &g_Texture1);
 
 	ZeroMemory(&g_Mtrl, sizeof(g_Mtrl));
@@ -335,6 +333,11 @@ bool ReadModelFile( const string &fileName, LPDIRECT3DVERTEXBUFFER9 &vtxBuff, in
 	using namespace std;
 	ifstream fin(fileName.c_str());
 	if (!fin.is_open())
+		return false;
+
+	string exporterVersion;
+	fin >>exporterVersion;
+	if (exporterVersion != "EXPORTER_V1")
 		return false;
 
 	string vtx, eq;
