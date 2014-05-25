@@ -1,9 +1,47 @@
 
 
+@@item Max Script ---------------------------------------
+
+@@item 1. WriteVtxNormTex 함수를 호출한다.
+			WriteVtxNormTex g_varSetMeshes[ i]
 
 
+@@item 2. max script 텍스쳐 좌표를 저장하는 함수를 만든다.
+fn WriteVtxNormTex obj = 
+(
+	WriteVertex obj
+	WriteIndex obj
+	WriteNormal obj
+	WriteTVertTVFace obj
+	format "TEXTURE_FILE = texture file name\n" to:Outfile
+)
 
-@@item 1. Vertex 구조체 uv 좌표 추가.
+
+@@item 3. 텍스쳐 uv 좌표 버퍼와 텍스쳐 face 버퍼를 저장하는 함수를 만든다.
+fn WriteTVertTVFace obj = 
+(
+	format "TEXTURE-VERTEX = %\n" obj.numTVerts to:Outfile
+	for i=1 to obj.numTVerts do
+	(
+		local tex = getTvert obj i
+		local uv = (ConvertToD3D_UV tex)
+		format "% %\n" uv.x  uv.y to:Outfile
+	)
+		
+	format "TEXTURE-FACE = %\n" obj.faces.count to:Outfile	
+	for i=1 to obj.faces.count do
+	(
+		local tvfaceidx = getTVFace obj i
+		local index = (ConvertToD3D_INDEX tvfaceidx)
+		format "% % %\n" (index.x as integer) (index.y as integer) (index.z as integer) to:Outfile
+	)
+)
+
+
+@@item C++ 어플리케이션------------------------------
+
+
+@@item 4. Vertex 구조체 uv 좌표 추가.
 struct Vertex
 {
 	Vertex() {}
@@ -17,11 +55,11 @@ struct Vertex
 };
 
 
-@@item 2. Vertex FVF 설정.
+@@item 5. Vertex FVF 설정.
 const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
 
 
-@@item 3. Texture 좌표, Texture Face 정보를 파일로부터 읽어온다.
+@@item 6. Texture 좌표, Texture Face 정보를 파일로부터 읽어온다.
 	string tex;
 	int numTex;
 	fin >> tex >> eq >> numTex;
@@ -56,7 +94,7 @@ const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
 	}
 
 
-@@item 4. Vertex 정보를 동적으로 추가될 자료구조를 선언하고, 초기화한다.
+@@item 7. Vertex 정보를 동적으로 추가될 자료구조를 선언하고, 초기화한다.
 		map<int, vector<int> > vtxIdxMap; // vertex index, vertex index array
 		for (int i=0; i < vtxSize; ++i)
 		{
@@ -67,7 +105,7 @@ const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
 		}
 
 
-@@item 5. Vertex 에 하나이상의 uv좌표가 있을 때, 동적으로 추가한다.
+@@item 8. Vertex 에 하나이상의 uv좌표가 있을 때, 동적으로 추가한다.
 		// 텍스쳐 좌표를 버텍스 버퍼에 저장한다. 
 		// 버텍스 버퍼의 uv 값이 초기화 되지 않았다면, 초기화 한다.
 		// 버텍스에 하나 이상의 uv값이 존재한다면, 버텍스를 추가하고, 인덱스버퍼를 수정한다.
@@ -115,22 +153,22 @@ const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
 		}
 
 
-@@item 6. 텍스쳐 객체를 선언한다.
+@@item 9. 텍스쳐 객체를 선언한다.
 IDirect3DTexture9* g_Texture1;
 
 
-@@item 7. 텍스쳐를 생성한다.
+@@item 10. 텍스쳐를 생성한다.
 D3DXCreateTextureFromFileA(g_pDevice, "../media/강소라2.jpg", &g_Texture1);
 
 
-@@item 8. 텍스쳐를 출력한다.
+@@item 11. 텍스쳐를 출력한다.
 		g_pDevice->SetTexture(0, g_Texture1);
 		g_pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 		g_pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 		g_pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
 
 
-@@item 9. 텍스쳐 객체를 제거한다.
+@@item 12. 텍스쳐 객체를 제거한다.
 	if (g_Texture1)
 		g_Texture1->Release();
 

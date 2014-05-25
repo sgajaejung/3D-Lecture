@@ -4,14 +4,6 @@ global g_FilePath
 
 global g_varSetMeshes = #()
 
-struct VtxNormTex
-(
-	vtx,
-	nrm,
-	tex
-)
-
-
 fn ConvertToD3D_POS max_pos =
 (
 	local d3d_pos = [0,0,0]
@@ -133,35 +125,6 @@ fn WriteIndex obj =
 )
 
 
-fn WriteTVertTVFace obj = 
-(
-	format "TEXTURE-VERTEX = %\n" obj.numTVerts to:Outfile
-	for i=1 to obj.numTVerts do
-	(
-		local tex = getTvert obj i
-		local uv = (ConvertToD3D_UV tex)
-		format "% %\n" uv.x  uv.y to:Outfile
-	)
-		
-	format "TEXTURE-FACE = %\n" obj.faces.count to:Outfile	
-	for i=1 to obj.faces.count do
-	(
-		local tvfaceidx = getTVFace obj i
-		local index = (ConvertToD3D_INDEX tvfaceidx)
-		format "% % %\n" (index.x as integer) (index.y as integer) (index.z as integer) to:Outfile
-	)	
-)
-
-
-fn WriteVtxNormTex obj = 
-(
-	WriteVertex obj
-	WriteIndex obj
-	WriteNormal obj
-	WriteTVertTVFace obj
-	format "TEXTURE_FILE = texture file name\n" to:Outfile
-)
-
 
 fn ExporterStart = 
 (
@@ -182,10 +145,6 @@ fn ExporterStart =
 		undo on
 		(
 			ConvertToMesh g_varSetMeshes[ i]
-			WriteVtxNormTex g_varSetMeshes[ i]
-			--WriteVertex g_varSetMeshes[ i]
-			--WriteNormal g_varSetMeshes[ i]
-			--WriteIndex g_varSetMeshes[ i]
 		)
 		max undo
 	)
