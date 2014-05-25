@@ -24,7 +24,6 @@ int g_VtxSize = 0;
 int g_FaceSize = 0;
 D3DMATERIAL9 g_Mtrl;
 D3DLIGHT9 g_Light;
-IDirect3DTexture9* g_Texture1;
 
 
 // 버텍스 구조체
@@ -32,15 +31,13 @@ struct Vertex
 {
 	Vertex() {}
 	Vertex(float x0, float y0, float z0) : p(Vector3(x0, y0, z0))
-		,u(-100), v(-100)
 	{}
 	Vector3 p;
 	Vector3 n;
-	float u, v;
 	static const DWORD FVF;
 };
 //버텍스 구조체 포맷.
-const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
+const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_NORMAL;
 
 
 
@@ -50,7 +47,6 @@ bool InitDirectX(HWND hWnd);
 bool InitVertexBuffer();
 void Render(int timeDelta);
 bool ReadModelFile( const string &fileName, LPDIRECT3DVERTEXBUFFER9 &vtxBuff, int &vtxSize,  LPDIRECT3DINDEXBUFFER9 &idxBuff, int &faceSize );
-void ComputeNormals(LPDIRECT3DVERTEXBUFFER9 vtxBuff, int vtxSize,  LPDIRECT3DINDEXBUFFER9 idxBuff, int faceSize);
 
 
 int APIENTRY WinMain(HINSTANCE hInstance, 
@@ -141,8 +137,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		g_pVB->Release();
 	if (g_pIB)
 		g_pIB->Release();
-	if (g_Texture1)
-		g_Texture1->Release();
 	if (g_pDevice)
 		g_pDevice->Release();
 	return 0;
@@ -267,11 +261,6 @@ void Render(int timeDelta)
 		r = rx*ry;
 		g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&r);
 
-		g_pDevice->SetTexture(0, g_Texture1);
-		g_pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-		g_pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-		g_pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
-
 		g_pDevice->SetMaterial(&g_Mtrl);
 		g_pDevice->SetStreamSource( 0, g_pVB, 0, sizeof(Vertex) );
 		g_pDevice->SetIndices(g_pIB);
@@ -289,7 +278,6 @@ void Render(int timeDelta)
 bool InitVertexBuffer()
 {
 	ReadModelFile("../media/cube.dat", g_pVB, g_VtxSize, g_pIB, g_FaceSize);
-	D3DXCreateTextureFromFileA(g_pDevice, "../media/강소라2.jpg", &g_Texture1);
 
 	ZeroMemory(&g_Mtrl, sizeof(g_Mtrl));
 	g_Mtrl.Ambient = D3DXCOLOR(1,1,1,1);
@@ -405,96 +393,7 @@ bool ReadModelFile( const string &fileName, LPDIRECT3DVERTEXBUFFER9 &vtxBuff, in
 		}
 	}
 
-
-	string tex;
-	int numTex;
-	fin >> tex >> eq >> numTex;
-
-	if (numTex > 0)
-	{
-		float fnum1, fnum2;
-		vector<Vector3> texVertices(numTex);
-		for (int i = 0; i < numTex; i++)
-		{
-			fin >> fnum1 >> fnum2;
-			texVertices[ i] = Vector3(fnum1, fnum2, 0);
-		}
-
-		string strTexFace;
-		int numTexFace;
-		fin >> strTexFace >> eq >> numTexFace;
-
-		vector<int> texFaces;
-		texFaces.reserve(numTexFace*3);
-		if (numTexFace > 0)
-		{
-			int num1, num2, num3;
-			for (int i=0; i < numTexFace; ++i)
-			{
-				fin >> num1 >> num2 >> num3;
-				texFaces.push_back( num1 );
-				texFaces.push_back( num2 );
-				texFaces.push_back( num3 );
-			}
-		}
-
-		map<int, vector<int> > vtxIdxMap; // vertex index, vertex index array
-		for (int i=0; i < vtxSize; ++i)
-		{
-			vector<int> varray;
-			varray.reserve(4);
-			varray.push_back(i);
-			vtxIdxMap[ i] = varray;
-		}
-
-		// 텍스쳐 좌표를 버텍스 버퍼에 저장한다. 
-		// 버텍스 버퍼의 uv 값이 초기화 되지 않았다면, 초기화 한다.
-		// 버텍스에 하나 이상의 uv값이 존재한다면, 버텍스를 추가하고, 인덱스버퍼를 수정한다.
-		for (int i=0; i < (int)texFaces.size(); ++i)
-		{
-			const Vector3 tex = texVertices[ texFaces[ i]];
-			const int vtxIdx = tempIdxBuff[ i];
-			
-			bool isFind = false;
-			for (int k=0; k < (int)vtxIdxMap[ vtxIdx].size(); ++k)
-			{
-				const int subVtxIdx = vtxIdxMap[ vtxIdx][ k];
-
-				// 텍스쳐 좌표가 버텍스 버퍼에 저장되어 있다면, index buffer 값을 해당 vertex index 로
-				// 설정 한다.
-				if ((-100 == tempVtxBuff[ subVtxIdx].u) &&
-					(-100 == tempVtxBuff[ subVtxIdx].v))
-				{
-					tempVtxBuff[ subVtxIdx].u = tex.x;
-					tempVtxBuff[ subVtxIdx].v = tex.y;
-					isFind = true;
-					break;
-				}
-				else if ((tex.x == tempVtxBuff[ subVtxIdx].u) && 
-							(tex.y == tempVtxBuff[ subVtxIdx].v))
-				{
-					tempIdxBuff[ i] = subVtxIdx;
-					isFind = true;
-					break;
-				}
-			}
-
-			// 버텍스 버퍼에 없는 uv 좌표라면, 새 버텍스를 버텍스버퍼에 추가한다.
-			// 인덱스 버퍼에도 새로 추가된 버텍스 인덱스값을 넣는다.
-			if (!isFind)
-			{
-				Vertex v = tempVtxBuff[ vtxIdx];
-				v.u = tex.x;
-				v.v = tex.y;
-				tempVtxBuff.push_back(v);
-				const int newVtxIdx = tempVtxBuff.size()-1;
-				vtxIdxMap[ vtxIdx].push_back( newVtxIdx );
-				tempIdxBuff[ i] = newVtxIdx;
-			}
-		}
-	}
-
-
+	
 	// 버텍스 버퍼 생성.
 	if (FAILED(g_pDevice->CreateVertexBuffer( tempVtxBuff.size() * sizeof(Vertex),
 		D3DUSAGE_WRITEONLY, Vertex::FVF,

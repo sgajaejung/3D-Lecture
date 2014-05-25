@@ -1,0 +1,137 @@
+
+
+
+
+
+@@item 1. Vertex 구조체 uv 좌표 추가.
+struct Vertex
+{
+	Vertex() {}
+	Vertex(float x0, float y0, float z0) : p(Vector3(x0, y0, z0))
+		,u(-100), v(-100)
+	{}
+	Vector3 p;
+	Vector3 n;
+	float u, v;
+	static const DWORD FVF;
+};
+
+
+@@item 2. Vertex FVF 설정.
+const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
+
+
+@@item 3. Texture 좌표, Texture Face 정보를 파일로부터 읽어온다.
+	string tex;
+	int numTex;
+	fin >> tex >> eq >> numTex;
+
+	if (numTex > 0)
+	{
+		float fnum1, fnum2;
+		vector<Vector3> texVertices(numTex);
+		for (int i = 0; i < numTex; i++)
+		{
+			fin >> fnum1 >> fnum2;
+			texVertices[ i] = Vector3(fnum1, fnum2, 0);
+		}
+
+		string strTexFace;
+		int numTexFace;
+		fin >> strTexFace >> eq >> numTexFace;
+
+		vector<int> texFaces;
+		texFaces.reserve(numTexFace*3);
+		if (numTexFace > 0)
+		{
+			int num1, num2, num3;
+			for (int i=0; i < numTexFace; ++i)
+			{
+				fin >> num1 >> num2 >> num3;
+				texFaces.push_back( num1 );
+				texFaces.push_back( num2 );
+				texFaces.push_back( num3 );
+			}
+		}
+	}
+
+
+@@item 4. Vertex 정보를 동적으로 추가될 자료구조를 선언하고, 초기화한다.
+		map<int, vector<int> > vtxIdxMap; // vertex index, vertex index array
+		for (int i=0; i < vtxSize; ++i)
+		{
+			vector<int> varray;
+			varray.reserve(4);
+			varray.push_back(i);
+			vtxIdxMap[ i] = varray;
+		}
+
+
+@@item 5. Vertex 에 하나이상의 uv좌표가 있을 때, 동적으로 추가한다.
+		// 텍스쳐 좌표를 버텍스 버퍼에 저장한다. 
+		// 버텍스 버퍼의 uv 값이 초기화 되지 않았다면, 초기화 한다.
+		// 버텍스에 하나 이상의 uv값이 존재한다면, 버텍스를 추가하고, 인덱스버퍼를 수정한다.
+		for (int i=0; i < (int)texFaces.size(); ++i)
+		{
+			const Vector3 tex = texVertices[ texFaces[ i]];
+			const int vtxIdx = tempIdxBuff[ i];
+			
+			bool isFind = false;
+			for (int k=0; k < (int)vtxIdxMap[ vtxIdx].size(); ++k)
+			{
+				const int subVtxIdx = vtxIdxMap[ vtxIdx][ k];
+
+				// 텍스쳐 좌표가 버텍스 버퍼에 저장되어 있다면, index buffer 값을 해당 vertex index 로
+				// 설정 한다.
+				if ((-100 == tempVtxBuff[ subVtxIdx].u) &&
+					(-100 == tempVtxBuff[ subVtxIdx].v))
+				{
+					tempVtxBuff[ subVtxIdx].u = tex.x;
+					tempVtxBuff[ subVtxIdx].v = tex.y;
+					isFind = true;
+					break;
+				}
+				else if ((tex.x == tempVtxBuff[ subVtxIdx].u) && 
+							(tex.y == tempVtxBuff[ subVtxIdx].v))
+				{
+					tempIdxBuff[ i] = subVtxIdx;
+					isFind = true;
+					break;
+				}
+			}
+
+			// 버텍스 버퍼에 없는 uv 좌표라면, 새 버텍스를 버텍스버퍼에 추가한다.
+			// 인덱스 버퍼에도 새로 추가된 버텍스 인덱스값을 넣는다.
+			if (!isFind)
+			{
+				Vertex v = tempVtxBuff[ vtxIdx];
+				v.u = tex.x;
+				v.v = tex.y;
+				tempVtxBuff.push_back(v);
+				const int newVtxIdx = tempVtxBuff.size()-1;
+				vtxIdxMap[ vtxIdx].push_back( newVtxIdx );
+				tempIdxBuff[ i] = newVtxIdx;
+			}
+		}
+
+
+@@item 6. 텍스쳐 객체를 선언한다.
+IDirect3DTexture9* g_Texture1;
+
+
+@@item 7. 텍스쳐를 생성한다.
+D3DXCreateTextureFromFileA(g_pDevice, "../media/강소라2.jpg", &g_Texture1);
+
+
+@@item 8. 텍스쳐를 출력한다.
+		g_pDevice->SetTexture(0, g_Texture1);
+		g_pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+		g_pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+		g_pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
+
+
+@@item 9. 텍스쳐 객체를 제거한다.
+	if (g_Texture1)
+		g_Texture1->Release();
+
+
