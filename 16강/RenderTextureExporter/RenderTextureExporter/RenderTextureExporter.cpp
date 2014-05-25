@@ -261,7 +261,7 @@ void Render(int timeDelta)
 			y = 0;
 
 		Matrix44 rx, ry, r;
-		//rx.SetRotationX(MATH_PI/4.f); 	// x축으로 45도 회전시킨다.
+		rx.SetRotationX(MATH_PI/4.f); 	// x축으로 45도 회전시킨다.
 		ry.SetRotationY(y); // y축으로 회전
 		r = rx*ry;
 		g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&r);
