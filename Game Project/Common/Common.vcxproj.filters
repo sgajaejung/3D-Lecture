@@ -22,6 +22,9 @@
     <ClInclude Include="etc\singleton.h">
       <Filter>Etc</Filter>
     </ClInclude>
+    <ClInclude Include="etc\filepath.h">
+      <Filter>Etc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -36,6 +39,9 @@
     </ClCompile>
     <ClCompile Include="math\vector4.cpp">
       <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="etc\filepath.cpp">
+      <Filter>Etc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

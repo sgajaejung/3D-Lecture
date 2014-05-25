@@ -40,6 +40,8 @@
 #include <algorithm>
 #include "math/Math.h"
 #include "etc/singleton.h"
+#include "etc/filepath.h"
+
 
 using std::string;
 using std::wstring;

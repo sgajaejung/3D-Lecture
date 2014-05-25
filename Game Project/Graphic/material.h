@@ -16,6 +16,7 @@ namespace graphic
 			const Vector4 &emmisive=Vector4(0,0,0,1),
 			const float pow=0);
 
+		void InitWhite();
 		void InitRed();
 		void InitBlue();
 		void Bind();

@@ -19,7 +19,7 @@ public:
 
 protected:
 	bool ReadModelFile( const string &fileName, graphic::cVertexBuffer &vtxBuff,  
-		graphic::cIndexBuffer &idxBuff );
+		graphic::cIndexBuffer &idxBuff, graphic::cTexture &texture );
 
 
 private:
@@ -27,6 +27,7 @@ private:
 	graphic::cIndexBuffer m_idxBuff;
 	graphic::cMaterial m_mtrl;
 	graphic::cLight m_light;
+	graphic::cTexture m_texture;
 	string m_filePath;
 
 };
@@ -34,24 +35,21 @@ private:
 INIT_FRAMEWORK(cViewer);
 
 
-const int WINSIZE_X = 1024;		//초기 윈도우 가로 크기
-const int WINSIZE_Y = 768;	//초기 윈도우 세로 크기
-const int WINPOS_X = 0; //초기 윈도우 시작 위치 X
-const int WINPOS_Y = 0; //초기 윈도우 시작 위치 Y
-
 
 // 버텍스 구조체
 struct Vertex
 {
 	Vertex() {}
-	Vertex(float x0, float y0, float z0) : p(Vector3(x0, y0, z0)), n(Vector3(0,0,0)) {}
+	Vertex(float x0, float y0, float z0) : p(Vector3(x0, y0, z0)), n(Vector3(0,0,0))
+		,u(-100), v(-100)
+	{}
 	Vector3 p;
 	Vector3 n;
 	float u,v;
 	static const DWORD FVF;
 };
 //버텍스 구조체 포맷.
-const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX0;
+const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
 
 
 cViewer::cViewer()
@@ -70,12 +68,14 @@ bool cViewer::OnInit()
 {
 	DragAcceptFiles(m_hWnd, TRUE);
 
-	ReadModelFile("../media/cube.dat", m_vtxBuff, m_idxBuff);
+	ReadModelFile("../media/cube.dat", m_vtxBuff, m_idxBuff, m_texture);
 
-	m_mtrl.InitRed();
+	m_mtrl.InitWhite();
 
 	Vector4 color(1,1,1,1);
 	m_light.Init( graphic::cLight::LIGHT_DIRECTIONAL, color * 0.4f, color, color * 0.6f, Vector3(1,0,0));
+	m_light.Bind(0);
+
 
 	Matrix44 V;
 	Vector3 dir = Vector3(0,0,0)-Vector3(0,0,-5);
@@ -83,11 +83,13 @@ bool cViewer::OnInit()
 	V.SetView(Vector3(0,0,-500), dir, Vector3(0,1,0));
 	graphic::GetDevice()->SetTransform(D3DTS_VIEW, (D3DXMATRIX*)&V);
 
+
+	const int WINSIZE_X = 1024;		//초기 윈도우 가로 크기
+	const int WINSIZE_Y = 768;	//초기 윈도우 세로 크기
 	Matrix44 proj;
 	proj.SetProjection(D3DX_PI * 0.5f, (float)WINSIZE_X / (float) WINSIZE_Y, 1.f, 1000.0f) ;
 	graphic::GetDevice()->SetTransform(D3DTS_PROJECTION, (D3DXMATRIX*)&proj) ;
 
-	m_light.Bind(0);
 
 	graphic::GetDevice()->LightEnable (
 		0, // 활성화/ 비활성화 하려는 광원 리스트 내의 요소
@@ -131,6 +133,7 @@ void cViewer::OnRender(const float elapseT)
 		graphic::GetDevice()->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&r);
 
 		m_mtrl.Bind();
+		m_texture.Bind(0);
 		m_idxBuff.Bind();
 		m_vtxBuff.Bind();
 		graphic::GetDevice()->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, 
@@ -164,28 +167,63 @@ void cViewer::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 				return;// handle error...
 
 			m_filePath = filePath;
+			m_texture.Clear();
 			m_vtxBuff.Clear();
 			m_idxBuff.Clear();
-			ReadModelFile(filePath, m_vtxBuff, m_idxBuff);
+			ReadModelFile(filePath, m_vtxBuff, m_idxBuff, m_texture);
 		}
 		break;
 
 	case WM_KEYDOWN:
-		if (wParam == VK_F5)
+		if (wParam == VK_F5) // Refresh
 		{
 			 if (m_filePath.empty())
 				 return;
+			 m_texture.Clear();
 			m_vtxBuff.Clear();
 			m_idxBuff.Clear();
-			ReadModelFile(m_filePath, m_vtxBuff, m_idxBuff);
+			ReadModelFile(m_filePath, m_vtxBuff, m_idxBuff, m_texture);
 		}
 		break;
 	}
 }
 
 
+void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+	if(from.empty())
+		return;
+	size_t start_pos = 0;
+	while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+		str.replace(start_pos, from.length(), to);
+		start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+	}
+}
+
+string& trim(string &str)
+{
+	for (int i=0; i < (int)str.length(); ++i)
+	{
+		if ((str[ i] == '\n') || (str[ i] == '\t') || (str[ i] == ' '))
+			str[ i] = '$';
+		else
+			break;
+	}
+
+	for (int i=str.length()-1; i >= 0; --i)
+	{
+		if ((str[ i] == '\n') || (str[ i] == '\t') || (str[ i] == ' '))
+			str[ i] = '$';
+		else
+			break;
+	}
+
+	replaceAll(str, "$", "");
+	return str;
+}
+
+
 bool cViewer::ReadModelFile( const string &fileName, graphic::cVertexBuffer &vtxBuff,  
-	graphic::cIndexBuffer &idxBuff )
+	graphic::cIndexBuffer &idxBuff, graphic::cTexture &texture )
 {
 	using namespace std;
 	ifstream fin(fileName.c_str());
@@ -353,6 +391,14 @@ bool cViewer::ReadModelFile( const string &fileName, graphic::cVertexBuffer &vtx
 			}
 		}
 	}
+
+
+	// 텍스쳐 파일이름 로딩.
+	string textureTok, texFilePath;
+	fin >> textureTok >> eq;
+	std::getline(fin, texFilePath);
+	string  textureFileName = common::GetFilePathExceptFileName(fileName) + "\\" + trim(texFilePath);
+	texture.Create( textureFileName);
 
 
 	// 버텍스 버퍼 생성.

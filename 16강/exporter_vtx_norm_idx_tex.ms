@@ -159,6 +159,7 @@ fn WriteVtxNormTex obj =
 	WriteIndex obj
 	WriteNormal obj
 	WriteTVertTVFace obj
+	format "TEXTURE_FILE = texture file name\n" to:Outfile
 )
 
 

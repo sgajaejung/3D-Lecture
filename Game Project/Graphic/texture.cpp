@@ -18,9 +18,12 @@ cTexture::~cTexture()
 }
 
 
-void cTexture::Create(const string &fileName)
+bool cTexture::Create(const string &fileName)
 {
-	D3DXCreateTextureFromFileA(GetDevice(), fileName.c_str(), &m_texture);
+	if (FAILED(D3DXCreateTextureFromFileA(GetDevice(), fileName.c_str(), &m_texture)))
+		return false;
+
+	return true;
 }
 
 

@@ -8,7 +8,7 @@ namespace graphic
 		cTexture();
 		virtual ~cTexture();
 
-		void Create(const string &fileName);
+		bool Create(const string &fileName);
 		void Bind(int stage);
 		void Clear();
 		
