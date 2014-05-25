@@ -13,7 +13,7 @@ cVertexBuffer::cVertexBuffer() :
 
 cVertexBuffer::~cVertexBuffer()
 {
-	SAFE_RELEASE(m_pVtxBuff);
+	Clear();
 }
 
 
@@ -60,4 +60,10 @@ void cVertexBuffer::Bind() const
 {
 	GetDevice()->SetStreamSource( 0, m_pVtxBuff, 0, m_sizeOfVertex );
 	GetDevice()->SetFVF( m_fvf );
+}
+
+
+void cVertexBuffer::Clear()
+{
+	SAFE_RELEASE(m_pVtxBuff);	
 }

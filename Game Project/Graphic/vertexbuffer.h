@@ -14,6 +14,7 @@ namespace graphic
 		void* Lock();
 		void Unlock();
 		void Bind() const;
+		void Clear();
 
 		int GetFVF() const;
 		int GetSizeOfVertex() const;

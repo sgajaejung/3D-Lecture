@@ -13,6 +13,8 @@ namespace graphic
 		void* Lock();
 		void Unlock();
 		void Bind() const;
+		int GetFaceCount() const;
+		void Clear();
 
 
 	protected:
@@ -20,6 +22,9 @@ namespace graphic
 
 	private:
 		LPDIRECT3DINDEXBUFFER9 m_pIdxBuff; // 인덱스 버퍼
+		int m_faceCount;
 	};
 
+
+	inline int cIndexBuffer::GetFaceCount() const { return m_faceCount; }
 }

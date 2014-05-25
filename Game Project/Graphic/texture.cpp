@@ -14,8 +14,7 @@ cTexture::cTexture() :
 
 cTexture::~cTexture()
 {
-	SAFE_RELEASE(m_texture);
-
+	Clear();
 }
 
 
@@ -31,4 +30,10 @@ void cTexture::Bind(int stage)
 	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 	GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
 	GetDevice()->SetTexture(stage, m_texture);
+}
+
+
+void cTexture::Clear()
+{
+	SAFE_RELEASE(m_texture);
 }

@@ -10,6 +10,7 @@ namespace graphic
 
 		void Create(const string &fileName);
 		void Bind(int stage);
+		void Clear();
 		
 
 	protected:

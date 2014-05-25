@@ -7,13 +7,14 @@ using namespace graphic;
 
 cIndexBuffer::cIndexBuffer() :
 	m_pIdxBuff(NULL)
+,	m_faceCount(0)
 {
 
 }
 
 cIndexBuffer::~cIndexBuffer()
 {
-	SAFE_RELEASE(m_pIdxBuff);
+	Clear();
 }
 
 
@@ -28,6 +29,7 @@ bool cIndexBuffer::Create(int faceCount)
 		return false;
 	}
 
+	m_faceCount = faceCount;
 	return true;
 }
 
@@ -51,3 +53,8 @@ void cIndexBuffer::Bind() const
 	GetDevice()->SetIndices(m_pIdxBuff);
 }
 
+
+void cIndexBuffer::Clear()
+{
+	SAFE_RELEASE(m_pIdxBuff);
+}
