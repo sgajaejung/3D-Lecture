@@ -361,12 +361,7 @@ bool cViewer::ReadModelFile( const string &fileName, graphic::cVertexBuffer &vtx
 
 
 	// 텍스쳐 파일이름 로딩.
-	string textureTok, texFilePath;
-	fin >> textureTok >> eq;
-	std::getline(fin, texFilePath);
-	string  textureFileName = common::GetFilePathExceptFileName(fileName) + "\\" + 
-		common::trim(texFilePath);
-	texture.Create( textureFileName);
+
 
 
 	// 버텍스 버퍼 생성.

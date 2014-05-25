@@ -173,3 +173,107 @@ D3DXCreateTextureFromFileA(g_pDevice, "../media/강소라2.jpg", &g_Texture1);
 		g_Texture1->Release();
 
 
+@@item Viewer ----------------------------------------
+
+
+@@item 13. 텍스쳐 이름을 파일로 부터 읽어온다.
+	// 텍스쳐 파일이름 로딩.
+	string textureTok, texFilePath;
+	fin >> textureTok >> eq;
+	std::getline(fin, texFilePath);
+	string  textureFileName = texFilePath;
+	texture.Create( textureFileName);
+
+
+@@item 14. filepath.h cpp 파일을 생성한다.
+
+
+@@item 15. 파일명을 제외한 나머지 경로를 얻는 함수를 선언한다.
+	std::string GetFilePathExceptFileName(const std::string &fileName);
+
+
+@@item 16. 파일경로에 관련된 함수는 셸 라이브러리를 이용해야 한다.
+#include <shlwapi.h> // 이 헤더 파일에 FilePath에 관련된 함수들이 많다. 잘 이용해보자.
+#pragma comment(lib, "shlwapi")
+
+
+@@item 17. GetFilePathExceptFileName 함수를 정의한다.
+//------------------------------------------------------------------------
+// fileName에서 파일이름과 확장자를 제외한 나머지 경로를 리턴한다.
+// 마지막에 '\' 문자는 없다.
+//------------------------------------------------------------------------
+std::string common::GetFilePathExceptFileName(const std::string &fileName)
+{
+	char srcFileName[ MAX_PATH];
+	strcpy_s(srcFileName, MAX_PATH, fileName.c_str() );
+	PathRemoveFileSpecA( srcFileName );
+	return srcFileName;
+}
+
+
+@@item 18. stringfunc.h cpp 를 생성한다.
+
+
+@@item 19. 파일명 앞뒤로 공백이 생기는 것을 막기위한 함수를 선언한다.
+	void replaceAll(std::string& str, const std::string& from, const std::string& to);
+	string& trim(string &str);
+
+
+@@item 20. replaceAll, trim 함수를 구현한다.
+void common::replaceAll(std::string& str, const std::string& from, const std::string& to) {
+	if(from.empty())
+		return;
+	size_t start_pos = 0;
+	while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+		str.replace(start_pos, from.length(), to);
+		start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+	}
+}
+
+
+string& common::trim(string &str)
+{
+	for (int i=0; i < (int)str.length(); ++i)
+	{
+		if ((str[ i] == '\n') || (str[ i] == '\t') || (str[ i] == ' '))
+			str[ i] = '$';
+		else
+			break;
+	}
+
+	for (int i=str.length()-1; i >= 0; --i)
+	{
+		if ((str[ i] == '\n') || (str[ i] == '\t') || (str[ i] == ' '))
+			str[ i] = '$';
+		else
+			break;
+	}
+
+	replaceAll(str, "$", "");
+	return str;
+}
+
+
+@@item 21. common.h 에 filepath.h  와 stringfunc.h 를 include 시킨다.
+#include <string>
+#include <map>
+#include <vector>
+#include <algorithm>
+
+using std::string;
+using std::wstring;
+using std::vector;
+using std::map;
+
+
+#include "math/Math.h"
+#include "etc/singleton.h"
+#include "etc/filepath.h"
+#include "etc/stringfunc.h"
+
+
+@@item 22. 정확한 텍스쳐 파일 이름을 얻어온다.
+	string  textureFileName = common::GetFilePathExceptFileName(fileName) + "\\" + trim(texFilePath);
+
+
+

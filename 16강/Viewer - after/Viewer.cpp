@@ -177,9 +177,9 @@ void cViewer::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_KEYDOWN:
 		if (wParam == VK_F5) // Refresh
 		{
-			 if (m_filePath.empty())
-				 return;
-			 m_texture.Clear();
+			if (m_filePath.empty())
+				return;
+			m_texture.Clear();
 			m_vtxBuff.Clear();
 			m_idxBuff.Clear();
 			ReadModelFile(m_filePath, m_vtxBuff, m_idxBuff, m_texture);

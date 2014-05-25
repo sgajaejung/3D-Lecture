@@ -70,6 +70,7 @@
     <ClInclude Include="common.h" />
     <ClInclude Include="etc\filepath.h" />
     <ClInclude Include="etc\singleton.h" />
+    <ClInclude Include="etc\stringfunc.h" />
     <ClInclude Include="math\box.h" />
     <ClInclude Include="math\Math.h" />
     <ClInclude Include="math\matrix44.h" />
@@ -80,6 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="etc\filepath.cpp" />
+    <ClCompile Include="etc\stringfunc.cpp" />
     <ClCompile Include="math\box.cpp" />
     <ClCompile Include="math\matrix44.cpp" />
     <ClCompile Include="math\vector3.cpp" />

@@ -38,12 +38,15 @@
 #include <map>
 #include <vector>
 #include <algorithm>
-#include "math/Math.h"
-#include "etc/singleton.h"
-#include "etc/filepath.h"
-
 
 using std::string;
 using std::wstring;
 using std::vector;
 using std::map;
+
+
+#include "math/Math.h"
+#include "etc/singleton.h"
+#include "etc/filepath.h"
+#include "etc/stringfunc.h"
+

@@ -25,6 +25,9 @@
     <ClInclude Include="etc\filepath.h">
       <Filter>Etc</Filter>
     </ClInclude>
+    <ClInclude Include="etc\stringfunc.h">
+      <Filter>Etc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -41,6 +44,9 @@
       <Filter>math</Filter>
     </ClCompile>
     <ClCompile Include="etc\filepath.cpp">
+      <Filter>Etc</Filter>
+    </ClCompile>
+    <ClCompile Include="etc\stringfunc.cpp">
       <Filter>Etc</Filter>
     </ClCompile>
   </ItemGroup>
