@@ -33,7 +33,6 @@ struct Vertex
 	Vertex() {}
 	Vertex(float x0, float y0, float z0) : p(Vector3(x0, y0, z0))
 		,u(-100), v(-100)
-		//, n(Vector3(0,0,0)) 
 	{}
 	Vector3 p;
 	Vector3 n;
@@ -109,8 +108,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	}
 
 	InitVertexBuffer();
-
 	ShowWindow( hWnd, nCmdShow );
+
 
 	//메시지 구조체
 	MSG msg;		
@@ -161,6 +160,7 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 		if (wParam == VK_ESCAPE)
 			::DestroyWindow(hWnd);
 		break;
+
 	case WM_DESTROY: //윈도우가 파괴된다면..
 		PostQuitMessage(0);	//프로그램 종료 요청 ( 메시지 루프를 빠져나가게 된다 )
 		break;
@@ -262,7 +262,7 @@ void Render(int timeDelta)
 			y = 0;
 
 		Matrix44 rx, ry, r;
-		//rx.SetRotationX(MATH_PI/4.f); 	// x축으로 45도 회전시킨다.
+		rx.SetRotationX(MATH_PI/4.f); 	// x축으로 45도 회전시킨다.
 		ry.SetRotationY(y); // y축으로 회전
 		r = rx*ry;
 		g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&r);
@@ -288,7 +288,7 @@ void Render(int timeDelta)
 
 bool InitVertexBuffer()
 {
-	ReadModelFile("../media/data.dat", g_pVB, g_VtxSize, g_pIB, g_FaceSize);
+	ReadModelFile("../media/cube.dat", g_pVB, g_VtxSize, g_pIB, g_FaceSize);
 	D3DXCreateTextureFromFileA(g_pDevice, "../media/강소라2.jpg", &g_Texture1);
 
 	ZeroMemory(&g_Mtrl, sizeof(g_Mtrl));
@@ -312,6 +312,10 @@ bool InitVertexBuffer()
 	V.SetView(Vector3(0,0,-500), dir, Vector3(0,1,0));
 	g_pDevice->SetTransform(D3DTS_VIEW, (D3DXMATRIX*)&V);
 
+	Matrix44 proj;
+	proj.SetProjection(D3DX_PI * 0.5f, (float)WINSIZE_X / (float) WINSIZE_Y, 1.f, 1000.0f) ;
+	g_pDevice->SetTransform(D3DTS_PROJECTION, (D3DXMATRIX*)&proj) ;
+
 	//g_pDevice->SetRenderState(D3DRS_CULLMODE, false);
 	//g_pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 	g_pDevice->SetLight(0, &g_Light); // 광원 설정.
@@ -329,6 +333,11 @@ bool ReadModelFile( const string &fileName, LPDIRECT3DVERTEXBUFFER9 &vtxBuff, in
 	using namespace std;
 	ifstream fin(fileName.c_str());
 	if (!fin.is_open())
+		return false;
+
+	string exporterVersion;
+	fin >>exporterVersion;
+	if (exporterVersion != "EXPORTER_V1")
 		return false;
 
 	string vtx, eq;
@@ -516,64 +525,5 @@ bool ReadModelFile( const string &fileName, LPDIRECT3DVERTEXBUFFER9 &vtxBuff, in
 		indices[ i] = tempIdxBuff[ i];
 	idxBuff->Unlock();
 
-	//ComputeNormals(vtxBuff, vtxSize, idxBuff, faceSize);
 	return true;
-}
-
-
-void ComputeNormals(LPDIRECT3DVERTEXBUFFER9 vtxBuff, int vtxSize,  LPDIRECT3DINDEXBUFFER9 idxBuff, int faceSize)
-{
-/*
-	Vertex* vertices;
-	vtxBuff->Lock( 0, 0, (void**)&vertices, 0);
-	WORD *indices = NULL;
-	idxBuff->Lock(0, 0, (void**)&indices, 0);
-
-	for (int i=0; i < faceSize*3; i+=3)
-	{
-		Vector3 p1 = vertices[ indices[ i]].p;
-		Vector3 p2 = vertices[ indices[ i+1]].p;
-		Vector3 p3 = vertices[ indices[ i+2]].p;
-
-		Vector3 v1 = p2 - p1;
-		Vector3 v2 = p3 - p1;
-		v1.Normalize();
-		v2.Normalize();
-		Vector3 n = v1.CrossProduct(v2);
-		n.Normalize();
-
-		if (vertices[ indices[ i]].n.IsEmpty())
-		{
-			vertices[ indices[ i]].n = n;
-		}
-		else
-		{
-			vertices[ indices[ i]].n += n;
-			vertices[ indices[ i]].n /= 2.f;
-		}
-
-		if (vertices[ indices[ i+1]].n.IsEmpty())
-		{
-			vertices[ indices[ i+1]].n = n;
-		}
-		else
-		{
-			vertices[ indices[ i+1]].n += n;
-			vertices[ indices[ i+1]].n /= 2.f;
-		}
-
-		if (vertices[ indices[ i+2]].n.IsEmpty())
-		{
-			vertices[ indices[ i+2]].n = n;
-		}
-		else
-		{
-			vertices[ indices[ i+2]].n += n;
-			vertices[ indices[ i+2]].n /= 2.f;
-		}
-	}
-
-	vtxBuff->Unlock();
-	idxBuff->Unlock();
-**/
 }
