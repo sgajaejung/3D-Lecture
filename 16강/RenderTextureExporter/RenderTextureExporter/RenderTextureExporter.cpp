@@ -163,16 +163,6 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 			::DestroyWindow(hWnd);
 		break;
 
-	case WM_DROPFILES:
-		{
-			HDROP hdrop = (HDROP)wParam;
-			char filePath[ MAX_PATH];
-			const UINT size = DragQueryFileA(hdrop, 0, filePath, MAX_PATH);
-			if (size == 0) 
-				return 0;// handle error...
-		}
-		break;
-
 	case WM_DESTROY: //윈도우가 파괴된다면..
 		PostQuitMessage(0);	//프로그램 종료 요청 ( 메시지 루프를 빠져나가게 된다 )
 		break;

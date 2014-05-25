@@ -35,11 +35,13 @@
 // 포함 파일들.
 
 #include <string>
-#include <string>
+#include <map>
+#include <vector>
 #include <algorithm>
 #include "math/Math.h"
 #include "etc/singleton.h"
 
 using std::string;
 using std::wstring;
-
+using std::vector;
+using std::map;

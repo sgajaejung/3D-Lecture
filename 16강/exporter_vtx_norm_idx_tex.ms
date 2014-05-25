@@ -167,6 +167,8 @@ fn ExporterStart =
 	CollectObject()
 
 	Outfile = createfile g_FilePath
+	
+	format "EXPORTER_V1\n" to:Outfile	
 
 	for i=1 to g_varSetMeshes.count do
 	(
