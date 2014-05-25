@@ -10,6 +10,7 @@
     <ClInclude Include="vertexbuffer.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="indexbuffer.h" />
+    <ClInclude Include="texture.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -19,5 +20,6 @@
     <ClCompile Include="vertexbuffer.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="indexbuffer.cpp" />
+    <ClCompile Include="texture.cpp" />
   </ItemGroup>
 </Project>
