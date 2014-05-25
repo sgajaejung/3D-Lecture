@@ -33,7 +33,6 @@ struct Vertex
 	Vertex() {}
 	Vertex(float x0, float y0, float z0) : p(Vector3(x0, y0, z0))
 		,u(-100), v(-100)
-		//, n(Vector3(0,0,0)) 
 	{}
 	Vector3 p;
 	Vector3 n;
@@ -520,64 +519,5 @@ bool ReadModelFile( const string &fileName, LPDIRECT3DVERTEXBUFFER9 &vtxBuff, in
 		indices[ i] = tempIdxBuff[ i];
 	idxBuff->Unlock();
 
-	//ComputeNormals(vtxBuff, vtxSize, idxBuff, faceSize);
 	return true;
-}
-
-
-void ComputeNormals(LPDIRECT3DVERTEXBUFFER9 vtxBuff, int vtxSize,  LPDIRECT3DINDEXBUFFER9 idxBuff, int faceSize)
-{
-/*
-	Vertex* vertices;
-	vtxBuff->Lock( 0, 0, (void**)&vertices, 0);
-	WORD *indices = NULL;
-	idxBuff->Lock(0, 0, (void**)&indices, 0);
-
-	for (int i=0; i < faceSize*3; i+=3)
-	{
-		Vector3 p1 = vertices[ indices[ i]].p;
-		Vector3 p2 = vertices[ indices[ i+1]].p;
-		Vector3 p3 = vertices[ indices[ i+2]].p;
-
-		Vector3 v1 = p2 - p1;
-		Vector3 v2 = p3 - p1;
-		v1.Normalize();
-		v2.Normalize();
-		Vector3 n = v1.CrossProduct(v2);
-		n.Normalize();
-
-		if (vertices[ indices[ i]].n.IsEmpty())
-		{
-			vertices[ indices[ i]].n = n;
-		}
-		else
-		{
-			vertices[ indices[ i]].n += n;
-			vertices[ indices[ i]].n /= 2.f;
-		}
-
-		if (vertices[ indices[ i+1]].n.IsEmpty())
-		{
-			vertices[ indices[ i+1]].n = n;
-		}
-		else
-		{
-			vertices[ indices[ i+1]].n += n;
-			vertices[ indices[ i+1]].n /= 2.f;
-		}
-
-		if (vertices[ indices[ i+2]].n.IsEmpty())
-		{
-			vertices[ indices[ i+2]].n = n;
-		}
-		else
-		{
-			vertices[ indices[ i+2]].n += n;
-			vertices[ indices[ i+2]].n /= 2.f;
-		}
-	}
-
-	vtxBuff->Unlock();
-	idxBuff->Unlock();
-**/
 }
