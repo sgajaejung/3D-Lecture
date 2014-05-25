@@ -133,3 +133,9 @@ Vector3 Vector3::CrossProduct( const Vector3& v ) const
 		(z * v.x) - (x * v.z), 
 		(x * v.y) - (y * v.x) );
 }
+
+
+bool Vector3::operator==( const Vector3 &rhs ) const
+{
+	return (x == rhs.x) && (y == rhs.y) && (z == rhs.z);
+}

@@ -50,4 +50,6 @@ struct Vector3
 		return *this;
 	}
 
+	bool operator==( const Vector3 &rhs ) const;
+
 };
