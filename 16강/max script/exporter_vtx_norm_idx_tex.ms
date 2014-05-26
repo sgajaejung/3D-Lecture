@@ -4,6 +4,7 @@ global g_FilePath
 
 global g_varSetMeshes = #()
 
+
 fn ConvertToD3D_POS max_pos =
 (
 	local d3d_pos = [0,0,0]
@@ -125,7 +126,6 @@ fn WriteIndex obj =
 )
 
 
-
 fn ExporterStart = 
 (
 	CollectObject()
@@ -136,7 +136,6 @@ fn ExporterStart =
 
 	for i=1 to g_varSetMeshes.count do
 	(
-		print g_varSetMeshes[i] 
 		print g_varSetMeshes[i].name 
 		
 		-- vertex, index값은 EditMesh모드일때만 얻어올수 있어서 ConvertToMesh 함수를
@@ -159,7 +158,7 @@ rollout ui "냠냠" width:387 height:266
 (
 	button btnRun "DX Exporter 실행" pos:[101,108] width:177 height:30
 
-	-- Bmm, Ani 파일명 입력창
+	-- 파일명 입력창
 	label lbl1 "파일명:" pos:[30,13] width:70 height:17
 	edittext editFilePath "" pos:[100,10] width:250 height:17 enabled:true
 

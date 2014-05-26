@@ -25,14 +25,10 @@ protected:
 
 
 private:
-	//LPDIRECT3DVERTEXBUFFER9 m_pVB; // 버텍스 버퍼
 	graphic::cVertexBuffer m_vtxBuff;
-	//LPDIRECT3DINDEXBUFFER9 m_pIB; // 인덱스 버퍼
 	graphic::cIndexBuffer m_idxBuff;
 	int m_VtxSize;
 	int m_FaceSize;
 	graphic::cMaterial m_mtrl;
-
-	//D3DLIGHT9 m_Light;
 	graphic::cLight m_light;
 };

@@ -6,22 +6,6 @@
 INIT_FRAMEWORK(cGameApp);
 
 
-const int WINSIZE_X = 1024;		//초기 윈도우 가로 크기
-const int WINSIZE_Y = 768;	//초기 윈도우 세로 크기
-const int WINPOS_X = 0; //초기 윈도우 시작 위치 X
-const int WINPOS_Y = 0; //초기 윈도우 시작 위치 Y
-
-
-template<class T>
-class SafeLock
-{
-public:
-	SafeLock(T &t) :m_t(t) { }
-	virtual ~SafeLock() { m_t.Unlock(); }
-	T &m_t;
-};
-
-
 // 버텍스 구조체
 struct Vertex
 {
@@ -36,8 +20,6 @@ const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_NORMAL;
 
 
 cGameApp::cGameApp()
-	//m_pVB(NULL),
-	//m_pIB(NULL)
 {
 	m_windowName = L"GameApp";
 	const RECT r = {0, 0, 800, 600};
@@ -62,12 +44,6 @@ bool cGameApp::OnInit()
 		color * 0.6f,
 		Vector3(1,0,0));
 	
-	//ZeroMemory(&m_Light, sizeof(m_Light));
-	//m_Light.Type = D3DLIGHT_DIRECTIONAL;
-	//m_Light.Ambient = color * 0.4f;
-	//m_Light.Diffuse = color;
-	//m_Light.Specular = color * 0.6f;
-	//m_Light.Direction = *(D3DXVECTOR3*)&Vector3(1,0,0);	
 
 	Matrix44 V;
 	Vector3 dir = Vector3(0,0,0)-Vector3(0,0,-5);
@@ -75,11 +51,13 @@ bool cGameApp::OnInit()
 	V.SetView(Vector3(0,0,-500), dir, Vector3(0,1,0));
 	graphic::GetDevice()->SetTransform(D3DTS_VIEW, (D3DXMATRIX*)&V);
 
+	const int WINSIZE_X = 1024;		//초기 윈도우 가로 크기
+	const int WINSIZE_Y = 768;	//초기 윈도우 세로 크기
+
 	Matrix44 proj;
 	proj.SetProjection(D3DX_PI * 0.5f, (float)WINSIZE_X / (float) WINSIZE_Y, 1.f, 1000.0f) ;
 	graphic::GetDevice()->SetTransform(D3DTS_PROJECTION, (D3DXMATRIX*)&proj) ;
 
-	//graphic::GetDevice()->SetLight(0, &m_Light); // 광원 설정.
 	m_light.Bind(0);
 
 	graphic::GetDevice()->LightEnable (
