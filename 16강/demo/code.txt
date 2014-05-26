@@ -38,10 +38,25 @@ fn WriteTVertTVFace obj =
 )
 
 
+@@item 4. 3DMax 텍스쳐 uv 좌표를 Direct3D uv 좌표 체계로 바꾸는 함수.
+-- MAX의 텍스쳐 좌표를 D3D의 uv좌표로 바꿔준다.
+fn ConvertToD3D_UV max_pos =
+(
+	if max_pos == undefined then return undefined
+	local d3d_uv = [0,0]
+
+	d3d_uv.x = max_pos.x
+	d3d_uv.y = 1.0 - max_pos.y
+
+	d3d_uv
+)
+
+
+
 @@item C++ 어플리케이션------------------------------
 
 
-@@item 4. Vertex 구조체 uv 좌표 추가.
+@@item 5. Vertex 구조체 uv 좌표 추가.
 struct Vertex
 {
 	Vertex() {}
@@ -55,11 +70,11 @@ struct Vertex
 };
 
 
-@@item 5. Vertex FVF 설정.
+@@item 6. Vertex FVF 설정.
 const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
 
 
-@@item 6. Texture 좌표, Texture Face 정보를 파일로부터 읽어온다.
+@@item 7. Texture 좌표, Texture Face 정보를 파일로부터 읽어온다.
 	string tex;
 	int numTex;
 	fin >> tex >> eq >> numTex;
@@ -94,7 +109,7 @@ const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
 	}
 
 
-@@item 7. Vertex 정보를 동적으로 추가될 자료구조를 선언하고, 초기화한다.
+@@item 8. Vertex 정보를 동적으로 추가될 자료구조를 선언하고, 초기화한다.
 		map<int, vector<int> > vtxIdxMap; // vertex index, vertex index array
 		for (int i=0; i < vtxSize; ++i)
 		{
@@ -105,7 +120,7 @@ const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
 		}
 
 
-@@item 8. Vertex 에 하나이상의 uv좌표가 있을 때, 동적으로 추가한다.
+@@item 9. Vertex 에 하나이상의 uv좌표가 있을 때, 동적으로 추가한다.
 		// 텍스쳐 좌표를 버텍스 버퍼에 저장한다. 
 		// 버텍스 버퍼의 uv 값이 초기화 되지 않았다면, 초기화 한다.
 		// 버텍스에 하나 이상의 uv값이 존재한다면, 버텍스를 추가하고, 인덱스버퍼를 수정한다.
@@ -153,22 +168,22 @@ const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
 		}
 
 
-@@item 9. 텍스쳐 객체를 선언한다.
+@@item 10. 텍스쳐 객체를 선언한다.
 IDirect3DTexture9* g_Texture1;
 
 
-@@item 10. 텍스쳐를 생성한다.
+@@item 11. 텍스쳐를 생성한다.
 D3DXCreateTextureFromFileA(g_pDevice, "../media/강소라2.jpg", &g_Texture1);
 
 
-@@item 11. 텍스쳐를 출력한다.
+@@item 12. 텍스쳐를 출력한다.
 		g_pDevice->SetTexture(0, g_Texture1);
 		g_pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 		g_pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 		g_pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
 
 
-@@item 12. 텍스쳐 객체를 제거한다.
+@@item 13. 텍스쳐 객체를 제거한다.
 	if (g_Texture1)
 		g_Texture1->Release();
 
@@ -176,7 +191,7 @@ D3DXCreateTextureFromFileA(g_pDevice, "../media/강소라2.jpg", &g_Texture1);
 @@item Viewer ----------------------------------------
 
 
-@@item 13. 텍스쳐 이름을 파일로 부터 읽어온다.
+@@item 14. 텍스쳐 이름을 파일로 부터 읽어온다.
 	// 텍스쳐 파일이름 로딩.
 	string textureTok, texFilePath;
 	fin >> textureTok >> eq;
@@ -185,19 +200,19 @@ D3DXCreateTextureFromFileA(g_pDevice, "../media/강소라2.jpg", &g_Texture1);
 	texture.Create( textureFileName);
 
 
-@@item 14. filepath.h cpp 파일을 생성한다.
+@@item 15. filepath.h cpp 파일을 생성한다.
 
 
-@@item 15. 파일명을 제외한 나머지 경로를 얻는 함수를 선언한다.
+@@item 16. 파일명을 제외한 나머지 경로를 얻는 함수를 선언한다.
 	std::string GetFilePathExceptFileName(const std::string &fileName);
 
 
-@@item 16. 파일경로에 관련된 함수는 셸 라이브러리를 이용해야 한다.
+@@item 17. 파일경로에 관련된 함수는 셸 라이브러리를 이용해야 한다.
 #include <shlwapi.h> // 이 헤더 파일에 FilePath에 관련된 함수들이 많다. 잘 이용해보자.
 #pragma comment(lib, "shlwapi")
 
 
-@@item 17. GetFilePathExceptFileName 함수를 정의한다.
+@@item 18. GetFilePathExceptFileName 함수를 정의한다.
 //------------------------------------------------------------------------
 // fileName에서 파일이름과 확장자를 제외한 나머지 경로를 리턴한다.
 // 마지막에 '\' 문자는 없다.
@@ -211,15 +226,15 @@ std::string common::GetFilePathExceptFileName(const std::string &fileName)
 }
 
 
-@@item 18. stringfunc.h cpp 를 생성한다.
+@@item 19. stringfunc.h cpp 를 생성한다.
 
 
-@@item 19. 파일명 앞뒤로 공백이 생기는 것을 막기위한 함수를 선언한다.
+@@item 20. 파일명 앞뒤로 공백이 생기는 것을 막기위한 함수를 선언한다.
 	void replaceAll(std::string& str, const std::string& from, const std::string& to);
 	string& trim(string &str);
 
 
-@@item 20. replaceAll, trim 함수를 구현한다.
+@@item 21. replaceAll, trim 함수를 구현한다.
 void common::replaceAll(std::string& str, const std::string& from, const std::string& to) {
 	if(from.empty())
 		return;
@@ -254,7 +269,7 @@ string& common::trim(string &str)
 }
 
 
-@@item 21. common.h 에 filepath.h  와 stringfunc.h 를 include 시킨다.
+@@item 22. common.h 에 filepath.h  와 stringfunc.h 를 include 시킨다.
 #include <string>
 #include <map>
 #include <vector>
@@ -272,7 +287,7 @@ using std::map;
 #include "etc/stringfunc.h"
 
 
-@@item 22. 정확한 텍스쳐 파일 이름을 얻어온다.
+@@item 23. 정확한 텍스쳐 파일 이름을 얻어온다.
 	string  textureFileName = common::GetFilePathExceptFileName(fileName) + "\\" + trim(texFilePath);
 
 

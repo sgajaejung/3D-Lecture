@@ -26,18 +26,6 @@ fn ConvertToD3D_INDEX max_index =
 	d3d_index
 )
 
--- MAX¿« ≈ÿΩ∫√ƒ ¡¬«•∏¶ D3D¿« uv¡¬«•∑Œ πŸ≤„¡ÿ¥Ÿ.
-fn ConvertToD3D_UV max_pos =
-(
-	if max_pos == undefined then return undefined
-	local d3d_uv = [0,0]
-
-	d3d_uv.x = max_pos.x
-	d3d_uv.y = 1.0 - max_pos.y
-
-	d3d_uv
-)
-
 
 
 fn CollectObject = 
@@ -154,7 +142,7 @@ fn ExporterStart =
 
 
 
-rollout ui "≥»≥»" width:387 height:266
+rollout ui "Exporter" width:387 height:266
 (
 	button btnRun "DX Exporter Ω««‡" pos:[101,108] width:177 height:30
 

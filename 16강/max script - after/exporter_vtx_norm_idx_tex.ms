@@ -4,13 +4,6 @@ global g_FilePath
 
 global g_varSetMeshes = #()
 
-struct VtxNormTex
-(
-	vtx,
-	nrm,
-	tex
-)
-
 
 fn ConvertToD3D_POS max_pos =
 (
@@ -173,7 +166,6 @@ fn ExporterStart =
 
 	for i=1 to g_varSetMeshes.count do
 	(
-		print g_varSetMeshes[i] 
 		print g_varSetMeshes[i].name 
 		
 		-- vertex, index값은 EditMesh모드일때만 얻어올수 있어서 ConvertToMesh 함수를
@@ -183,9 +175,6 @@ fn ExporterStart =
 		(
 			ConvertToMesh g_varSetMeshes[ i]
 			WriteVtxNormTex g_varSetMeshes[ i]
-			--WriteVertex g_varSetMeshes[ i]
-			--WriteNormal g_varSetMeshes[ i]
-			--WriteIndex g_varSetMeshes[ i]
 		)
 		max undo
 	)
@@ -196,15 +185,15 @@ fn ExporterStart =
 
 
 
-rollout ui "냠냠" width:387 height:266
+rollout ui "Exporter" width:387 height:266
 (
 	button btnRun "DX Exporter 실행" pos:[101,108] width:177 height:30
 
-	-- Bmm, Ani 파일명 입력창
+	-- 파일명 입력창
 	label lbl1 "파일명:" pos:[30,13] width:70 height:17
 	edittext editFilePath "" pos:[100,10] width:250 height:17 enabled:true
 
-	-- UI 창이 열릴때 
+	-- UI 창이 열릴때 호출됨
 	on ui open do
 	(
 		editFilePath.text = "data.dat"
