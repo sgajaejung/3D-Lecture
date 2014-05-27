@@ -303,6 +303,7 @@ void Render(int timeDelta)
 
 
 		g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&r);
+		g_pDevice->SetTexture(0, 0);
 		g_pDevice->SetMaterial(&g_Mtrl2);
 		g_pDevice->SetStreamSource( 0, g_pVB2, 0, sizeof(Vertex) );
 		g_pDevice->SetIndices(g_pIB2);
@@ -322,12 +323,12 @@ bool InitVertexBuffer()
 {
 	ReadModelFile("../../media/cube.dat", g_pVB, g_VtxSize, g_pIB, g_FaceSize);
 	ReadModelFile("../../media/teapot.dat", g_pVB2, g_VtxSize2, g_pIB2, g_FaceSize2);
-	D3DXCreateTextureFromFileA(g_pDevice, "../media/강소라2.jpg", &g_Texture1);
+	D3DXCreateTextureFromFileA(g_pDevice, "../../media/강소라2.jpg", &g_Texture1);
 
 	ZeroMemory(&g_Mtrl, sizeof(g_Mtrl));
-	g_Mtrl.Ambient = D3DXCOLOR(0,0,1,1);
-	g_Mtrl.Diffuse = D3DXCOLOR(0,0,1,1);
-	g_Mtrl.Specular = D3DXCOLOR(0,0,1,1);
+	g_Mtrl.Ambient = D3DXCOLOR(1,1,1,1);
+	g_Mtrl.Diffuse = D3DXCOLOR(1,1,1,1);
+	g_Mtrl.Specular = D3DXCOLOR(1,1,1,1);
 	g_Mtrl.Emissive = D3DXCOLOR(0,0,0,1);
 	g_Mtrl.Power = 0.f;
 

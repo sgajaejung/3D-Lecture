@@ -32,6 +32,7 @@ int g_FaceSize2 = 0;
 
 @@item 5. 주전자 출력
 		g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&r);
+		g_pDevice->SetTexture(0, 0);
 		g_pDevice->SetMaterial(&g_Mtrl2);
 		g_pDevice->SetStreamSource( 0, g_pVB2, 0, sizeof(Vertex) );
 		g_pDevice->SetIndices(g_pIB2);
