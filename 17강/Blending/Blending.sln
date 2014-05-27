@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Blending", "Blending\Blending.vcxproj", "{5E83BCA4-D16C-4710-A8DF-D3942D79BEDB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5E83BCA4-D16C-4710-A8DF-D3942D79BEDB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5E83BCA4-D16C-4710-A8DF-D3942D79BEDB}.Debug|Win32.Build.0 = Debug|Win32
+		{5E83BCA4-D16C-4710-A8DF-D3942D79BEDB}.Release|Win32.ActiveCfg = Release|Win32
+		{5E83BCA4-D16C-4710-A8DF-D3942D79BEDB}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
