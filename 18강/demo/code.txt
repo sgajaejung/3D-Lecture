@@ -3,51 +3,139 @@
 @@item 텍스트 출력 ---------------------------------------
 
 
-@@item 1. 주전자 출력을 위한 객체 추가.
-LPDIRECT3DVERTEXBUFFER9 g_pVB2 = NULL; // 버텍스 버퍼
-LPDIRECT3DINDEXBUFFER9 g_pIB2 = NULL; // 인덱스 버퍼
-int g_VtxSize2 = 0;
-int g_FaceSize2 = 0;
+@@item 1. 폰트 출력 객체 선언.
+ID3DXFont *g_Font = NULL;
 
 
-@@item 2. 주전자 객체 제거 코드 추가.
-	if (g_pVB2)
-		g_pVB2->Release();
-	if (g_pIB2)
-		g_pIB2->Release();
+@@item 2. 폰트 객체 제거
+	if (g_Font)
+		g_Font->Release();
 
 
-@@item 3. 주전자 데이타 읽어오기.
-	ReadModelFile("../../media/teapot.dat", g_pVB2, g_VtxSize2, g_pIB2, g_FaceSize2);
+@@item 3. 폰트 객체 생성.
+	HRESULT hr = D3DXCreateFont( g_pDevice, // D3D device
+		0,               // Height
+		0,                     // Width
+		FW_BOLD,               // Weight
+		1,                     // MipLevels, 0 = autogen mipmaps
+		FALSE,                 // Italic
+		DEFAULT_CHARSET,       // 그냥 디폴트
+		OUT_DEFAULT_PRECIS,    // 정밀도
+		DEFAULT_QUALITY,       // 그냥 디폴트
+		DEFAULT_PITCH | FF_DONTCARE, // 디폴트
+		L"굴림",              // pFaceName
+		&g_Font );              // ppFont
+	if (FAILED(hr))
+		return false;
 
 
-@@item 4. 주전자 메터리얼 설정.
-	ZeroMemory(&g_Mtrl2, sizeof(g_Mtrl));
-	g_Mtrl2.Ambient = D3DXCOLOR(1,0,0,0.5f);
-	g_Mtrl2.Diffuse = D3DXCOLOR(1,0,0,0.5f);
-	g_Mtrl2.Specular = D3DXCOLOR(1,0,0,0.5f);
-	g_Mtrl2.Emissive = D3DXCOLOR(0,0,0,1);
-	g_Mtrl2.Power = 0.f;
+@@item 4. 폰트 출력
+		RECT rc;
+		SetRect( &rc, 150, 100, 0, 0 );
+		g_Font->DrawTextA( NULL, 
+			"g_Font->DrawText", 
+			-1, 
+			&rc, 
+			DT_NOCLIP,
+			D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f) );
 
 
-@@item 5. 주전자 출력
-		g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&r);
-		g_pDevice->SetTexture(0, 0);
-		g_pDevice->SetMaterial(&g_Mtrl2);
-		g_pDevice->SetStreamSource( 0, g_pVB2, 0, sizeof(Vertex) );
-		g_pDevice->SetIndices(g_pIB2);
-		g_pDevice->SetFVF( Vertex::FVF );
-		g_pDevice->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, g_VtxSize2, 0, g_FaceSize2);
+
+@@item Sprite 객체를 통한 출력 ---------------------------------------
+
+@@item 1. Sprite 객체 선언.
+ID3DXSprite *g_TextSprite = NULL;   // Sprite for batching draw text calls
 
 
-@@item 6. 블렌딩 플래그 켜기
-		g_pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+@@item 2. Sprite 객체 제거.
+	if (g_TextSprite)
+		g_TextSprite->Release();
 
 
-@@item 7. 블렌딩 인수 설정.
-		g_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE );
-		g_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1 );
-		g_pDevice->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
-		g_pDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
+@@item 3. Sprite 객체 생성.
+	if (FAILED(hr = D3DXCreateSprite(g_pDevice, &g_TextSprite)))
+		return false;
+
+
+@@item 4. Sprite 객체를 통해 출력.
+		g_TextSprite->Begin( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
+
+		g_TextSprite->End();
+
+
+@@item 5. Sprite 객체 가지고놀기.
+		g_TextSprite->Begin( D3DXSPRITE_ALPHABLEND);
+		Matrix44 mm;
+		mm.SetScale(Vector3(0.5, 0.3f, 0.3f));
+		g_TextSprite->SetTransform((D3DXMATRIX*)&mm);
+		RECT rc2 = {0,0,1920,2000};
+		Vector3 center(00,00,0);
+		Vector3 pos(0,0,0);
+		g_TextSprite->Draw(g_Texture1, NULL, (D3DXVECTOR3*)&center, 
+			(D3DXVECTOR3*)&pos,  
+			D3DCOLOR_RGBA(255,255,255,255));
+		g_TextSprite->End();
+
+
+
+@@item 3D 폰트 출력 ---------------------------------------
+
+@@item 1. 폰트를 저장할 객체 선언.
+ID3DXMesh*g_Mesh3DText = NULL;
+
+
+@@item 2. 3D 폰트 제거.
+	if (g_Mesh3DText)
+		g_Mesh3DText->Release();
+
+
+@@item 3. 3D 폰트 생성 함수 호출
+	CreateD3DXTextMesh(g_pDevice, &g_Mesh3DText, "굴림", 0, FALSE, FALSE);
+
+
+@@item 4. 3D 폰트 생성 함수 선언.
+HRESULT CreateD3DXTextMesh( IDirect3DDevice9* pd3dDevice, LPD3DXMESH* ppMesh, char* pstrFont, DWORD dwSize, BOOL bBold, BOOL bItalic );
+
+
+@@item 5. 3D 폰트 생성 함수 구현.
+HRESULT CreateD3DXTextMesh( IDirect3DDevice9* pd3dDevice,
+	LPD3DXMESH* ppMesh,
+	char* pstrFont, DWORD dwSize,
+	BOOL bBold, BOOL bItalic )
+{
+	HRESULT hr;
+	LPD3DXMESH pMeshNew = NULL;
+	HDC hdc = CreateCompatibleDC( NULL );
+	if( hdc == NULL )
+		return E_OUTOFMEMORY;
+	INT nHeight = -MulDiv( dwSize, GetDeviceCaps( hdc, LOGPIXELSY ), 72 );
+	HFONT hFont;
+	HFONT hFontOld;
+
+	hFont = CreateFontA( nHeight, 0, 0, 0, bBold ? FW_BOLD : FW_NORMAL, bItalic, FALSE, FALSE, DEFAULT_CHARSET,
+		OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
+		pstrFont );
+
+	hFontOld = ( HFONT )SelectObject( hdc, hFont );
+
+	hr = D3DXCreateText( pd3dDevice, hdc, L"This is calling D3DXCreateText",
+		0.001f, 0.4f, &pMeshNew, NULL, NULL );
+
+	SelectObject( hdc, hFontOld );
+	DeleteObject( hFont );
+	DeleteDC( hdc );
+
+	if( SUCCEEDED( hr ) )
+		*ppMesh = pMeshNew;
+
+	return hr;
+}
+
+
+@@item 6. 3D 폰트 출력.
+		Matrix44 mat;
+		mat.SetTranslate(Vector3(-10, 0, -490));
+		g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&mat);
+		g_Mesh3DText->DrawSubset( 0 );
 
 

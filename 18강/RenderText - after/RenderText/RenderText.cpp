@@ -26,8 +26,9 @@ int g_FaceSize = 0;
 D3DMATERIAL9 g_Mtrl;
 D3DLIGHT9 g_Light;
 IDirect3DTexture9* g_Texture1;
-
-
+ID3DXFont *g_Font = NULL;
+ID3DXMesh*g_Mesh3DText = NULL;
+ID3DXSprite *g_TextSprite = NULL;   // Sprite for batching draw text calls
 
 
 // 버텍스 구조체
@@ -54,6 +55,10 @@ bool InitVertexBuffer();
 void Render(int timeDelta);
 bool ReadModelFile( const string &fileName, LPDIRECT3DVERTEXBUFFER9 &vtxBuff, int &vtxSize,  LPDIRECT3DINDEXBUFFER9 &idxBuff, int &faceSize );
 void ComputeNormals(LPDIRECT3DVERTEXBUFFER9 vtxBuff, int vtxSize,  LPDIRECT3DINDEXBUFFER9 idxBuff, int faceSize);
+HRESULT CreateD3DXTextMesh( IDirect3DDevice9* pd3dDevice,
+	LPD3DXMESH* ppMesh,
+	char* pstrFont, DWORD dwSize,
+	BOOL bBold, BOOL bItalic );
 
 
 
@@ -147,6 +152,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		g_pIB->Release();
 	if (g_Texture1)
 		g_Texture1->Release();
+	if (g_Font)
+		g_Font->Release();
+	if (g_TextSprite)
+		g_TextSprite->Release();
 	if (g_pDevice)
 		g_pDevice->Release();
 	return 0;
@@ -249,7 +258,25 @@ bool InitVertexBuffer()
 	D3DXCreateTextureFromFileA(g_pDevice, "../../media/강소라2.jpg", &g_Texture1);
 
 
+	HRESULT hr = D3DXCreateFont( g_pDevice, // D3D device
+		0,               // Height
+		0,                     // Width
+		FW_BOLD,               // Weight
+		1,                     // MipLevels, 0 = autogen mipmaps
+		FALSE,                 // Italic
+		DEFAULT_CHARSET,       // 그냥 디폴트
+		OUT_DEFAULT_PRECIS,    // 정밀도
+		DEFAULT_QUALITY,       // 그냥 디폴트
+		DEFAULT_PITCH | FF_DONTCARE, // 디폴트
+		L"굴림",              // pFaceName
+		&g_Font );              // ppFont
+	if (FAILED(hr))
+		return false;
 
+	if (FAILED(hr = D3DXCreateSprite(g_pDevice, &g_TextSprite)))
+		return false;
+
+	CreateD3DXTextMesh(g_pDevice, &g_Mesh3DText, "굴림", 0, FALSE, FALSE);
 
 
 	ZeroMemory(&g_Mtrl, sizeof(g_Mtrl));
@@ -326,7 +353,22 @@ void Render(int timeDelta)
 		g_pDevice->SetStreamSource( 0, g_pVB, 0, sizeof(Vertex) );
 		g_pDevice->SetIndices(g_pIB);
 		g_pDevice->SetFVF( Vertex::FVF );
-		g_pDevice->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, g_VtxSize, 0, g_FaceSize);
+		//g_pDevice->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, g_VtxSize, 0, g_FaceSize);
+
+		RECT rc;
+		SetRect( &rc, 150, 100, 0, 0 );
+		g_Font->DrawTextA( NULL, 
+			"g_Font->DrawText", 
+			-1, 
+			&rc, 
+			DT_NOCLIP,
+			D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f) );
+
+
+		Matrix44 mat;
+		mat.SetTranslate(Vector3(-10, 0, -490));
+		g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&mat);
+		g_Mesh3DText->DrawSubset( 0 );
 
 
 		//랜더링 끝
@@ -539,3 +581,35 @@ bool ReadModelFile( const string &fileName, LPDIRECT3DVERTEXBUFFER9 &vtxBuff, in
 }
 
 
+HRESULT CreateD3DXTextMesh( IDirect3DDevice9* pd3dDevice,
+	LPD3DXMESH* ppMesh,
+	char* pstrFont, DWORD dwSize,
+	BOOL bBold, BOOL bItalic )
+{
+	HRESULT hr;
+	LPD3DXMESH pMeshNew = NULL;
+	HDC hdc = CreateCompatibleDC( NULL );
+	if( hdc == NULL )
+		return E_OUTOFMEMORY;
+	INT nHeight = -MulDiv( dwSize, GetDeviceCaps( hdc, LOGPIXELSY ), 72 );
+	HFONT hFont;
+	HFONT hFontOld;
+
+	hFont = CreateFontA( nHeight, 0, 0, 0, bBold ? FW_BOLD : FW_NORMAL, bItalic, FALSE, FALSE, DEFAULT_CHARSET,
+		OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
+		pstrFont );
+
+	hFontOld = ( HFONT )SelectObject( hdc, hFont );
+
+	hr = D3DXCreateText( pd3dDevice, hdc, L"This is calling D3DXCreateText",
+		0.001f, 0.4f, &pMeshNew, NULL, NULL );
+
+	SelectObject( hdc, hFontOld );
+	DeleteObject( hFont );
+	DeleteDC( hdc );
+
+	if( SUCCEEDED( hr ) )
+		*ppMesh = pMeshNew;
+
+	return hr;
+}
