@@ -49,7 +49,7 @@ cRenderer::~cRenderer()
 // DirectX Device °´Ã¼ »ý¼º.
 bool cRenderer::CreateDirectX(HWND hWnd, const int width, const int height)
 {
-	if (!InitDirectX(hWnd, width, height, m_DxDevice))
+	if (!InitDirectX(hWnd, width, height, m_pDevice))
 		return false;
 
 	return true;

@@ -10,14 +10,14 @@ namespace graphic
 		virtual ~cRenderer();
 
 		bool CreateDirectX(HWND hWnd, const int width, const int height);
-		LPDIRECT3DDEVICE9 GetDevice() { return m_DxDevice; }
+		LPDIRECT3DDEVICE9 GetDevice() { return m_pDevice; }
 
 
 	protected:
 
 
 	private:
-		LPDIRECT3DDEVICE9 m_DxDevice;
+		LPDIRECT3DDEVICE9 m_pDevice;
 	};
 
 
