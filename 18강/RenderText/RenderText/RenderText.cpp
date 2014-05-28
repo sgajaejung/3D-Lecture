@@ -23,10 +23,12 @@ LPDIRECT3DINDEXBUFFER9 g_pIB = NULL; // 인덱스 버퍼
 int g_VtxSize = 0;
 int g_FaceSize = 0;
 
-
 D3DMATERIAL9 g_Mtrl;
 D3DLIGHT9 g_Light;
 IDirect3DTexture9* g_Texture1;
+ID3DXFont *g_Font = NULL;
+ID3DXMesh*g_Mesh3DText = NULL;
+ID3DXSprite *g_TextSprite = NULL;   // Sprite for batching draw text calls
 
 
 // 버텍스 구조체
@@ -53,6 +55,11 @@ bool InitVertexBuffer();
 void Render(int timeDelta);
 bool ReadModelFile( const string &fileName, LPDIRECT3DVERTEXBUFFER9 &vtxBuff, int &vtxSize,  LPDIRECT3DINDEXBUFFER9 &idxBuff, int &faceSize );
 void ComputeNormals(LPDIRECT3DVERTEXBUFFER9 vtxBuff, int vtxSize,  LPDIRECT3DINDEXBUFFER9 idxBuff, int faceSize);
+HRESULT CreateD3DXTextMesh( IDirect3DDevice9* pd3dDevice,
+	LPD3DXMESH* ppMesh,
+	char* pstrFont, DWORD dwSize,
+	BOOL bBold, BOOL bItalic );
+
 
 
 int APIENTRY WinMain(HINSTANCE hInstance, 
@@ -145,6 +152,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		g_pIB->Release();
 	if (g_Texture1)
 		g_Texture1->Release();
+	if (g_Font)
+		g_Font->Release();
+	if (g_TextSprite)
+		g_TextSprite->Release();
 	if (g_pDevice)
 		g_pDevice->Release();
 	return 0;
@@ -241,63 +252,32 @@ bool InitDirectX(HWND hWnd)
 }
 
 
-//랜더
-void Render(int timeDelta)
-{
-	//화면 청소
-	if (SUCCEEDED(g_pDevice->Clear( 
-		0,			//청소할 영역의 D3DRECT 배열 갯수		( 전체 클리어 0 )
-		NULL,		//청소할 영역의 D3DRECT 배열 포인터		( 전체 클리어 NULL )
-		D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL,	//청소될 버퍼 플레그 ( D3DCLEAR_TARGET 컬러버퍼, D3DCLEAR_ZBUFFER 깊이버퍼, D3DCLEAR_STENCIL 스텐실버퍼
-		D3DCOLOR_XRGB(255, 255, 255),			//컬러버퍼를 청소하고 채워질 색상( 0xAARRGGBB )
-		1.0f,				//깊이버퍼를 청소할값 ( 0 ~ 1 0 이 카메라에서 제일가까운 1 이 카메라에서 제일 먼 )
-		0					//스텐실 버퍼를 채울값
-		)))
-	{
-		//화면 청소가 성공적으로 이루어 졌다면... 랜더링 시작
-		g_pDevice->BeginScene();
-
-		static float y = 0;
-		y += timeDelta / 1000.f;
-		// 각도가 2*PI 에 이르면 0으로 초기화한다.
-		if (y >= 6.28f)
-			y = 0;
-
-		Matrix44 rx, ry, r;
-		rx.SetRotationX(MATH_PI/4.f); 	// x축으로 45도 회전시킨다.
-		ry.SetRotationY(y); // y축으로 회전
-		r = rx*ry;
-
-		Matrix44 mt;
-		mt.SetTranslate(Vector3(0, 0, 300));
-		Matrix44 tm1 = mt;
-		g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&tm1);
-
-		g_pDevice->SetTexture(0, g_Texture1);
-		g_pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-		g_pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-		g_pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
-
-		g_pDevice->SetMaterial(&g_Mtrl);
-		g_pDevice->SetStreamSource( 0, g_pVB, 0, sizeof(Vertex) );
-		g_pDevice->SetIndices(g_pIB);
-		g_pDevice->SetFVF( Vertex::FVF );
-		g_pDevice->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, g_VtxSize, 0, g_FaceSize);
-
-
-
-		//랜더링 끝
-		g_pDevice->EndScene();
-		//랜더링이 끝났으면 랜더링된 내용 화면으로 전송
-		g_pDevice->Present( NULL, NULL, NULL, NULL );
-	}
-}
-
-
 bool InitVertexBuffer()
 {
 	ReadModelFile("../../media/cube.dat", g_pVB, g_VtxSize, g_pIB, g_FaceSize);
 	D3DXCreateTextureFromFileA(g_pDevice, "../../media/강소라2.jpg", &g_Texture1);
+
+
+	HRESULT hr = D3DXCreateFont( g_pDevice, // D3D device
+		0,               // Height
+		0,                     // Width
+		FW_BOLD,               // Weight
+		1,                     // MipLevels, 0 = autogen mipmaps
+		FALSE,                 // Italic
+		DEFAULT_CHARSET,       // 그냥 디폴트
+		OUT_DEFAULT_PRECIS,    // 정밀도
+		DEFAULT_QUALITY,       // 그냥 디폴트
+		DEFAULT_PITCH | FF_DONTCARE, // 디폴트
+		L"굴림",              // pFaceName
+		&g_Font );              // ppFont
+	if (FAILED(hr))
+		return false;
+
+	if (FAILED(hr = D3DXCreateSprite(g_pDevice, &g_TextSprite)))
+		return false;
+
+	CreateD3DXTextMesh(g_pDevice, &g_Mesh3DText, "굴림", 0, FALSE, FALSE);
+
 
 	ZeroMemory(&g_Mtrl, sizeof(g_Mtrl));
 	g_Mtrl.Ambient = D3DXCOLOR(1,1,1,1);
@@ -332,6 +312,70 @@ bool InitVertexBuffer()
 		true); // true = 활성화 ， false = 비활성화
 
 	return true;
+}
+
+
+
+//랜더
+void Render(int timeDelta)
+{
+	//화면 청소
+	if (SUCCEEDED(g_pDevice->Clear( 
+		0,			//청소할 영역의 D3DRECT 배열 갯수		( 전체 클리어 0 )
+		NULL,		//청소할 영역의 D3DRECT 배열 포인터		( 전체 클리어 NULL )
+		D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL,	//청소될 버퍼 플레그 ( D3DCLEAR_TARGET 컬러버퍼, D3DCLEAR_ZBUFFER 깊이버퍼, D3DCLEAR_STENCIL 스텐실버퍼
+		D3DCOLOR_XRGB(255, 255, 255),			//컬러버퍼를 청소하고 채워질 색상( 0xAARRGGBB )
+		1.0f,				//깊이버퍼를 청소할값 ( 0 ~ 1 0 이 카메라에서 제일가까운 1 이 카메라에서 제일 먼 )
+		0					//스텐실 버퍼를 채울값
+		)))
+	{
+		//화면 청소가 성공적으로 이루어 졌다면... 랜더링 시작
+		g_pDevice->BeginScene();
+
+		static float y = 0;
+		y += timeDelta / 1000.f;
+		// 각도가 2*PI 에 이르면 0으로 초기화한다.
+		if (y >= 6.28f)
+			y = 0;
+
+		Matrix44 rx, ry, r;
+		rx.SetRotationX(MATH_PI/4.f); 	// x축으로 45도 회전시킨다.
+		ry.SetRotationY(y); // y축으로 회전
+		r = rx*ry;
+
+		g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&r);
+		g_pDevice->SetTexture(0, g_Texture1);
+		g_pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+		g_pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+		g_pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
+
+		g_pDevice->SetMaterial(&g_Mtrl);
+		g_pDevice->SetStreamSource( 0, g_pVB, 0, sizeof(Vertex) );
+		g_pDevice->SetIndices(g_pIB);
+		g_pDevice->SetFVF( Vertex::FVF );
+		g_pDevice->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, g_VtxSize, 0, g_FaceSize);
+
+		RECT rc;
+		SetRect( &rc, 150, 100, 0, 0 );
+		g_Font->DrawTextA( NULL, 
+			"g_Font->DrawText", 
+			-1, 
+			&rc, 
+			DT_NOCLIP,
+			D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f) );
+
+
+		Matrix44 mat;
+		mat.SetTranslate(Vector3(100, 100, 0));
+		g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&mat);
+		g_Mesh3DText->DrawSubset( 0 );
+
+
+		//랜더링 끝
+		g_pDevice->EndScene();
+		//랜더링이 끝났으면 랜더링된 내용 화면으로 전송
+		g_pDevice->Present( NULL, NULL, NULL, NULL );
+	}
 }
 
 
@@ -534,4 +578,38 @@ bool ReadModelFile( const string &fileName, LPDIRECT3DVERTEXBUFFER9 &vtxBuff, in
 	idxBuff->Unlock();
 
 	return true;
+}
+
+
+HRESULT CreateD3DXTextMesh( IDirect3DDevice9* pd3dDevice,
+	LPD3DXMESH* ppMesh,
+	char* pstrFont, DWORD dwSize,
+	BOOL bBold, BOOL bItalic )
+{
+	HRESULT hr;
+	LPD3DXMESH pMeshNew = NULL;
+	HDC hdc = CreateCompatibleDC( NULL );
+	if( hdc == NULL )
+		return E_OUTOFMEMORY;
+	INT nHeight = -MulDiv( dwSize, GetDeviceCaps( hdc, LOGPIXELSY ), 72 );
+	HFONT hFont;
+	HFONT hFontOld;
+
+	hFont = CreateFontA( nHeight, 0, 0, 0, bBold ? FW_BOLD : FW_NORMAL, bItalic, FALSE, FALSE, DEFAULT_CHARSET,
+		OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
+		pstrFont );
+
+	hFontOld = ( HFONT )SelectObject( hdc, hFont );
+
+	hr = D3DXCreateText( pd3dDevice, hdc, L"This is calling D3DXCreateText",
+		0.001f, 0.4f, &pMeshNew, NULL, NULL );
+
+	SelectObject( hdc, hFontOld );
+	DeleteObject( hFont );
+	DeleteDC( hdc );
+
+	if( SUCCEEDED( hr ) )
+		*ppMesh = pMeshNew;
+
+	return hr;
 }
