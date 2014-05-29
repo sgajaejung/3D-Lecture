@@ -166,3 +166,44 @@ void Matrix44::SetProjection(	const float fov, const float aspect, const float n
 	_44 = 1.0f;
 	_44 = 0.f;
 }
+
+
+Quaternion Matrix44::GetQuaternion() const
+{
+	Quaternion q;
+
+	float fTr = _11 + _22 + _33 + _44;
+
+	if( fTr >= 1.0F )	// w >= 0.5
+	{
+		float s = sqrtf( fTr );
+		q.x = ( _32 - _23 ) / ( 2.0F * s );
+		q.y = ( _13 - _31 ) / ( 2.0F * s );
+		q.z = ( _21 - _12 ) / ( 2.0F * s );
+		q.w = 0.5F * s;
+	}
+	else
+	{
+		float v[3];
+		int i, j, k;
+
+		if( _11 > _22 )		i = 0;
+		else				i = 1;
+		if( _33 > m[i][i] )	i = 2;
+
+		j = ( i + 1 ) % 3;
+		k = ( j + 1 ) % 3;
+
+		float s = sqrtf( m[i][i] - m[j][j] - m[k][k] + 1.0F );
+		v[i] = 0.5F * s;
+		v[j] = ( m[j][i] + m[i][j] ) / ( 2.0F * s );
+		v[k] = ( m[k][i] + m[i][k] ) / ( 2.0F * s );
+
+		q.x = v[0];
+		q.y = v[1];
+		q.z = v[2];
+		q.w = ( m[k][j] - m[j][k] ) / ( 2.0F * s );
+	}
+
+	return q;
+}

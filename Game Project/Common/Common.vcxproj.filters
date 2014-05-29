@@ -28,6 +28,9 @@
     <ClInclude Include="etc\stringfunc.h">
       <Filter>Etc</Filter>
     </ClInclude>
+    <ClInclude Include="math\quaternion.h">
+      <Filter>math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -48,6 +51,9 @@
     </ClCompile>
     <ClCompile Include="etc\stringfunc.cpp">
       <Filter>Etc</Filter>
+    </ClCompile>
+    <ClCompile Include="math\quaternion.cpp">
+      <Filter>math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

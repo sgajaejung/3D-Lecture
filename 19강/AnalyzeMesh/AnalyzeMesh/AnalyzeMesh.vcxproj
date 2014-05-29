@@ -75,6 +75,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\math\matrix44.cpp" />
+    <ClCompile Include="..\math\quaternion.cpp" />
     <ClCompile Include="..\math\vector3.cpp" />
     <ClCompile Include="..\math\vector4.cpp" />
     <ClCompile Include="AnalyzeMesh.cpp" />
@@ -82,6 +83,7 @@
   <ItemGroup>
     <ClInclude Include="..\math\Math.h" />
     <ClInclude Include="..\math\matrix44.h" />
+    <ClInclude Include="..\math\quaternion.h" />
     <ClInclude Include="..\math\vector3.h" />
     <ClInclude Include="..\math\vector4.h" />
   </ItemGroup>
