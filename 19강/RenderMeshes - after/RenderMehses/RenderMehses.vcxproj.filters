@@ -11,6 +11,9 @@
     <ClCompile Include="..\math\vector4.cpp">
       <Filter>math</Filter>
     </ClCompile>
+    <ClCompile Include="..\math\quaternion.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -28,6 +31,9 @@
       <Filter>math</Filter>
     </ClInclude>
     <ClInclude Include="..\math\vector4.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\math\quaternion.h">
       <Filter>math</Filter>
     </ClInclude>
   </ItemGroup>

@@ -19,7 +19,7 @@ const int WINPOS_X = 0; //초기 윈도우 시작 위치 X
 const int WINPOS_Y = 0; //초기 윈도우 시작 위치 Y
 D3DLIGHT9 g_Light;
 D3DMATERIAL9 g_Mtrl;
-
+LPD3DXMESH g_Mesh;
 
 
 
@@ -133,6 +133,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		}
 	}
 
+	if (g_Mesh)
+		g_Mesh->Release();
 	if (g_pDevice)
 		g_pDevice->Release();
 	return 0;
@@ -238,6 +240,14 @@ bool InitDirectX(HWND hWnd)
 
 bool InitVertexBuffer()
 {
+	//D3DXCreateBox(g_pDevice, 200, 200, 200, &g_Mesh, NULL);
+	//D3DXCreateSphere(g_pDevice, 100, 10, 10, &g_Mesh, NULL);
+	//D3DXCreateCylinder(g_pDevice, 100, 150, 200, 10, 10, &g_Mesh, NULL);
+	//D3DXCreateTeapot(g_pDevice, &g_Mesh, NULL);
+	//D3DXCreatePolygon(g_pDevice, 100, 20, &g_Mesh, NULL);
+	D3DXCreateTorus(g_pDevice, 50, 100, 20, 10, &g_Mesh, NULL);
+
+
 
 	ZeroMemory(&g_Mtrl, sizeof(g_Mtrl));
 	g_Mtrl.Ambient = D3DXCOLOR(0,0,1,1);
@@ -300,13 +310,12 @@ void Render(int timeDelta)
 		Matrix44 rx, ry, r;
 		rx.SetRotationX(MATH_PI/4.f); 	// x축으로 45도 회전시킨다.
 		ry.SetRotationY(y); // y축으로 회전
-		r = rx*ry;
+		//r = rx*ry;
 
 		//r.SetTranslate(Vector3(0, 0, -498)); // teapot
 		g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&r);
-
 		g_pDevice->SetMaterial(&g_Mtrl);
-
+		g_Mesh->DrawSubset(0);
 
 		//랜더링 끝
 		g_pDevice->EndScene();
