@@ -1,0 +1,29 @@
+
+
+@@item 메쉬 출력 ---------------------------------------
+
+
+@@item 1. 메쉬 객체 선언.
+LPD3DXMESH g_Mesh;
+
+
+@@item 2. 메쉬 메모리 제거.
+	if (g_Mesh)
+		g_Mesh->Release();
+
+
+@@item 3. 메쉬 생성.
+	D3DXCreateBox(g_pDevice, 200, 200, 200, &g_Mesh, NULL);
+	//D3DXCreateSphere(g_pDevice, 100, 10, 10, &g_Mesh, NULL);
+	//D3DXCreateCylinder(g_pDevice, 100, 150, 200, 10, 10, &g_Mesh, NULL);
+	//D3DXCreateTeapot(g_pDevice, &g_Mesh, NULL);
+	//D3DXCreatePolygon(g_pDevice, 100, 20, &g_Mesh, NULL);
+	//D3DXCreateTorus(g_pDevice, 50, 100, 20, 10, &g_Mesh, NULL);
+
+
+@@item 4. 메쉬 출력
+		g_Mesh->DrawSubset(0);
+
+
+
+
