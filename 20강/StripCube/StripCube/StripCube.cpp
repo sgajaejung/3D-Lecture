@@ -157,7 +157,7 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 		if (wParam == VK_TAB)
 		{
 			static bool flag = false;
-			g_pDevice->SetRenderState(D3DRS_CULLMODE, flag);
+			g_pDevice->SetRenderState(D3DRS_CULLMODE, flag? D3DCULL_CCW : D3DCULL_NONE);
 			g_pDevice->SetRenderState(D3DRS_FILLMODE, flag? D3DFILL_SOLID : D3DFILL_WIREFRAME);
 			flag = !flag;
 		}
@@ -276,12 +276,38 @@ bool InitDirectX(HWND hWnd)
 
 bool InitVertexBuffer()
 {
-	D3DXCreateBox(g_pDevice, 200, 200, 200, &g_Mesh, NULL);
+	//D3DXCreateBox(g_pDevice, 200, 200, 200, &g_Mesh, NULL);
 	//D3DXCreateSphere(g_pDevice, 100, 10, 10, &g_Mesh, NULL);
 	//D3DXCreateCylinder(g_pDevice, 100, 150, 200, 10, 10, &g_Mesh, NULL);
 	//D3DXCreateTeapot(g_pDevice, &g_Mesh, NULL);
-	//D3DXCreatePolygon(g_pDevice, 100, 20, &g_Mesh, NULL);
+	//D3DXCreatePolygon(g_pDevice, 100, 3, &g_Mesh, NULL);
 	//D3DXCreateTorus(g_pDevice, 50, 100, 20, 10, &g_Mesh, NULL);
+
+	D3DXCreateMeshFVF(2, 4, D3DXMESH_DYNAMIC, Vertex::FVF,
+		g_pDevice, &g_Mesh);
+
+
+	LPDIRECT3DVERTEXBUFFER9 vtxBuff;
+	g_Mesh->GetVertexBuffer(&vtxBuff);
+
+	Vertex *vertices;
+	vtxBuff->Lock(0, 0, (void**)&vertices, 0);
+	vertices[ 0] = Vertex(-100, 0, 100);
+	vertices[ 1] = Vertex(-100, 0, -100);
+	vertices[ 2] = Vertex(100, 0, -100);
+	vertices[ 3] = Vertex(100, 0, 100);
+	vtxBuff->Unlock();
+
+
+	LPDIRECT3DINDEXBUFFER9 idxBuff;
+	g_Mesh->GetIndexBuffer(&idxBuff);
+	WORD *indices;
+	idxBuff->Lock(0, 0, (void**)&indices, 0);
+	indices[ 0] = 0; indices[ 1] = 1; indices[ 2] = 2;
+	indices[ 3] = 0; indices[ 4] = 2; indices[ 5] = 3;
+	idxBuff->Unlock();
+
+
 
 	ZeroMemory(&g_Mtrl, sizeof(g_Mtrl));
 	g_Mtrl.Ambient = D3DXCOLOR(0,0,1,1);

@@ -138,7 +138,7 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 		if (wParam == VK_TAB)
 		{
 			static bool flag = false;
-			g_pDevice->SetRenderState(D3DRS_CULLMODE, flag);
+			g_pDevice->SetRenderState(D3DRS_CULLMODE, flag? D3DCULL_CCW : D3DCULL_NONE);
 			g_pDevice->SetRenderState(D3DRS_FILLMODE, flag? D3DFILL_SOLID : D3DFILL_WIREFRAME);
 			flag = !flag;
 		}
