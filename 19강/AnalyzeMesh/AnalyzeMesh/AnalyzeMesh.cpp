@@ -20,7 +20,6 @@ const int WINPOS_Y = 0; //초기 윈도우 시작 위치 Y
 D3DLIGHT9 g_Light;
 D3DMATERIAL9 g_Mtrl;
 LPD3DXMESH g_Mesh = NULL;
-LPD3DXMESH g_CloneMesh = NULL;
 
 
 
@@ -117,8 +116,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
 	if (g_Mesh)
 		g_Mesh->Release();
-	if (g_CloneMesh)
-		g_CloneMesh->Release();
 	if (g_pDevice)
 		g_pDevice->Release();
 	return 0;
@@ -231,52 +228,6 @@ bool InitVertexBuffer()
 	//D3DXCreatePolygon(g_pDevice, 100, 20, &g_Mesh, NULL);
 	//D3DXCreateTorus(g_pDevice, 50, 100, 20, 10, &g_Mesh, NULL);
 
-	LPDIRECT3DVERTEXBUFFER9 vtxBuff;
-	g_Mesh->GetVertexBuffer(&vtxBuff);
-	LPDIRECT3DINDEXBUFFER9 idxBuff;
-	g_Mesh->GetIndexBuffer(&idxBuff);
-
-	const int fvf = g_Mesh->GetFVF();
-	const int numVertices = g_Mesh->GetNumVertices();
-	const int numBytesPerVertex = g_Mesh->GetNumBytesPerVertex();
-	const int numFace = g_Mesh->GetNumFaces();
-	const int option = g_Mesh->GetOptions(); // D3DXMESH_SYSTEMMEM, D3DXMESH_MANAGED, 
-
-
-	void *vertices;
-	g_Mesh->LockVertexBuffer(0, &vertices);
-	WORD *indices;
-	g_Mesh->LockIndexBuffer(0, (void**)&indices);
-
-
-	vector<int> adjInfo(numFace*3, 0);
-	g_Mesh->GenerateAdjacency(0.0, (DWORD*)&adjInfo[0]);
-
-	vector<int> optAdjInfo(numFace*3, 0);
-	g_Mesh->OptimizeInplace(
-		D3DXMESHOPT_COMPACT |
-		D3DXMESHOPT_ATTRSORT |
-		D3DXMESHOPT_VERTEXCACHE,
-		(DWORD*)&adjInfo[0],
-		(DWORD*)&optAdjInfo[0],
-		NULL,
-		NULL);
-
-
-	DWORD numAttr;
-	g_Mesh->GetAttributeTable( NULL, &numAttr );
-
-	vector<D3DXATTRIBUTERANGE> attrRangeBuff(numAttr);
-	g_Mesh->GetAttributeTable( &attrRangeBuff[0], &numAttr );
-
-
-	g_Mesh->CloneMeshFVF(g_Mesh->GetOptions(),
-		D3DFVF_XYZ | D3DFVF_NORMAL,
-		g_pDevice,
-		&g_CloneMesh
-		);
-
-
 
 	ZeroMemory(&g_Mtrl, sizeof(g_Mtrl));
 	g_Mtrl.Ambient = D3DXCOLOR(0,0,1,1);
@@ -344,14 +295,6 @@ void Render(int timeDelta)
 
 		g_pDevice->SetMaterial(&g_Mtrl);
 		g_Mesh->DrawSubset(0);
-
-		if (g_CloneMesh)
-		{
-			Matrix44 mat;
-			mat.SetTranslate(Vector3(300,0,0));
-			g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&mat);
-			g_CloneMesh->DrawSubset(0);
-		}
 
 		//랜더링 끝
 		g_pDevice->EndScene();

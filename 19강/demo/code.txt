@@ -25,5 +25,86 @@ LPD3DXMESH g_Mesh;
 		g_Mesh->DrawSubset(0);
 
 
+@@item 메쉬 분석 ---------------------------------------
+
+
+@@item 1. 버텍스 버퍼, 인덱스 버퍼 가져오기.
+	LPDIRECT3DVERTEXBUFFER9 vtxBuff;
+	g_Mesh->GetVertexBuffer(&vtxBuff);
+	LPDIRECT3DINDEXBUFFER9 idxBuff;
+	g_Mesh->GetIndexBuffer(&idxBuff);
+
+
+@@item 2. 메쉬 정보 가져오기.
+	const int fvf = g_Mesh->GetFVF();
+	const int numVertices = g_Mesh->GetNumVertices();
+	const int numBytesPerVertex = g_Mesh->GetNumBytesPerVertex();
+	const int numFace = g_Mesh->GetNumFaces();
+	const int option = g_Mesh->GetOptions(); // D3DXMESH_SYSTEMMEM, D3DXMESH_MANAGED, 
+
+
+
+@@item 4. 버텍스, 인덱스 버퍼 락 걸기.
+	void *vertices;
+	g_Mesh->LockVertexBuffer(0, &vertices);
+	WORD *indices;
+	g_Mesh->LockIndexBuffer(0, (void**)&indices);
+
+
+
+@@item 5. 근접 정보 만들기
+	vector<int> adjInfo(numFace*3, 0);
+	g_Mesh->GenerateAdjacency(0.0, (DWORD*)&adjInfo[0]);
+
+
+@@item 6. 근접 정보 최적화 하기.
+	vector<int> optAdjInfo(numFace*3, 0);
+	g_Mesh->OptimizeInplace(
+		D3DXMESHOPT_COMPACT |
+		D3DXMESHOPT_ATTRSORT |
+		D3DXMESHOPT_VERTEXCACHE,
+		(DWORD*)&adjInfo[0],
+		(DWORD*)&optAdjInfo[0],
+		NULL,
+		NULL);
+
+
+@@item 7. 속성 테이블 가져오기.
+	DWORD numAttr;
+	g_Mesh->GetAttributeTable( NULL, &numAttr );
+
+	vector<D3DXATTRIBUTERANGE> attrRangeBuff(numAttr);
+	g_Mesh->GetAttributeTable( &attrRangeBuff[0], &numAttr );
+
+
+
+@@item 메쉬 복사 하기 ---------------------------------------
+
+@@item 1. 복사될 메시 선언. (클론 메시)
+LPD3DXMESH g_CloneMesh = NULL;
+
+
+@@item 2. 클론메시 제거.
+	if (g_CloneMesh)
+		g_CloneMesh->Release();
+
+
+@@item 3. 클론메시 생성.
+	g_Mesh->CloneMeshFVF(g_Mesh->GetOptions(),
+		D3DFVF_XYZ | D3DFVF_NORMAL,
+		g_pDevice,
+		&g_CloneMesh
+		);
+
+
+@@item 4. 클론메시 출력.
+		if (g_CloneMesh)
+		{
+			Matrix44 mat;
+			mat.SetTranslate(Vector3(300,0,0));
+			g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&mat);
+			g_CloneMesh->DrawSubset(0);
+		}
+
 
 
