@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{A9C6BC7D-F11C-49D1-BEDF-40B7C13893A5}</ProjectGuid>
+    <ProjectGuid>{BA17787B-CDD3-491B-8FC1-C53BA1BD55F0}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>StripCube</RootNamespace>
+    <RootNamespace>SpreadCube</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -78,7 +78,7 @@
     <ClCompile Include="..\math\quaternion.cpp" />
     <ClCompile Include="..\math\vector3.cpp" />
     <ClCompile Include="..\math\vector4.cpp" />
-    <ClCompile Include="StripCube.cpp" />
+    <ClCompile Include="SpreadCube.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\math\Math.h" />

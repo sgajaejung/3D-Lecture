@@ -156,7 +156,7 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 			::DestroyWindow(hWnd);
 		if (wParam == VK_TAB)
 		{
-			static bool flag = false;
+			static bool flag = true;
 			g_pDevice->SetRenderState(D3DRS_CULLMODE, flag? D3DCULL_CCW : D3DCULL_NONE);
 			g_pDevice->SetRenderState(D3DRS_FILLMODE, flag? D3DFILL_SOLID : D3DFILL_WIREFRAME);
 			flag = !flag;
@@ -286,7 +286,6 @@ bool InitVertexBuffer()
 	D3DXCreateMeshFVF(2, 4, D3DXMESH_DYNAMIC, Vertex::FVF,
 		g_pDevice, &g_Mesh);
 
-
 	LPDIRECT3DVERTEXBUFFER9 vtxBuff;
 	g_Mesh->GetVertexBuffer(&vtxBuff);
 
@@ -295,9 +294,8 @@ bool InitVertexBuffer()
 	vertices[ 0] = Vertex(-100, 0, 100);
 	vertices[ 1] = Vertex(-100, 0, -100);
 	vertices[ 2] = Vertex(100, 0, -100);
-	vertices[ 3] = Vertex(100, 0, 100);
+	vertices[ 3] = Vertex(100, 200, 100);
 	vtxBuff->Unlock();
-
 
 	LPDIRECT3DINDEXBUFFER9 idxBuff;
 	g_Mesh->GetIndexBuffer(&idxBuff);
@@ -308,11 +306,20 @@ bool InitVertexBuffer()
 	idxBuff->Unlock();
 
 
+	const int numFace = g_Mesh->GetNumFaces();
+	vector<int> adjInfo(numFace*3, 0);
+	g_Mesh->GenerateAdjacency(0.0, (DWORD*)&adjInfo[0]);
+
+
+
+
+
+
 
 	ZeroMemory(&g_Mtrl, sizeof(g_Mtrl));
-	g_Mtrl.Ambient = D3DXCOLOR(0,0,1,1);
-	g_Mtrl.Diffuse = D3DXCOLOR(0,0,1,1);
-	g_Mtrl.Specular = D3DXCOLOR(0,0,1,1);
+	g_Mtrl.Ambient = D3DXCOLOR(1,1,1,1);
+	g_Mtrl.Diffuse = D3DXCOLOR(1,1,1,1);
+	g_Mtrl.Specular = D3DXCOLOR(1,1,1,1);
 	g_Mtrl.Emissive = D3DXCOLOR(0,0,0,1);
 	g_Mtrl.Power = 0.f;
 
@@ -325,14 +332,19 @@ bool InitVertexBuffer()
 	g_Light.Direction = *(D3DXVECTOR3*)&Vector3(0,-1,0);	
 
 	Matrix44 V;
-	Vector3 dir = Vector3(0,0,0)-Vector3(0,0,-500);
+	Vector3 camPos(0,200,-500);
+	Vector3 lookAt(0, 0, 0);
+	Vector3 dir = lookAt - camPos;
 	dir.Normalize();
-	V.SetView(Vector3(0,0,-500), dir, Vector3(0,1,0));
+	V.SetView(camPos, dir, Vector3(0,1,0));
 	g_pDevice->SetTransform(D3DTS_VIEW, (D3DXMATRIX*)&V);
 
 	Matrix44 proj;
 	proj.SetProjection(D3DX_PI * 0.5f, (float)WINSIZE_X / (float) WINSIZE_Y, 1.f, 1000.0f) ;
 	g_pDevice->SetTransform(D3DTS_PROJECTION, (D3DXMATRIX*)&proj) ;
+
+	g_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	g_pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 
 	g_pDevice->SetLight(0, &g_Light); // ±¤¿ø ¼³Á¤.
 	g_pDevice->LightEnable(
