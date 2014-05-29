@@ -24,6 +24,7 @@ Matrix44 g_matWorld;
 Matrix44 g_matLocal;
 Vector3 g_PenguinPos(0,0,-300);
 Vector3 g_PenguinVel(0, 0, 3000.f);
+float g_wingRot = 0;
 
 const int MAX_GROUND = 6;
 vector<Vector3> g_groundVtx;
@@ -204,7 +205,8 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
  */
 void	MainLoop(int elapse_time)
 {
-	float static incT = (elapse_time * 0.001f);
+	float elapse_fT = (elapse_time * 0.001f);
+	float static incT = elapse_fT;
 
 	// √Êµπ √º≈©.
 	g_penguinBox.SetWorldTM(g_matLocal * g_matWorld);
@@ -238,6 +240,9 @@ void	MainLoop(int elapse_time)
 		g_PenguinPos.x += movOffset;
 	}
 	
+	// ∆Î±œ ≥Ø∞≥ »ÁµÈ∞≈∏Æ±‚.
+	g_wingRot += elapse_fT;
+
 
 	// ∆Î±œ ¿Ãµø
 	const Vector3 mov = (g_Stop)? Vector3(0,0,0) : g_PenguinVel * incT;
@@ -491,7 +496,26 @@ void Paint(HWND hWnd, HDC hdc)
 	DeleteObject(hbrBkGnd);
 
 	Matrix44 vpv = g_matView * g_matProjection * g_matViewPort;
-	RenderIndices(hdcMem, g_vertices, g_indices, g_normals, g_matLocal * g_matWorld, vpv);
+
+	RenderIndices(hdcMem, g_vertices, g_indices, g_normals, 
+		g_matLocal * g_matWorld, vpv);
+
+
+	Matrix44 wingS;
+	wingS.SetScale(Vector3(0.2f, 0.04f, 0.2f));
+	Matrix44 wingTR, wingTL;
+	wingTR.SetTranslate(Vector3(45,20,0));
+	wingTL.SetTranslate(Vector3(-45,20,0));
+
+	Matrix44 wingR;
+	wingR.SetRotationZ(g_wingRot);
+
+	Matrix44 wingMR = wingS * wingR * wingTR * g_matWorld;
+	RenderIndices(hdcMem, g_vertices, g_indices, g_normals, 
+		wingMR, vpv);
+	Matrix44 wingML = wingS * wingR * wingTL * g_matWorld;
+	RenderIndices(hdcMem, g_vertices, g_indices, g_normals, 
+		wingML, vpv);
 
 	for (int i=0; i < (int)g_matGrounds.size(); ++i)
 		RenderIndices(hdcMem, g_groundVtx, g_groundIdx, g_groundNormals, g_matGrounds[ i], vpv);
