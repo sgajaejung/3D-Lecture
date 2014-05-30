@@ -276,46 +276,6 @@ bool InitDirectX(HWND hWnd)
 
 bool InitVertexBuffer()
 {
-	//D3DXCreateBox(g_pDevice, 200, 200, 200, &g_Mesh, NULL);
-	//D3DXCreateSphere(g_pDevice, 100, 10, 10, &g_Mesh, NULL);
-	//D3DXCreateCylinder(g_pDevice, 100, 150, 200, 10, 10, &g_Mesh, NULL);
-	//D3DXCreateTeapot(g_pDevice, &g_Mesh, NULL);
-	//D3DXCreatePolygon(g_pDevice, 100, 3, &g_Mesh, NULL);
-	//D3DXCreateTorus(g_pDevice, 50, 100, 20, 10, &g_Mesh, NULL);
-
-	D3DXCreateMeshFVF(2, 4, D3DXMESH_DYNAMIC, Vertex::FVF,
-		g_pDevice, &g_Mesh);
-
-	LPDIRECT3DVERTEXBUFFER9 vtxBuff;
-	g_Mesh->GetVertexBuffer(&vtxBuff);
-
-	Vertex *vertices;
-	vtxBuff->Lock(0, 0, (void**)&vertices, 0);
-	vertices[ 0] = Vertex(-100, 0, 100);
-	vertices[ 1] = Vertex(-100, 0, -100);
-	vertices[ 2] = Vertex(100, 0, -100);
-	vertices[ 3] = Vertex(100, 200, 100);
-	vtxBuff->Unlock();
-
-	LPDIRECT3DINDEXBUFFER9 idxBuff;
-	g_Mesh->GetIndexBuffer(&idxBuff);
-	WORD *indices;
-	idxBuff->Lock(0, 0, (void**)&indices, 0);
-	indices[ 0] = 0; indices[ 1] = 1; indices[ 2] = 2;
-	indices[ 3] = 0; indices[ 4] = 2; indices[ 5] = 3;
-	idxBuff->Unlock();
-
-
-	const int numFace = g_Mesh->GetNumFaces();
-	vector<int> adjInfo(numFace*3, 0);
-	g_Mesh->GenerateAdjacency(0.0, (DWORD*)&adjInfo[0]);
-
-
-
-
-
-
-
 	ZeroMemory(&g_Mtrl, sizeof(g_Mtrl));
 	g_Mtrl.Ambient = D3DXCOLOR(1,1,1,1);
 	g_Mtrl.Diffuse = D3DXCOLOR(1,1,1,1);
@@ -374,12 +334,9 @@ void Render(int timeDelta)
 		//r.SetTranslate(Vector3(0, 0, -498)); // teapot
 		g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&g_LocalTm);
 
-		g_pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-		g_pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-		g_pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
-
 		g_pDevice->SetMaterial(&g_Mtrl);
-		g_Mesh->DrawSubset(0);
+		if (g_Mesh)
+			g_Mesh->DrawSubset(0);
 
 		//랜더링 끝
 		g_pDevice->EndScene();
