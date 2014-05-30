@@ -22,6 +22,11 @@ vector<Vector3> g_normals;
 vector<int> g_indices;
 Matrix44 g_matWorld;
 Matrix44 g_matLocal;
+
+vector<Vector3> g_wingVertices;
+vector<Vector3> g_wingNormals;
+vector<int> g_wingIndices;
+
 Vector3 g_PenguinPos(0,0,-300);
 Vector3 g_PenguinVel(0, 0, 3000.f);
 float g_wingRot = 0;
@@ -242,6 +247,8 @@ void	MainLoop(int elapse_time)
 	
 	// Æë±Ï ³¯°³ Èçµé°Å¸®±â.
 	g_wingRot += elapse_fT;
+//	if (g_wingRot > 0.5f)
+//		g_wingRot -= elapse_fT;
 
 
 	// Æë±Ï ÀÌµ¿
@@ -299,6 +306,7 @@ bool Init()
 
 	// ¸ðµ¨ »ý¼º.
 	ReadModelFile("cube.dat", g_vertices, g_indices, g_normals);
+	ReadModelFile("wing.dat", g_wingVertices, g_wingIndices, g_wingNormals);
 	ReadModelFile("plane.dat", g_groundVtx, g_groundIdx, g_groundNormals);
 	ReadModelFile("cone.dat", g_obstructVtx, g_obstructdIdx, g_obstructNormals);
 
@@ -502,24 +510,29 @@ void Paint(HWND hWnd, HDC hdc)
 
 
 	Matrix44 wingS;
-	wingS.SetScale(Vector3(0.2f, 0.04f, 0.2f));
+	wingS.SetScale(Vector3(0.4f, 0.04f, 0.2f));
 	Matrix44 wingTR, wingTL;
-	wingTR.SetTranslate(Vector3(45,20,0));
-	wingTL.SetTranslate(Vector3(-45,20,0));
+	wingTR.SetTranslate(Vector3(25,20,0));
+	wingTL.SetTranslate(Vector3(-25,20,0));
 
 	Matrix44 wingR;
 	wingR.SetRotationZ(g_wingRot);
 
 	Matrix44 wingMR = wingS * wingR * wingTR * g_matWorld;
-	RenderIndices(hdcMem, g_vertices, g_indices, g_normals, 
-		wingMR, vpv);
+//	RenderIndices(hdcMem, g_vertices, g_indices, g_normals, 
+//		wingMR, vpv);
+	RenderIndices(hdcMem, g_wingVertices, g_wingIndices, 
+		g_wingNormals, wingMR, vpv);
 	Matrix44 wingML = wingS * wingR * wingTL * g_matWorld;
-	RenderIndices(hdcMem, g_vertices, g_indices, g_normals, 
-		wingML, vpv);
+	RenderIndices(hdcMem, g_wingVertices, g_wingIndices, 
+		g_wingNormals, wingML, vpv);
+//	RenderIndices(hdcMem, g_vertices, g_indices, g_normals, 
+//		wingML, vpv);
+
+
 
 	for (int i=0; i < (int)g_matGrounds.size(); ++i)
 		RenderIndices(hdcMem, g_groundVtx, g_groundIdx, g_groundNormals, g_matGrounds[ i], vpv);
-
 	for (int i=0; i < (int)g_matObstructs.size(); ++i)
 		RenderIndices(hdcMem, g_obstructVtx, g_obstructdIdx, g_obstructNormals, g_matObstructs[ i], vpv);
 
