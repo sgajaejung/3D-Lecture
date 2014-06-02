@@ -395,7 +395,7 @@ bool InitVertexBuffer()
 	g_Light.Ambient = color * 0.4f;
 	g_Light.Diffuse = color;
 	g_Light.Specular = color * 0.6f;
-	g_Light.Direction = *(D3DXVECTOR3*)&Vector3(0,0,1);	
+	g_Light.Direction = *(D3DXVECTOR3*)&Vector3(0,-1,0);	
 
 	Matrix44 V;
 	Vector3 dir = Vector3(0,0,0)-Vector3(0,0,200);
