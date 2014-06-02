@@ -30,6 +30,9 @@ private:
 	graphic::cTexture m_texture;
 	string m_filePath;
 
+	POINT m_curPos;
+	bool m_LButtonDown;
+	Matrix44 g_localTm;
 };
 
 INIT_FRAMEWORK(cViewer);
@@ -57,6 +60,7 @@ cViewer::cViewer()
 	m_windowName = L"Viewer";
 	const RECT r = {0, 0, 800, 600};
 	m_windowRect = r;
+	m_LButtonDown = false;
 }
 
 cViewer::~cViewer()
@@ -121,7 +125,7 @@ void cViewer::OnRender(const float elapseT)
 		graphic::GetDevice()->BeginScene();
 
 		static float y = 0;
-		y += elapseT;
+		y += elapseT * 0.1f;
 		// 각도가 2*PI 에 이르면 0으로 초기화한다.
 		if (y >= 6.28f)
 			y = 0;
@@ -130,7 +134,10 @@ void cViewer::OnRender(const float elapseT)
 		rx.SetRotationX(MATH_PI/4.f); 	// x축으로 45도 회전시킨다.
 		ry.SetRotationY(y); // y축으로 회전
 		r = rx*ry;
-		graphic::GetDevice()->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&r);
+
+		Matrix44 tm;
+		tm = r * g_localTm;
+		graphic::GetDevice()->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&tm);
 
 		m_mtrl.Bind();
 		m_texture.Bind(0);
@@ -183,6 +190,46 @@ void cViewer::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 			m_vtxBuff.Clear();
 			m_idxBuff.Clear();
 			ReadModelFile(m_filePath, m_vtxBuff, m_idxBuff, m_texture);
+		}
+		else if (wParam == VK_TAB)
+		{
+			static bool flag = false;
+			graphic::GetDevice()->SetRenderState(D3DRS_CULLMODE, flag);
+			graphic::GetDevice()->SetRenderState(D3DRS_FILLMODE, flag? D3DFILL_SOLID : D3DFILL_WIREFRAME);
+			flag = !flag;
+		}
+		break;
+
+	case WM_LBUTTONDOWN:
+		{
+			m_LButtonDown = true;
+			m_curPos.x = LOWORD(lParam);
+			m_curPos.y = HIWORD(lParam);
+		}
+		break;
+
+	case WM_LBUTTONUP:
+		m_LButtonDown = false;
+		break;
+
+	case WM_MOUSEMOVE:
+		if (m_LButtonDown)
+		{
+			POINT pos;
+			pos.x = LOWORD(lParam);
+			pos.y = HIWORD(lParam);
+
+			const int x = pos.x - m_curPos.x;
+			const int y = pos.y - m_curPos.y;
+
+			Matrix44 mat1;
+			mat1.SetRotationY( -x * 0.01f );
+			Matrix44 mat2;
+			mat2.SetRotationX( -y * 0.01f );
+
+			m_curPos = pos;
+
+			g_localTm *= (mat1 * mat2);
 		}
 		break;
 	}
