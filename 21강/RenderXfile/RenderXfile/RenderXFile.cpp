@@ -333,7 +333,7 @@ void Render(int timeDelta)
 		g_pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 		g_pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
 
-		for( int i = 0; i < g_Mtrls.size(); ++i )
+		for( int i = 0; i < (int)g_Mtrls.size(); ++i )
 		{
 			g_pDevice->SetMaterial( &g_Mtrls[ i] );
 			g_pDevice->SetTexture( 0, g_Texture[ i] );
@@ -373,7 +373,9 @@ bool InitVertexBuffer()
 			if( mtrls[ i].pTextureFilename )
 			{
 				IDirect3DTexture9 *tex = NULL;
-				D3DXCreateTextureFromFileA( g_pDevice, mtrls[ i].pTextureFilename, &tex );
+				string filePath = "../../media/";
+				filePath += mtrls[ i].pTextureFilename;
+				D3DXCreateTextureFromFileA( g_pDevice, filePath.c_str(), &tex );
 				g_Texture.push_back( tex );
 			}
 			else
