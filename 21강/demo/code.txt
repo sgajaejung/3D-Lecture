@@ -1,0 +1,66 @@
+
+
+@@item maxscript 애니메이션 정보 뽑기. ---------------------------------------
+
+
+@@item 1. WriteAni 함수 정의하기
+fn WriteAni obj = 
+(
+
+
+)
+
+
+@@item 2. WriteAni 함수 호출하기.
+WriteAni g_varSetMeshes[ i]
+
+
+@@item 3. 이동 정보 모으기.
+	postrack = #()
+	
+	-- Collect
+	if obj.pos.isAnimated then
+	(
+		obj.pos.controller = tcb_position()
+		local keys = obj.pos.controller.keys
+		local oldkey
+
+		start = 1
+		if keys.count > 1 then	
+			start = 2
+		
+		for i=start to keys.count do
+		(
+			-- 전의 키와 같다면 넘어간다.
+			if i > start then
+			(
+				if abs (oldkey.x - keys[i].value.x) < g_fEpsilon and
+				   abs (oldkey.y - keys[i].value.y) < g_fEpsilon and
+				   abs (oldkey.z - keys[i].value.z) < g_fEpsilon do 
+					continue
+			)
+			oldkey = keys[i].value
+			append postrack keys[i]
+		)
+	)
+
+
+@@item 4. 이동 오차 한계 범위 설정
+global g_fEpsilon = 0.0001
+
+
+@@item 5. 이동 정보 저장하기.
+	-- Write
+	format "KEY_POS = %\n" postrack.count to:Outfile
+	
+	for i = 1 to postrack.count do
+	(
+		local t = postrack[i].time
+		if t < 0 then 
+			t = 0
+			
+		pos = (ConvertToD3D_POS postrack[i].value)
+		format "FRAME_POS % % % % \n" t pos.x pos.y pos.z to:Outfile
+	)
+
+
