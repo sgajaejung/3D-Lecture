@@ -11,6 +11,7 @@ ID3DXPMesh *g_pPMesh;
 		g_pPMesh->Release();
 
 
+@@item 3. 메쉬 최적화 하기.
 	// 메쉬 최적화
 	hr = g_pMesh->OptimizeInplace( 
 		D3DXMESHOPT_COMPACT | D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_VERTEXCACHE, 
@@ -20,7 +21,7 @@ ID3DXPMesh *g_pPMesh;
 		return false;
 
 
-@@item 3. 프로그레시브 메쉬 생성하기.
+@@item 4. 프로그레시브 메쉬 생성하기.
 	// 프로그레시브 메쉬 생성.
 	hr = D3DXGeneratePMesh(g_pMesh, (DWORD*)adjBuff->GetBufferPointer(), 0, 0, 1, 
 		D3DXMESHSIMP_FACE, &g_pPMesh );
@@ -32,7 +33,7 @@ ID3DXPMesh *g_pPMesh;
 
 
 
-@@item 4. 프로그레시브 메쉬 출력하기.
+@@item 5. 프로그레시브 메쉬 출력하기.
 		for( int i = 0; i < (int)g_Mtrls.size(); ++i )
 		{
 			g_pDevice->SetMaterial( &g_Mtrls[ i] );
@@ -41,7 +42,7 @@ ID3DXPMesh *g_pPMesh;
 		}
 
 
-@@item 5. 프로그레시브 메쉬 면을 증가/감소 시키기.
+@@item 6. 프로그레시브 메쉬 면을 증가/감소 시키기.
 	// 프로그레시브 메쉬, 면 증가/감소 시키기.
 	const int numFaces = g_pPMesh->GetNumFaces();
 	if (::GetAsyncKeyState('A') & 0x8000f)
