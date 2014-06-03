@@ -4,11 +4,11 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 #include "../math/Math.h"
+#include <vector>
+#include <map>
 #pragma comment( lib, "d3d9.lib" )
 #pragma comment( lib, "d3dx9.lib" )
 
-#include <vector>
-#include <map>
 
 using namespace std;
 
@@ -18,43 +18,16 @@ const int WINSIZE_Y = 768;	//초기 윈도우 세로 크기
 const int WINPOS_X = 0; //초기 윈도우 시작 위치 X
 const int WINPOS_Y = 0; //초기 윈도우 시작 위치 Y
 
-LPDIRECT3DVERTEXBUFFER9 g_pVB = NULL; // 버텍스 버퍼
-LPDIRECT3DINDEXBUFFER9 g_pIB = NULL; // 인덱스 버퍼
-int g_VtxSize = 0;
-int g_FaceSize = 0;
-
-D3DMATERIAL9 g_Mtrl;
 D3DLIGHT9 g_Light;
-
-Vector3 g_from(0, 1, 0);
-Vector3 g_to(1, 0, 0);
-bool g_ani = false;
-float g_alpha = 0.f;
 
 POINT g_CurPos;
 bool g_LButtonDown = false;
 Matrix44 g_LocalTm;
 
-
 ID3DXMesh *g_pMesh;
+ID3DXPMesh *g_pPMesh;
 vector< D3DMATERIAL9 > g_Mtrls;
 vector< IDirect3DTexture9* > g_Texture;
-
-
-// 버텍스 구조체
-struct Vertex
-{
-	Vertex() {}
-	Vertex(float x0, float y0, float z0) : p(Vector3(x0, y0, z0))
-		,u(-100), v(-100)
-	{}
-	Vector3 p;
-	Vector3 n;
-	float u, v;
-	static const DWORD FVF;
-};
-//버텍스 구조체 포맷.
-const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
 
 
 
@@ -63,7 +36,6 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 bool InitDirectX(HWND hWnd);
 bool InitVertexBuffer();
 void Render(int timeDelta);
-bool ReadModelFile( const string &fileName, LPDIRECT3DVERTEXBUFFER9 &vtxBuff, int &vtxSize,  LPDIRECT3DINDEXBUFFER9 &idxBuff, int &faceSize );
 
 
 int APIENTRY WinMain(HINSTANCE hInstance, 
@@ -150,10 +122,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		}
 	}
 
-	if (g_pVB)
-		g_pVB->Release();
-	if (g_pIB)
-		g_pIB->Release();
+	if (g_pPMesh)
+		g_pPMesh->Release();
+	if (g_pMesh)
+		g_pMesh->Release();
 	if (g_pDevice)
 		g_pDevice->Release();
 	return 0;
@@ -179,8 +151,6 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 		}
 		else if (wParam == VK_SPACE)
 		{
-			g_ani = true;
-			g_alpha = 0;
 		}
 		break;
 
@@ -298,12 +268,28 @@ bool InitDirectX(HWND hWnd)
 //랜더
 void Render(int timeDelta)
 {
+	// 프로그레시브 메쉬, 면 증가/감소 시키기.
+	const int numFaces = g_pPMesh->GetNumFaces();
+	if (::GetAsyncKeyState('A') & 0x8000f)
+	{
+		// 면을 중가 시킨다.
+		g_pPMesh->SetNumFaces( numFaces + 4 );
+		if (g_pPMesh->GetNumFaces() == numFaces)
+			g_pPMesh->SetNumFaces( numFaces + 8 );
+	}
+
+	if (::GetAsyncKeyState('S') & 0x8000f)
+		g_pPMesh->SetNumFaces( numFaces - 4 ); // 면을 감소 시킨다.
+
+
+
+
 	//화면 청소
 	if (SUCCEEDED(g_pDevice->Clear( 
 		0,			//청소할 영역의 D3DRECT 배열 갯수		( 전체 클리어 0 )
 		NULL,		//청소할 영역의 D3DRECT 배열 포인터		( 전체 클리어 NULL )
 		D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL,	//청소될 버퍼 플레그 ( D3DCLEAR_TARGET 컬러버퍼, D3DCLEAR_ZBUFFER 깊이버퍼, D3DCLEAR_STENCIL 스텐실버퍼
-		D3DCOLOR_XRGB(255, 255, 255),			//컬러버퍼를 청소하고 채워질 색상( 0xAARRGGBB )
+		D3DCOLOR_XRGB(0, 0, 0),			//컬러버퍼를 청소하고 채워질 색상( 0xAARRGGBB )
 		1.0f,				//깊이버퍼를 청소할값 ( 0 ~ 1 0 이 카메라에서 제일가까운 1 이 카메라에서 제일 먼 )
 		0					//스텐실 버퍼를 채울값
 		)))
@@ -311,22 +297,7 @@ void Render(int timeDelta)
 		//화면 청소가 성공적으로 이루어 졌다면... 랜더링 시작
 		g_pDevice->BeginScene();
 
-		Matrix44 mR;
-		if (g_ani)
-		{
-			g_alpha += timeDelta / 1000.f;
-			if (g_alpha > 1)
-			{
-				g_alpha = 1;
-				g_ani = false;
-			}
-		}
-
-		Vector3 v = g_from.Interpolate(g_to, g_alpha);
-		Quaternion quat(Vector3(0,1,0), v);
-		mR = quat.GetMatrix();
-
-		Matrix44 tm = mR * g_LocalTm;
+		Matrix44 tm = g_LocalTm;
 		g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&tm);
 
 		g_pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
@@ -337,7 +308,7 @@ void Render(int timeDelta)
 		{
 			g_pDevice->SetMaterial( &g_Mtrls[ i] );
 			g_pDevice->SetTexture( 0, g_Texture[ i] );
-			g_pMesh->DrawSubset( i );
+			g_pPMesh->DrawSubset( i );
 		}
 
 
@@ -356,11 +327,14 @@ bool InitVertexBuffer()
 	ID3DXBuffer *mtrlBuff = NULL;
 	DWORD numMtrls = 0;
 
-	hr = D3DXLoadMeshFromXA( "../../media/seat woman.x", D3DXMESH_MANAGED, g_pDevice, &adjBuff, &mtrlBuff, 0, &numMtrls, &g_pMesh );
-	if( FAILED(hr) )
-		return FALSE;
+	// 메쉬 정보 로드
+	hr = D3DXLoadMeshFromXA( "../../media/bigship1.x", D3DXMESH_MANAGED, 
+		g_pDevice, &adjBuff, &mtrlBuff, 0, &numMtrls, &g_pMesh );
+	if (FAILED(hr))
+		return false;
 
 	/////////////////////////////////////////////////////////////////////////////
+	// 매터리얼 설정
 	if( mtrlBuff && numMtrls > 0 )
 	{
 		D3DXMATERIAL *mtrls = (D3DXMATERIAL*)mtrlBuff->GetBufferPointer();
@@ -385,7 +359,29 @@ bool InitVertexBuffer()
 		}
 	}
 	mtrlBuff->Release();
+
+	// 메쉬 최적화
+	hr = g_pMesh->OptimizeInplace( 
+		D3DXMESHOPT_COMPACT | D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_VERTEXCACHE, 
+		(DWORD*)adjBuff->GetBufferPointer(), (DWORD*)adjBuff->GetBufferPointer(), 0, 0 );
+
+	if (FAILED(hr))
+		return false;
+
+	// 프로그레시브 메쉬 생성.
+	hr = D3DXGeneratePMesh(g_pMesh, (DWORD*)adjBuff->GetBufferPointer(), 0, 0, 1, 
+		D3DXMESHSIMP_FACE, &g_pPMesh );
+	g_pMesh->Release();
+	g_pMesh = NULL;
 	adjBuff->Release();
+	if (FAILED(hr))
+		return false;
+
+	//DWORD maxFaces = g_pPMesh->GetMaxFaces();
+	//g_pPMesh->SetNumFaces( maxFaces );
+
+
+
 
 	D3DXCOLOR color(1,1,1,1);
 	ZeroMemory(&g_Light, sizeof(g_Light));
@@ -395,10 +391,14 @@ bool InitVertexBuffer()
 	g_Light.Specular = color * 0.6f;
 	g_Light.Direction = *(D3DXVECTOR3*)&Vector3(0,-1,0);	
 
+
+
 	Matrix44 V;
-	Vector3 dir = Vector3(0,0,0)-Vector3(0,0,200);
+	Vector3 camPos(0,0,-20);
+	Vector3 lookAtPos(0,0,0);
+	Vector3 dir = lookAtPos - camPos;
 	dir.Normalize();
-	V.SetView(Vector3(0,0,200), dir, Vector3(0,1,0));
+	V.SetView(camPos, dir, Vector3(0,1,0));
 	g_pDevice->SetTransform(D3DTS_VIEW, (D3DXMATRIX*)&V);
 
 	Matrix44 proj;
@@ -410,207 +410,8 @@ bool InitVertexBuffer()
 		0, // 활성화/ 비활성화 하려는 광원 리스트 내의 요소
 		true); // true = 활성화 ， false = 비활성화
 
-	return true;
-}
-
-
-bool ReadModelFile( const string &fileName, LPDIRECT3DVERTEXBUFFER9 &vtxBuff, int &vtxSize,  
-	LPDIRECT3DINDEXBUFFER9 &idxBuff, int &faceSize )
-{
-	using namespace std;
-	ifstream fin(fileName.c_str());
-	if (!fin.is_open())
-		return false;
-
-	string exporterVersion;
-	fin >>exporterVersion;
-	if (exporterVersion != "EXPORTER_V1")
-		return false;
-
-	string vtx, eq;
-	fin >> vtx >> eq >> vtxSize;
-
-	if (vtxSize <= 0)
-		return  false;
-
-	vector<Vertex> tempVtxBuff;
-	tempVtxBuff.reserve(vtxSize + vtxSize/2);
-
-	float num1, num2, num3;
-	for (int i = 0; i < vtxSize; i++)
-	{
-		fin >> num1 >> num2 >> num3;
-		tempVtxBuff.push_back( Vertex(num1, num2, num3) );
-	}
-
-
-	// 인덱스 버퍼 초기화.
-	string idx;
-	fin >> idx >> eq >> faceSize;
-
-	vector<int> tempIdxBuff;
-	tempIdxBuff.reserve(faceSize);
-
-	if (faceSize > 0)
-	{
-		int num1, num2, num3;
-		for (int i = 0; i < faceSize*3; i+=3)
-		{
-			fin >> num1 >> num2 >> num3;
-			tempIdxBuff.push_back(num1);
-			tempIdxBuff.push_back(num2);
-			tempIdxBuff.push_back(num3);
-		}
-	}
-
-	string norm;
-	int numNormal;
-	fin >> norm >> eq >> numNormal;
-
-	if (numNormal > 0)
-	{
-		float num1, num2, num3;
-		vector<int> vertCount(vtxSize, 0);
-		for (int i = 0; i < numNormal; i++)
-		{
-			fin >> num1 >> num2 >> num3;
-			Vector3 n(num1, num2, num3);
-
-			// 법선벡터의 평균을 구해서 할당한다.
-			for (int k=0; k < 3; ++k)
-			{
-				const int vtxIdx = tempIdxBuff[ i*3 + k];
-				tempVtxBuff[ vtxIdx].n += n;
-				++vertCount[ vtxIdx];
-			}
-		}
-
-		for (int i=0; i < vtxSize; ++i)
-		{
-			tempVtxBuff[ i].n /= (float)vertCount[ i];
-			tempVtxBuff[ i].n.Normalize();
-		}
-	}
-
-
-	string tex;
-	int numTex;
-	fin >> tex >> eq >> numTex;
-
-	if (numTex > 0)
-	{
-		float fnum1, fnum2;
-		vector<Vector3> texVertices(numTex);
-		for (int i = 0; i < numTex; i++)
-		{
-			fin >> fnum1 >> fnum2;
-			texVertices[ i] = Vector3(fnum1, fnum2, 0);
-		}
-
-		string strTexFace;
-		int numTexFace;
-		fin >> strTexFace >> eq >> numTexFace;
-
-		vector<int> texFaces;
-		texFaces.reserve(numTexFace*3);
-		if (numTexFace > 0)
-		{
-			int num1, num2, num3;
-			for (int i=0; i < numTexFace; ++i)
-			{
-				fin >> num1 >> num2 >> num3;
-				texFaces.push_back( num1 );
-				texFaces.push_back( num2 );
-				texFaces.push_back( num3 );
-			}
-		}
-
-		map<int, vector<int> > vtxIdxMap; // vertex index, vertex index array
-		for (int i=0; i < vtxSize; ++i)
-		{
-			vector<int> varray;
-			varray.reserve(4);
-			varray.push_back(i);
-			vtxIdxMap[ i] = varray;
-		}
-
-		// 텍스쳐 좌표를 버텍스 버퍼에 저장한다. 
-		// 버텍스 버퍼의 uv 값이 초기화 되지 않았다면, 초기화 한다.
-		// 버텍스에 하나 이상의 uv값이 존재한다면, 버텍스를 추가하고, 인덱스버퍼를 수정한다.
-		for (int i=0; i < (int)texFaces.size(); ++i)
-		{
-			const Vector3 tex = texVertices[ texFaces[ i]];
-			const int vtxIdx = tempIdxBuff[ i];
-
-			bool isFind = false;
-			for (int k=0; k < (int)vtxIdxMap[ vtxIdx].size(); ++k)
-			{
-				const int subVtxIdx = vtxIdxMap[ vtxIdx][ k];
-
-				// 텍스쳐 좌표가 버텍스 버퍼에 저장되어 있다면, index buffer 값을 해당 vertex index 로
-				// 설정 한다.
-				if ((-100 == tempVtxBuff[ subVtxIdx].u) &&
-					(-100 == tempVtxBuff[ subVtxIdx].v))
-				{
-					tempVtxBuff[ subVtxIdx].u = tex.x;
-					tempVtxBuff[ subVtxIdx].v = tex.y;
-					isFind = true;
-					break;
-				}
-				else if ((tex.x == tempVtxBuff[ subVtxIdx].u) && 
-					(tex.y == tempVtxBuff[ subVtxIdx].v))
-				{
-					tempIdxBuff[ i] = subVtxIdx;
-					isFind = true;
-					break;
-				}
-			}
-
-			// 버텍스 버퍼에 없는 uv 좌표라면, 새 버텍스를 버텍스버퍼에 추가한다.
-			// 인덱스 버퍼에도 새로 추가된 버텍스 인덱스값을 넣는다.
-			if (!isFind)
-			{
-				Vertex v = tempVtxBuff[ vtxIdx];
-				v.u = tex.x;
-				v.v = tex.y;
-				tempVtxBuff.push_back(v);
-				const int newVtxIdx = tempVtxBuff.size()-1;
-				vtxIdxMap[ vtxIdx].push_back( newVtxIdx );
-				tempIdxBuff[ i] = newVtxIdx;
-			}
-		}
-	}
-
-
-	// 버텍스 버퍼 생성.
-	if (FAILED(g_pDevice->CreateVertexBuffer( tempVtxBuff.size() * sizeof(Vertex),
-		D3DUSAGE_WRITEONLY, Vertex::FVF,
-		D3DPOOL_MANAGED, &vtxBuff, NULL)))
-	{
-		return false;
-	}
-	// 버텍스 버퍼 초기화.
-	Vertex* vertices;
-	if (FAILED(vtxBuff->Lock( 0, sizeof(Vertex), (void**)&vertices, 0)))
-		return false;
-	for (int i = 0; i < (int)tempVtxBuff.size(); i++)
-		vertices[ i] = tempVtxBuff[ i];
-	vtxBuff->Unlock();
-
-	// 인덱스 버퍼 생성.
-	if (FAILED(g_pDevice->CreateIndexBuffer(tempIdxBuff.size()*sizeof(WORD), 
-		D3DUSAGE_WRITEONLY,
-		D3DFMT_INDEX16,
-		D3DPOOL_MANAGED,
-		&idxBuff, NULL)))
-	{
-		return false;
-	}
-	WORD *indices = NULL;
-	idxBuff->Lock(0, 0, (void**)&indices, 0);
-	for (int i = 0; i < (int)tempIdxBuff.size(); ++i)
-		indices[ i] = tempIdxBuff[ i];
-	idxBuff->Unlock();
+	g_pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, true);
+	g_pDevice->SetRenderState(D3DRS_SPECULARENABLE, true);
 
 	return true;
 }
