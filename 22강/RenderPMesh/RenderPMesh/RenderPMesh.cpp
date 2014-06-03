@@ -25,7 +25,6 @@ bool g_LButtonDown = false;
 Matrix44 g_LocalTm;
 
 ID3DXMesh *g_pMesh;
-ID3DXPMesh *g_pPMesh;
 vector< D3DMATERIAL9 > g_Mtrls;
 vector< IDirect3DTexture9* > g_Texture;
 
@@ -43,8 +42,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	LPSTR lpCmdLine, 
 	int nCmdShow)
 {
-	wchar_t className[32] = L"Quaternion";
-	wchar_t windowName[32] = L"Quaternion";
+	wchar_t className[32] = L"Render PMesh";
+	wchar_t windowName[32] = L"Render PMesh";
 
 	//윈도우 클레스 정보 생성
 	//내가 이러한 윈도를 만들겠다 라는 정보
@@ -122,8 +121,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		}
 	}
 
-	if (g_pPMesh)
-		g_pPMesh->Release();
 	if (g_pMesh)
 		g_pMesh->Release();
 	if (g_pDevice)
@@ -268,22 +265,6 @@ bool InitDirectX(HWND hWnd)
 //랜더
 void Render(int timeDelta)
 {
-	// 프로그레시브 메쉬, 면 증가/감소 시키기.
-	const int numFaces = g_pPMesh->GetNumFaces();
-	if (::GetAsyncKeyState('A') & 0x8000f)
-	{
-		// 면을 중가 시킨다.
-		g_pPMesh->SetNumFaces( numFaces + 4 );
-		if (g_pPMesh->GetNumFaces() == numFaces)
-			g_pPMesh->SetNumFaces( numFaces + 8 );
-	}
-
-	if (::GetAsyncKeyState('S') & 0x8000f)
-		g_pPMesh->SetNumFaces( numFaces - 4 ); // 면을 감소 시킨다.
-
-
-
-
 	//화면 청소
 	if (SUCCEEDED(g_pDevice->Clear( 
 		0,			//청소할 영역의 D3DRECT 배열 갯수		( 전체 클리어 0 )
@@ -304,12 +285,6 @@ void Render(int timeDelta)
 		g_pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 		g_pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
 
-		for( int i = 0; i < (int)g_Mtrls.size(); ++i )
-		{
-			g_pDevice->SetMaterial( &g_Mtrls[ i] );
-			g_pDevice->SetTexture( 0, g_Texture[ i] );
-			g_pPMesh->DrawSubset( i );
-		}
 
 
 		//랜더링 끝
@@ -360,29 +335,8 @@ bool InitVertexBuffer()
 	}
 	mtrlBuff->Release();
 
-	// 메쉬 최적화
-	hr = g_pMesh->OptimizeInplace( 
-		D3DXMESHOPT_COMPACT | D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_VERTEXCACHE, 
-		(DWORD*)adjBuff->GetBufferPointer(), (DWORD*)adjBuff->GetBufferPointer(), 0, 0 );
 
-	if (FAILED(hr))
-		return false;
-
-	// 프로그레시브 메쉬 생성.
-	hr = D3DXGeneratePMesh(g_pMesh, (DWORD*)adjBuff->GetBufferPointer(), 0, 0, 1, 
-		D3DXMESHSIMP_FACE, &g_pPMesh );
-	g_pMesh->Release();
-	g_pMesh = NULL;
-	adjBuff->Release();
-	if (FAILED(hr))
-		return false;
-
-	//DWORD maxFaces = g_pPMesh->GetMaxFaces();
-	//g_pPMesh->SetNumFaces( maxFaces );
-
-
-
-
+	// 빛 생성.
 	D3DXCOLOR color(1,1,1,1);
 	ZeroMemory(&g_Light, sizeof(g_Light));
 	g_Light.Type = D3DLIGHT_DIRECTIONAL;
@@ -392,7 +346,7 @@ bool InitVertexBuffer()
 	g_Light.Direction = *(D3DXVECTOR3*)&Vector3(0,-1,0);	
 
 
-
+	// 카메라, 투영행렬 생성
 	Matrix44 V;
 	Vector3 camPos(0,0,-20);
 	Vector3 lookAtPos(0,0,0);

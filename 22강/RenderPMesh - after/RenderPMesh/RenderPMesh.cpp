@@ -43,8 +43,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	LPSTR lpCmdLine, 
 	int nCmdShow)
 {
-	wchar_t className[32] = L"Quaternion";
-	wchar_t windowName[32] = L"Quaternion";
+	wchar_t className[32] = L"Render PMesh";
+	wchar_t windowName[32] = L"Render PMesh";
 
 	//윈도우 클레스 정보 생성
 	//내가 이러한 윈도를 만들겠다 라는 정보

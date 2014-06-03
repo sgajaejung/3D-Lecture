@@ -1,5 +1,62 @@
 
 
+@@item 프로그레시브 메쉬 출력하기. ---------------------------------------
+
+@@item 1. 프로그레시브 메쉬 선언.
+ID3DXPMesh *g_pPMesh;
+
+
+@@item 2. 프로그레시브 메쉬 제거.
+	if (g_pPMesh)
+		g_pPMesh->Release();
+
+
+	// 메쉬 최적화
+	hr = g_pMesh->OptimizeInplace( 
+		D3DXMESHOPT_COMPACT | D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_VERTEXCACHE, 
+		(DWORD*)adjBuff->GetBufferPointer(), (DWORD*)adjBuff->GetBufferPointer(), 0, 0 );
+
+	if (FAILED(hr))
+		return false;
+
+
+@@item 3. 프로그레시브 메쉬 생성하기.
+	// 프로그레시브 메쉬 생성.
+	hr = D3DXGeneratePMesh(g_pMesh, (DWORD*)adjBuff->GetBufferPointer(), 0, 0, 1, 
+		D3DXMESHSIMP_FACE, &g_pPMesh );
+	g_pMesh->Release();
+	g_pMesh = NULL;
+	adjBuff->Release();
+	if (FAILED(hr))
+		return false;
+
+
+
+@@item 4. 프로그레시브 메쉬 출력하기.
+		for( int i = 0; i < (int)g_Mtrls.size(); ++i )
+		{
+			g_pDevice->SetMaterial( &g_Mtrls[ i] );
+			g_pDevice->SetTexture( 0, g_Texture[ i] );
+			g_pPMesh->DrawSubset( i );
+		}
+
+
+@@item 5. 프로그레시브 메쉬 면을 증가/감소 시키기.
+	// 프로그레시브 메쉬, 면 증가/감소 시키기.
+	const int numFaces = g_pPMesh->GetNumFaces();
+	if (::GetAsyncKeyState('A') & 0x8000f)
+	{
+		// 면을 중가 시킨다.
+		g_pPMesh->SetNumFaces( numFaces + 4 );
+		if (g_pPMesh->GetNumFaces() == numFaces)
+			g_pPMesh->SetNumFaces( numFaces + 8 );
+	}
+
+	if (::GetAsyncKeyState('S') & 0x8000f)
+		g_pPMesh->SetNumFaces( numFaces - 4 ); // 면을 감소 시킨다.
+
+
+
 @@item maxscript 애니메이션 정보 뽑기. ---------------------------------------
 
 
