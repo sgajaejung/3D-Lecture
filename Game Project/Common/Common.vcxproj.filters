@@ -31,6 +31,9 @@
     <ClInclude Include="math\quaternion.h">
       <Filter>math</Filter>
     </ClInclude>
+    <ClInclude Include="etc\dbg.h">
+      <Filter>Etc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -54,6 +57,9 @@
     </ClCompile>
     <ClCompile Include="math\quaternion.cpp">
       <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="etc\dbg.cpp">
+      <Filter>Etc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

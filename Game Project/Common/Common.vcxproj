@@ -68,6 +68,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />
+    <ClInclude Include="etc\dbg.h" />
     <ClInclude Include="etc\filepath.h" />
     <ClInclude Include="etc\singleton.h" />
     <ClInclude Include="etc\stringfunc.h" />
@@ -81,6 +82,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="etc\dbg.cpp" />
     <ClCompile Include="etc\filepath.cpp" />
     <ClCompile Include="etc\stringfunc.cpp" />
     <ClCompile Include="math\box.cpp" />
