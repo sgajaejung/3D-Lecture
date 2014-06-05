@@ -11,6 +11,9 @@
     <ClInclude Include="light.h" />
     <ClInclude Include="indexbuffer.h" />
     <ClInclude Include="texture.h" />
+    <ClInclude Include="model\node.h">
+      <Filter>model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -21,5 +24,13 @@
     <ClCompile Include="light.cpp" />
     <ClCompile Include="indexbuffer.cpp" />
     <ClCompile Include="texture.cpp" />
+    <ClCompile Include="model\node.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="model">
+      <UniqueIdentifier>{26b94ef7-1f2c-401f-a7dd-bcfc4a70711c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

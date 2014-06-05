@@ -72,6 +72,7 @@
     <ClInclude Include="indexbuffer.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="material.h" />
+    <ClInclude Include="model\node.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -83,6 +84,7 @@
     <ClCompile Include="indexbuffer.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="material.cpp" />
+    <ClCompile Include="model\node.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
