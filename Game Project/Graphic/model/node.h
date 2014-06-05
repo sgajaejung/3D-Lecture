@@ -2,6 +2,7 @@
 
 namespace graphic
 {
+
 	class cNode
 	{
 	public:

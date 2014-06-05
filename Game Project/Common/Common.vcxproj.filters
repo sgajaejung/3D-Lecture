@@ -34,6 +34,9 @@
     <ClInclude Include="etc\dbg.h">
       <Filter>Etc</Filter>
     </ClInclude>
+    <ClInclude Include="container\vectorhelper.h">
+      <Filter>container</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -68,6 +71,9 @@
     </Filter>
     <Filter Include="Etc">
       <UniqueIdentifier>{c61673fa-04bb-421e-ad9e-ad682ac30936}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="container">
+      <UniqueIdentifier>{5fbca98c-399a-486a-a487-cad45a0e473d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

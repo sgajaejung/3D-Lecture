@@ -47,22 +47,45 @@ cNode* cNode::FindNode(const int id)
 
 	BOOST_FOREACH (auto node, m_children)
 	{
-
-
+		if (cNode *ret = node->FindNode(id))
+			return ret;
 	}
 
 	return NULL;
 }
 
 
+// id 노드를 제거한다. 메모리까지 제거된다.
 bool cNode::RemoveNode(const int id)
 {
+	BOOST_FOREACH (auto node, m_children)
+	{
+		if (node->GetId() == id)
+		{
+			delete node;
+			common::removevector(m_children, node);
+			return true;
+		}
+	}
 
-	return true;
+	BOOST_FOREACH (auto node, m_children)
+	{
+		if (node->RemoveNode(id))
+			return true;
+	}
+
+	return false;
 }
 
 
+// 모든 노드를 제거한다.
 void cNode::Clear()
 {
+	BOOST_FOREACH (auto node, m_children)
+	{
+		node->Clear();
+		delete node;
+	}
 
+	m_children.clear();
 }

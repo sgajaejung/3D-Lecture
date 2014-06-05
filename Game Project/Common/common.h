@@ -46,9 +46,9 @@ using std::vector;
 using std::map;
 
 
+#include "container/vectorhelper.h"
 #include "math/Math.h"
 #include "etc/singleton.h"
 #include "etc/filepath.h"
 #include "etc/stringfunc.h"
 #include "etc/dbg.h"
-
