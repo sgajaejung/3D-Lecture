@@ -33,6 +33,9 @@ private:
 	POINT m_curPos;
 	bool m_LButtonDown;
 	Matrix44 g_localTm;
+
+	Vector3 m_camPos;
+	Vector3 m_lookAtPos;
 };
 
 INIT_FRAMEWORK(cViewer);
@@ -82,9 +85,11 @@ bool cViewer::OnInit()
 
 
 	Matrix44 V;
-	Vector3 dir = Vector3(0,0,0)-Vector3(0,0,-5);
+	m_camPos = Vector3(0,0,-500);
+	m_lookAtPos = Vector3(0,0,0);
+	Vector3 dir = m_lookAtPos - m_camPos;
 	dir.Normalize();
-	V.SetView(Vector3(0,0,-500), dir, Vector3(0,1,0));
+	V.SetView(m_camPos, dir, Vector3(0,1,0));
 	graphic::GetDevice()->SetTransform(D3DTS_VIEW, (D3DXMATRIX*)&V);
 
 
@@ -181,6 +186,21 @@ void cViewer::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 
+	case WM_MOUSEWHEEL:
+		{
+			int fwKeys = GET_KEYSTATE_WPARAM(wParam);
+			int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+			dbg::Print( "%d %d", fwKeys, zDelta);
+
+			Matrix44 V;
+			m_camPos.z += (zDelta<0)? -50 : 50;
+			Vector3 dir = m_lookAtPos - m_camPos;
+			dir.Normalize();
+			V.SetView(m_camPos, dir, Vector3(0,1,0));
+			graphic::GetDevice()->SetTransform(D3DTS_VIEW, (D3DXMATRIX*)&V);
+		}
+		break;
+
 	case WM_KEYDOWN:
 		if (wParam == VK_F5) // Refresh
 		{
@@ -247,7 +267,9 @@ bool cViewer::ReadModelFile( const string &fileName, graphic::cVertexBuffer &vtx
 	string exporterVersion;
 	fin >>exporterVersion;
 
-	if (exporterVersion != "EXPORTER_V1")
+	if ((exporterVersion != "EXPORTER_V1") &&
+		(exporterVersion != "EXPORTER_V2")
+		)
 		return false;
 
 	string vtx, eq;
