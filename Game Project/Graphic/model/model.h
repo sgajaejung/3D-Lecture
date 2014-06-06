@@ -22,7 +22,7 @@ namespace graphic
 
 
 	private:
-		cNode *m_root;
+		cMesh *m_root;
 		Matrix44 m_matTM;
 	};
 

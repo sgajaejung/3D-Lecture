@@ -23,11 +23,16 @@ cModel::~cModel()
 
 bool cModel::Create(const string &modelName)
 {
-	sRawMesh *raw = cResourceManager::Get()->LoadModel(modelName);
-	RETV(!raw, false);
+	sRawMesh *rawMesh = cResourceManager::Get()->LoadModel(modelName);
+	RETV(!rawMesh, false);
 
 	SAFE_DELETE(m_root);
-	m_root = new cMesh(0, *raw);
+	m_root = new cMesh(0, *rawMesh);
+
+	if (sRawAni *rawAni = cResourceManager::Get()->FindAni(modelName))
+	{
+		m_root->LoadAnimation(*rawAni);
+	}
 
 	return true;
 }

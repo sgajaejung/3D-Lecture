@@ -5,7 +5,13 @@
 using namespace graphic;
 
 
-cMesh::cMesh(const int id, const sRawMesh &raw) : cNode(id)
+cMesh::cMesh(const int id, const sRawMesh &raw) : 
+	cNode(id)
+,	m_track(NULL)
+,	m_aniTime(0)
+,	m_aniStart(0)
+,	m_aniEnd(0)
+,	m_aniFrame(0)
 {
 	// 버텍스 버퍼 생성.
 	if (m_vtxBuff.Create(raw.vertices.size(), sizeof(sVertexNormTex), sVertexNormTex::FVF))
@@ -33,14 +39,28 @@ cMesh::cMesh(const int id, const sRawMesh &raw) : cNode(id)
 
 cMesh::~cMesh()
 {
-
+	SAFE_DELETE(m_track);
 }
 
 
 // Animation
 bool cMesh::Move(const float elapseTime)
 {
-	cNode::Move(elapseTime);
+	RETV(!m_track, false);
+
+	//  프레임 단위로 변환한다.
+	m_aniTime += elapseTime;
+	m_aniFrame = (int)(m_aniTime * 30.f);
+
+	if (m_aniFrame > m_aniEnd)
+	{
+		m_aniTime = m_aniStart * 30.f;
+		m_aniFrame = m_aniStart;
+		m_track->InitAnimation();
+	}
+
+	m_matAniTM.SetIdentity();
+	m_track->Move(m_aniFrame, m_matAniTM);
 	return true;
 }
 
@@ -52,7 +72,7 @@ void cMesh::Render(const Matrix44 &parentTm)
 	m_vtxBuff.Bind();
 	m_idxBuff.Bind();
 
-	const Matrix44 tm = m_matTM * parentTm;
+	const Matrix44 tm = m_matAniTM * m_matTM * parentTm;
 	GetDevice()->MultiplyTransform( D3DTS_WORLD, (D3DXMATRIX*)&tm );
 	GetDevice()->DrawIndexedPrimitive( 
 		D3DPT_TRIANGLELIST, 0, 0, 
@@ -64,4 +84,16 @@ void cMesh::Render(const Matrix44 &parentTm)
 void cMesh::RenderBBox()
 {
 
+}
+
+
+// Load Animation
+void cMesh::LoadAnimation( const sRawAni &rawAni )
+{
+	SAFE_DELETE(m_track);
+
+	m_track = new cTrack(rawAni);
+	m_aniStart = (int)rawAni.start;
+	m_aniEnd = (int)rawAni.end;
+	m_aniFrame = (int)rawAni.start;
 }

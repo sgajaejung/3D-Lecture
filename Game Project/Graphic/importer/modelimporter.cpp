@@ -523,6 +523,13 @@ bool importer::ReadRawMeshFileV3( const string &fileName,
 
 	
 	// 애니메이션 로딩.
+	float startT = 0;
+	float endT = 0;
+
+	string aniRange, strST, strET;
+	fin >> aniRange >> eq >> strST >> strET;
+	startT = (float)atof(strST.c_str());
+	endT = (float)atof(strET.c_str());
 
 	{ // 이동 애니메이션 로딩
 		string keypos;
@@ -533,10 +540,11 @@ bool importer::ReadRawMeshFileV3( const string &fileName,
 
 		for (int i=0; i < posSize; ++i)
 		{
-			string framePos; // FRAME_POS
-			float t, x, y, z;
-			fin >> framePos >> t >> x >> y >> z;
-		
+			string framePos, strT; // FRAME_POS
+			float x, y, z;
+			fin >> framePos >> strT >> x >> y >> z;
+			const float t = (float)atof(strT.c_str());
+
 			rawAni.pos[ i].t = t;
 			rawAni.pos[ i].p = Vector3(x, y, z);
 		}
@@ -552,15 +560,18 @@ bool importer::ReadRawMeshFileV3( const string &fileName,
 
 		for (int i=0; i < rotSize; ++i)
 		{
-			string frameRot; // FRAME_ROT
-			float t, x, y, z, w;
-			fin >> frameRot >> t >> x >> y >> z >> w;
+			string frameRot, strT; // FRAME_ROT
+			float x, y, z, w;
+			fin >> frameRot >> strT >> x >> y >> z >> w;
+			const float t = (float)atof(strT.c_str());
 
 			rawAni.rot[ i].t = t;
 			rawAni.rot[ i].q = Quaternion(x, y, z, w);
 		}
 	}
 
+	rawAni.start = startT;
+	rawAni.end = endT;
 
 	return true;
 }

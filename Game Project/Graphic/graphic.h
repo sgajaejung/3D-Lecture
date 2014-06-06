@@ -18,6 +18,8 @@ using namespace common;
 #include "base/vertexformat.h"
 #include "model/rawmesh.h"
 #include "model/rawani.h"
+#include "model/track.h"
+#include "model/mesh.h"
 #include "model/model.h"
 
 

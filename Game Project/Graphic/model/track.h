@@ -10,12 +10,12 @@ namespace graphic
 		cTrack(const sRawAni &rawAni);
 		virtual ~cTrack();
 
+		void InitAnimation();
 		void Move( const int curFrame, OUT Matrix44 &out );
 		int GetCurrentFrame() const;
 
 
 	protected:
-		void InitAnimation();
 		bool GetPosKey( const int curFrame, OUT Vector3 &out );
 		bool GetRotKey( const int curFrame, OUT Quaternion &out );
 		bool GetScaleKey( const int curFrame, OUT Vector3 &out );
