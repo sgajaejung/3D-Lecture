@@ -11,6 +11,7 @@ namespace graphic
 
 		bool CreateDirectX(HWND hWnd, const int width, const int height);
 		LPDIRECT3DDEVICE9 GetDevice() { return m_pDevice; }
+		void RenderAxis();
 
 
 	protected:
