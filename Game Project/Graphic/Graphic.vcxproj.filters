@@ -4,13 +4,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="graphic.h" />
-    <ClInclude Include="DxInit.h" />
-    <ClInclude Include="material.h" />
     <ClInclude Include="Renderer.h" />
-    <ClInclude Include="vertexbuffer.h" />
-    <ClInclude Include="light.h" />
-    <ClInclude Include="indexbuffer.h" />
-    <ClInclude Include="texture.h" />
     <ClInclude Include="model\node.h">
       <Filter>model</Filter>
     </ClInclude>
@@ -20,16 +14,31 @@
     <ClInclude Include="model\model.h">
       <Filter>model</Filter>
     </ClInclude>
+    <ClInclude Include="base\DxInit.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\indexbuffer.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\light.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\material.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\texture.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\vertexbuffer.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="manager\resourcemanager.h">
+      <Filter>manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="DxInit.cpp" />
-    <ClCompile Include="material.cpp" />
     <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="vertexbuffer.cpp" />
-    <ClCompile Include="light.cpp" />
-    <ClCompile Include="indexbuffer.cpp" />
-    <ClCompile Include="texture.cpp" />
     <ClCompile Include="model\node.cpp">
       <Filter>model</Filter>
     </ClCompile>
@@ -39,10 +48,37 @@
     <ClCompile Include="model\model.cpp">
       <Filter>model</Filter>
     </ClCompile>
+    <ClCompile Include="base\DxInit.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\indexbuffer.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\light.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\material.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\texture.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\vertexbuffer.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="manager\resourcemanager.cpp">
+      <Filter>manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="model">
       <UniqueIdentifier>{26b94ef7-1f2c-401f-a7dd-bcfc4a70711c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="base">
+      <UniqueIdentifier>{c5706fb9-e586-41aa-9ea2-ac17edb7c4d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="manager">
+      <UniqueIdentifier>{804bc56f-36fa-4643-8c34-4d4bc353e013}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

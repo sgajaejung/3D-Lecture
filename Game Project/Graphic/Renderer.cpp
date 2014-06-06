@@ -1,7 +1,7 @@
 
 #include "stdafx.h"
 #include "Renderer.h"
-#include "DxInit.h"
+#include "base/DxInit.h"
 
 using namespace graphic;
 

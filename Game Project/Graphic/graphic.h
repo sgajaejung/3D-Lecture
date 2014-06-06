@@ -9,11 +9,11 @@
 using namespace common;
 
 #include "Renderer.h"
-#include "material.h"
-#include "light.h"
-#include "vertexbuffer.h"
-#include "indexbuffer.h"
-#include "texture.h"
+#include "base/material.h"
+#include "base/light.h"
+#include "base/vertexbuffer.h"
+#include "base/indexbuffer.h"
+#include "base/texture.h"
 
 
 #pragma comment( lib, "d3d9.lib" )
