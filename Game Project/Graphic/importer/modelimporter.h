@@ -1,9 +1,14 @@
 #pragma once
 
-namespace graphic
+namespace graphic 
 {
 	struct sRawMesh;
 
-	bool ReadRawMeshFile( const string &fileName, sRawMesh &raw );
+	namespace importer 
+	{
 
+		bool ReadRawMeshFile( const string &fileName, 
+			OUT sRawMesh &raw, OUT sRawAni &rawAni );
+
+	}
 }

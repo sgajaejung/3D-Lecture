@@ -46,6 +46,12 @@
     <ClInclude Include="base\vertexformat.h">
       <Filter>base</Filter>
     </ClInclude>
+    <ClInclude Include="model\track.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="model\rawani.h">
+      <Filter>model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -79,9 +85,6 @@
     <ClCompile Include="manager\resourcemanager.cpp">
       <Filter>manager</Filter>
     </ClCompile>
-    <ClCompile Include="model\rawmesh.cpp">
-      <Filter>model</Filter>
-    </ClCompile>
     <ClCompile Include="importer\modelimporter.cpp">
       <Filter>importer</Filter>
     </ClCompile>
@@ -90,6 +93,9 @@
     </ClCompile>
     <ClCompile Include="base\vertexformat.cpp">
       <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="model\track.cpp">
+      <Filter>model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

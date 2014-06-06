@@ -12,12 +12,12 @@ using namespace graphic;
 cModel::cModel() :
 	m_root(NULL)
 {
-
+	
 }
 
 cModel::~cModel()
 {
-
+	Clear();
 }
 
 
@@ -25,7 +25,6 @@ bool cModel::Create(const string &modelName)
 {
 	sRawMesh *raw = cResourceManager::Get()->LoadModel(modelName);
 	RETV(!raw, false);
-
 
 	SAFE_DELETE(m_root);
 	m_root = new cMesh(0, *raw);

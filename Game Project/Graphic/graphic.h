@@ -17,6 +17,7 @@ using namespace common;
 #include "base/texture.h"
 #include "base/vertexformat.h"
 #include "model/rawmesh.h"
+#include "model/rawani.h"
 #include "model/model.h"
 
 

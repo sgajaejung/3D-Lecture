@@ -77,6 +77,7 @@
     <ClInclude Include="math\Math.h" />
     <ClInclude Include="math\matrix44.h" />
     <ClInclude Include="math\quaternion.h" />
+    <ClInclude Include="math\vector2.h" />
     <ClInclude Include="math\vector3.h" />
     <ClInclude Include="math\vector4.h" />
     <ClInclude Include="stdafx.h" />

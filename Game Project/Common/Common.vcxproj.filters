@@ -37,6 +37,9 @@
     <ClInclude Include="container\vectorhelper.h">
       <Filter>container</Filter>
     </ClInclude>
+    <ClInclude Include="math\vector2.h">
+      <Filter>math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
