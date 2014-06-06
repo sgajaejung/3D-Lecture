@@ -1,7 +1,5 @@
 
 #include "stdafx.h"
-#include <fstream>
-
 
 
 class cViewer : public framework::cGameMain
@@ -18,21 +16,23 @@ public:
 
 
 protected:
-	bool ReadModelFile( const string &fileName, graphic::cVertexBuffer &vtxBuff,  
-		graphic::cIndexBuffer &idxBuff, graphic::cTexture &texture );
-
 
 private:
+	graphic::cLight m_light;
+
 	graphic::cVertexBuffer m_vtxBuff;
 	graphic::cIndexBuffer m_idxBuff;
 	graphic::cMaterial m_mtrl;
-	graphic::cLight m_light;
 	graphic::cTexture m_texture;
+
+	graphic::cModel m_model;
+	
+
 	string m_filePath;
 
 	POINT m_curPos;
 	bool m_LButtonDown;
-	Matrix44 g_localTm;
+	Matrix44 g_rotateTm;
 
 	Vector3 m_camPos;
 	Vector3 m_lookAtPos;
@@ -75,12 +75,14 @@ bool cViewer::OnInit()
 {
 	DragAcceptFiles(m_hWnd, TRUE);
 
-	ReadModelFile("../media/cube.dat", m_vtxBuff, m_idxBuff, m_texture);
+	//ReadModelFile("../media/cube.dat", m_vtxBuff, m_idxBuff, m_texture);
+	m_filePath = "../media/data.dat";
+	m_model.Create( m_filePath );
 
 	m_mtrl.InitWhite();
 
 	Vector4 color(1,1,1,1);
-	m_light.Init( graphic::cLight::LIGHT_DIRECTIONAL, color * 0.4f, color, color * 0.6f, Vector3(1,0,0));
+	m_light.Init( graphic::cLight::LIGHT_DIRECTIONAL, color * 0.4f, color, color * 0.6f, Vector3(0,-1,0));
 	m_light.Bind(0);
 
 
@@ -110,7 +112,7 @@ bool cViewer::OnInit()
 
 void cViewer::OnUpdate(const float elapseT)
 {
-
+	m_model.Move(elapseT);
 }
 
 
@@ -130,7 +132,7 @@ void cViewer::OnRender(const float elapseT)
 		graphic::GetDevice()->BeginScene();
 
 		static float y = 0;
-		y += elapseT * 0.1f;
+		y += elapseT * 0.03f;
 		// 각도가 2*PI 에 이르면 0으로 초기화한다.
 		if (y >= 6.28f)
 			y = 0;
@@ -141,16 +143,18 @@ void cViewer::OnRender(const float elapseT)
 		r = rx*ry;
 
 		Matrix44 tm;
-		tm = r * g_localTm;
-		graphic::GetDevice()->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&tm);
+		tm = r * g_rotateTm;
+		//graphic::GetDevice()->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&tm);
 
-		m_mtrl.Bind();
-		m_texture.Bind(0);
-		m_idxBuff.Bind();
-		m_vtxBuff.Bind();
-		graphic::GetDevice()->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, 
-			m_vtxBuff.GetVertexCount(), 0, m_idxBuff.GetFaceCount());
+		//m_mtrl.Bind();
+		//m_texture.Bind(0);
+		//m_idxBuff.Bind();
+		//m_vtxBuff.Bind();
+		//graphic::GetDevice()->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, 
+		//	m_vtxBuff.GetVertexCount(), 0, m_idxBuff.GetFaceCount());
 
+		m_model.SetTM(tm);
+		m_model.Render();
 
 		//랜더링 끝
 		graphic::GetDevice()->EndScene();
@@ -179,10 +183,11 @@ void cViewer::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 				return;// handle error...
 
 			m_filePath = filePath;
-			m_texture.Clear();
-			m_vtxBuff.Clear();
-			m_idxBuff.Clear();
-			ReadModelFile(filePath, m_vtxBuff, m_idxBuff, m_texture);
+			//m_texture.Clear();
+			//m_vtxBuff.Clear();
+			//m_idxBuff.Clear();
+			//ReadModelFile(filePath, m_vtxBuff, m_idxBuff, m_texture);
+			m_model.Create(filePath);
 		}
 		break;
 
@@ -190,7 +195,7 @@ void cViewer::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			int fwKeys = GET_KEYSTATE_WPARAM(wParam);
 			int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-			dbg::Print( "%d %d", fwKeys, zDelta);
+			//dbg::Print( "%d %d", fwKeys, zDelta);
 
 			Matrix44 V;
 			m_camPos.z += (zDelta<0)? -50 : 50;
@@ -206,10 +211,11 @@ void cViewer::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			 if (m_filePath.empty())
 				 return;
-			 m_texture.Clear();
-			m_vtxBuff.Clear();
-			m_idxBuff.Clear();
-			ReadModelFile(m_filePath, m_vtxBuff, m_idxBuff, m_texture);
+			// m_texture.Clear();
+			//m_vtxBuff.Clear();
+			//m_idxBuff.Clear();
+			//ReadModelFile(m_filePath, m_vtxBuff, m_idxBuff, m_texture);
+			 m_model.Create(m_filePath);
 		}
 		else if (wParam == VK_TAB)
 		{
@@ -249,212 +255,9 @@ void cViewer::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 
 			m_curPos = pos;
 
-			g_localTm *= (mat1 * mat2);
+			g_rotateTm *= (mat1 * mat2);
 		}
 		break;
 	}
 }
 
-
-bool cViewer::ReadModelFile( const string &fileName, graphic::cVertexBuffer &vtxBuff,  
-	graphic::cIndexBuffer &idxBuff, graphic::cTexture &texture )
-{
-	using namespace std;
-	ifstream fin(fileName.c_str());
-	if (!fin.is_open())
-		return false;
-
-	string exporterVersion;
-	fin >>exporterVersion;
-
-	if ((exporterVersion != "EXPORTER_V1") &&
-		(exporterVersion != "EXPORTER_V2")
-		)
-		return false;
-
-	string vtx, eq;
-	int vtxSize;
-	fin >> vtx >> eq >> vtxSize;
-
-	if (vtxSize <= 0)
-		return  false;
-
-	vector<Vertex> tempVtxBuff;
-	tempVtxBuff.reserve(vtxSize + vtxSize/2);
-
-	float num1, num2, num3;
-	for (int i = 0; i < vtxSize; i++)
-	{
-		fin >> num1 >> num2 >> num3;
-		tempVtxBuff.push_back( Vertex(num1, num2, num3) );
-	}
-
-
-	// 인덱스 버퍼 초기화.
-	string idx;
-	int faceSize;
-	fin >> idx >> eq >> faceSize;
-
-	vector<int> tempIdxBuff;
-	tempIdxBuff.reserve(faceSize);
-
-	if (faceSize > 0)
-	{
-		int num1, num2, num3;
-		for (int i = 0; i < faceSize*3; i+=3)
-		{
-			fin >> num1 >> num2 >> num3;
-			tempIdxBuff.push_back(num1);
-			tempIdxBuff.push_back(num2);
-			tempIdxBuff.push_back(num3);
-		}
-	}
-
-	string norm;
-	int numNormal;
-	fin >> norm >> eq >> numNormal;
-
-	if (numNormal > 0)
-	{
-		float num1, num2, num3;
-		vector<int> vertCount(vtxSize, 0);
-		for (int i = 0; i < numNormal; i++)
-		{
-			fin >> num1 >> num2 >> num3;
-			Vector3 n(num1, num2, num3);
-
-			// 법선벡터의 평균을 구해서 할당한다.
-			for (int k=0; k < 3; ++k)
-			{
-				const int vtxIdx = tempIdxBuff[ i*3 + k];
-				tempVtxBuff[ vtxIdx].n += n;
-				++vertCount[ vtxIdx];
-			}
-		}
-
-		for (int i=0; i < vtxSize; ++i)
-		{
-			tempVtxBuff[ i].n /= (float)vertCount[ i];
-			tempVtxBuff[ i].n.Normalize();
-		}
-	}
-
-
-	string tex;
-	int numTex;
-	fin >> tex >> eq >> numTex;
-
-	if (numTex > 0)
-	{
-		float fnum1, fnum2;
-		vector<Vector3> texVertices(numTex);
-		for (int i = 0; i < numTex; i++)
-		{
-			fin >> fnum1 >> fnum2;
-			texVertices[ i] = Vector3(fnum1, fnum2, 0);
-		}
-
-		string strTexFace;
-		int numTexFace;
-		fin >> strTexFace >> eq >> numTexFace;
-
-		vector<int> texFaces;
-		texFaces.reserve(numTexFace*3);
-		if (numTexFace > 0)
-		{
-			int num1, num2, num3;
-			for (int i=0; i < numTexFace; ++i)
-			{
-				fin >> num1 >> num2 >> num3;
-				texFaces.push_back( num1 );
-				texFaces.push_back( num2 );
-				texFaces.push_back( num3 );
-			}
-		}
-
-		map<int, vector<int> > vtxIdxMap; // vertex index, vertex index array
-		for (int i=0; i < vtxSize; ++i)
-		{
-			vector<int> varray;
-			varray.reserve(4);
-			varray.push_back(i);
-			vtxIdxMap[ i] = varray;
-		}
-
-		// 텍스쳐 좌표를 버텍스 버퍼에 저장한다. 
-		// 버텍스 버퍼의 uv 값이 초기화 되지 않았다면, 초기화 한다.
-		// 버텍스에 하나 이상의 uv값이 존재한다면, 버텍스를 추가하고, 인덱스버퍼를 수정한다.
-		for (int i=0; i < (int)texFaces.size(); ++i)
-		{
-			const Vector3 tex = texVertices[ texFaces[ i]];
-			const int vtxIdx = tempIdxBuff[ i];
-
-			bool isFind = false;
-			for (int k=0; k < (int)vtxIdxMap[ vtxIdx].size(); ++k)
-			{
-				const int subVtxIdx = vtxIdxMap[ vtxIdx][ k];
-
-				// 텍스쳐 좌표가 버텍스 버퍼에 저장되어 있다면, index buffer 값을 해당 vertex index 로
-				// 설정 한다.
-				if ((-100 == tempVtxBuff[ subVtxIdx].u) &&
-					(-100 == tempVtxBuff[ subVtxIdx].v))
-				{
-					tempVtxBuff[ subVtxIdx].u = tex.x;
-					tempVtxBuff[ subVtxIdx].v = tex.y;
-					isFind = true;
-					break;
-				}
-				else if ((tex.x == tempVtxBuff[ subVtxIdx].u) && 
-					(tex.y == tempVtxBuff[ subVtxIdx].v))
-				{
-					tempIdxBuff[ i] = subVtxIdx;
-					isFind = true;
-					break;
-				}
-			}
-
-			// 버텍스 버퍼에 없는 uv 좌표라면, 새 버텍스를 버텍스버퍼에 추가한다.
-			// 인덱스 버퍼에도 새로 추가된 버텍스 인덱스값을 넣는다.
-			if (!isFind)
-			{
-				Vertex v = tempVtxBuff[ vtxIdx];
-				v.u = tex.x;
-				v.v = tex.y;
-				tempVtxBuff.push_back(v);
-				const int newVtxIdx = tempVtxBuff.size()-1;
-				vtxIdxMap[ vtxIdx].push_back( newVtxIdx );
-				tempIdxBuff[ i] = newVtxIdx;
-			}
-		}
-	}
-
-
-	// 텍스쳐 파일이름 로딩.
-	string textureTok, texFilePath;
-	fin >> textureTok >> eq;
-	std::getline(fin, texFilePath);
-	string  textureFileName = common::GetFilePathExceptFileName(fileName) + "\\" + 
-		common::trim(texFilePath);
-	texture.Create( textureFileName);
-
-
-	// 버텍스 버퍼 생성.
-	if (!vtxBuff.Create(tempVtxBuff.size(), sizeof(Vertex), Vertex::FVF))
-		return false;
-
-	// 버텍스 버퍼 초기화.
-	Vertex* vertices = (Vertex*)vtxBuff.Lock();
-	for (int i = 0; i < (int)tempVtxBuff.size(); i++)
-		vertices[ i] = tempVtxBuff[ i];
-	vtxBuff.Unlock();
-
-	// 인덱스 버퍼 생성.
-	if (!idxBuff.Create(tempIdxBuff.size()))
-		return false;
-	WORD *indices = (WORD*)idxBuff.Lock();
-	for (int i = 0; i < (int)tempIdxBuff.size(); ++i)
-		indices[ i] = tempIdxBuff[ i];
-	idxBuff.Unlock();
-
-	return true;
-}
