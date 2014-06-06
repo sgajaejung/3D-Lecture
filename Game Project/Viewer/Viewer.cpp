@@ -16,6 +16,8 @@ public:
 
 
 protected:
+	void UpdateCamera();
+
 
 private:
 	graphic::cLight m_light;
@@ -32,7 +34,8 @@ private:
 
 	POINT m_curPos;
 	bool m_LButtonDown;
-	Matrix44 g_rotateTm;
+	bool m_RButtonDown;
+	Matrix44 m_rotateTm;
 
 	Vector3 m_camPos;
 	Vector3 m_lookAtPos;
@@ -64,6 +67,7 @@ cViewer::cViewer()
 	const RECT r = {0, 0, 800, 600};
 	m_windowRect = r;
 	m_LButtonDown = false;
+	m_RButtonDown = false;
 }
 
 cViewer::~cViewer()
@@ -86,14 +90,9 @@ bool cViewer::OnInit()
 	m_light.Bind(0);
 
 
-	Matrix44 V;
-	m_camPos = Vector3(0,0,-500);
+	m_camPos = Vector3(100,100,-500);
 	m_lookAtPos = Vector3(0,0,0);
-	Vector3 dir = m_lookAtPos - m_camPos;
-	dir.Normalize();
-	V.SetView(m_camPos, dir, Vector3(0,1,0));
-	graphic::GetDevice()->SetTransform(D3DTS_VIEW, (D3DXMATRIX*)&V);
-
+	UpdateCamera();
 
 	const int WINSIZE_X = 1024;		//초기 윈도우 가로 크기
 	const int WINSIZE_Y = 768;	//초기 윈도우 세로 크기
@@ -131,19 +130,21 @@ void cViewer::OnRender(const float elapseT)
 		//화면 청소가 성공적으로 이루어 졌다면... 랜더링 시작
 		graphic::GetDevice()->BeginScene();
 
-		static float y = 0;
-		y += elapseT * 0.03f;
-		// 각도가 2*PI 에 이르면 0으로 초기화한다.
-		if (y >= 6.28f)
-			y = 0;
+		graphic::GetRenderer()->RenderAxis();
 
-		Matrix44 rx, ry, r;
-		rx.SetRotationX(MATH_PI/4.f); 	// x축으로 45도 회전시킨다.
-		ry.SetRotationY(y); // y축으로 회전
-		r = rx*ry;
+		//static float y = 0;
+		//y += elapseT * 0.03f;
+		//// 각도가 2*PI 에 이르면 0으로 초기화한다.
+		//if (y >= 6.28f)
+		//	y = 0;
 
-		Matrix44 tm;
-		tm = r * g_rotateTm;
+		//Matrix44 rx, ry, r;
+		////rx.SetRotationX(MATH_PI/4.f); 	// x축으로 45도 회전시킨다.
+		//ry.SetRotationY(y); // y축으로 회전
+		//r = rx*ry;
+
+		//Matrix44 tm;
+		//tm = m_rotateTm;
 		//graphic::GetDevice()->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&tm);
 
 		//m_mtrl.Bind();
@@ -153,7 +154,7 @@ void cViewer::OnRender(const float elapseT)
 		//graphic::GetDevice()->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, 
 		//	m_vtxBuff.GetVertexCount(), 0, m_idxBuff.GetFaceCount());
 
-		m_model.SetTM(tm);
+		m_model.SetTM(m_rotateTm);
 		m_model.Render();
 
 		//랜더링 끝
@@ -197,32 +198,37 @@ void cViewer::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 			int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
 			//dbg::Print( "%d %d", fwKeys, zDelta);
 
-			Matrix44 V;
-			m_camPos.z += (zDelta<0)? -50 : 50;
 			Vector3 dir = m_lookAtPos - m_camPos;
 			dir.Normalize();
-			V.SetView(m_camPos, dir, Vector3(0,1,0));
-			graphic::GetDevice()->SetTransform(D3DTS_VIEW, (D3DXMATRIX*)&V);
+
+			m_camPos += (zDelta<0)? dir*-50.f : dir*50.f;
+			UpdateCamera();
 		}
 		break;
 
 	case WM_KEYDOWN:
-		if (wParam == VK_F5) // Refresh
+		switch (wParam)
 		{
-			 if (m_filePath.empty())
-				 return;
-			// m_texture.Clear();
-			//m_vtxBuff.Clear();
-			//m_idxBuff.Clear();
-			//ReadModelFile(m_filePath, m_vtxBuff, m_idxBuff, m_texture);
-			 m_model.Create(m_filePath);
-		}
-		else if (wParam == VK_TAB)
-		{
-			static bool flag = false;
-			graphic::GetDevice()->SetRenderState(D3DRS_CULLMODE, flag);
-			graphic::GetDevice()->SetRenderState(D3DRS_FILLMODE, flag? D3DFILL_SOLID : D3DFILL_WIREFRAME);
-			flag = !flag;
+		case VK_F5: // Refresh
+			{
+				if (m_filePath.empty())
+					return;
+				m_model.Create(m_filePath);
+			}
+			break;
+		case VK_BACK:
+			// 회전 행렬 초기화.
+			m_rotateTm.SetIdentity();
+			m_model.SetTM(m_rotateTm);
+			break;
+		case VK_TAB:
+			{
+				static bool flag = false;
+				graphic::GetDevice()->SetRenderState(D3DRS_CULLMODE, flag);
+				graphic::GetDevice()->SetRenderState(D3DRS_FILLMODE, flag? D3DFILL_SOLID : D3DFILL_WIREFRAME);
+				flag = !flag;
+			}
+			break;
 		}
 		break;
 
@@ -236,6 +242,18 @@ void cViewer::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_LBUTTONUP:
 		m_LButtonDown = false;
+		break;
+
+	case WM_RBUTTONDOWN:
+		{
+			m_RButtonDown = true;
+			m_curPos.x = LOWORD(lParam);
+			m_curPos.y = HIWORD(lParam);
+		}
+		break;
+
+	case WM_RBUTTONUP:
+		m_RButtonDown = false;
 		break;
 
 	case WM_MOUSEMOVE:
@@ -255,9 +273,42 @@ void cViewer::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 
 			m_curPos = pos;
 
-			g_rotateTm *= (mat1 * mat2);
+			m_rotateTm *= (mat1 * mat2);
+		}
+		else if (m_RButtonDown)
+		{
+			POINT pos;
+			pos.x = LOWORD(lParam);
+			pos.y = HIWORD(lParam);
+
+			const int x = pos.x - m_curPos.x;
+			const int y = pos.y - m_curPos.y;
+			m_curPos = pos;
+
+			{ // rotate Y-Axis
+				Quaternion q(Vector3(0,1,0), x * 0.005f); 
+				Matrix44 m = q.GetMatrix();
+				m_camPos *= m;
+			}
+
+			{ // rotate X-Axis
+				Quaternion q(Vector3(1,0,0), y * 0.005f); 
+				Matrix44 m = q.GetMatrix();
+				m_camPos *= m;
+			}
+
+			UpdateCamera();
 		}
 		break;
 	}
 }
 
+
+void cViewer::UpdateCamera()
+{
+	Matrix44 V;
+	Vector3 dir = m_lookAtPos - m_camPos;
+	dir.Normalize();
+	V.SetView(m_camPos, dir, Vector3(0,1,0));
+	graphic::GetDevice()->SetTransform(D3DTS_VIEW, (D3DXMATRIX*)&V);
+}
