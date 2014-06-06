@@ -14,6 +14,12 @@
     <ClInclude Include="model\node.h">
       <Filter>model</Filter>
     </ClInclude>
+    <ClInclude Include="model\mesh.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="model\model.h">
+      <Filter>model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -25,6 +31,12 @@
     <ClCompile Include="indexbuffer.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="model\node.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="model\mesh.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="model\model.cpp">
       <Filter>model</Filter>
     </ClCompile>
   </ItemGroup>

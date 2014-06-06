@@ -17,9 +17,6 @@ namespace graphic
 		void Clear();
 
 
-	protected:
-
-
 	private:
 		LPDIRECT3DINDEXBUFFER9 m_pIdxBuff; // 인덱스 버퍼
 		int m_faceCount;

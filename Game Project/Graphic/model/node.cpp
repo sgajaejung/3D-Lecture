@@ -5,26 +5,14 @@
 using namespace graphic;
 
 
-cNode::cNode( const int id)
+cNode::cNode( const int id) : m_id(id)
 {
 
 }
 
 cNode::~cNode()
 {
-
-}
-
-
-bool cNode::Move(const float elapseTime)
-{
-
-	return true;
-}
-
-void cNode::Render()
-{
-	
+	Clear();
 }
 
 

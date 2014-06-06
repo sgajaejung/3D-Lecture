@@ -72,6 +72,8 @@
     <ClInclude Include="indexbuffer.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="material.h" />
+    <ClInclude Include="model\mesh.h" />
+    <ClInclude Include="model\model.h" />
     <ClInclude Include="model\node.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="stdafx.h" />
@@ -84,6 +86,8 @@
     <ClCompile Include="indexbuffer.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="material.cpp" />
+    <ClCompile Include="model\mesh.cpp" />
+    <ClCompile Include="model\model.cpp" />
     <ClCompile Include="model\node.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="stdafx.cpp">
