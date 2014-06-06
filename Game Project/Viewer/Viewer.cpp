@@ -131,6 +131,7 @@ void cViewer::OnRender(const float elapseT)
 		graphic::GetDevice()->BeginScene();
 
 		graphic::GetRenderer()->RenderAxis();
+		graphic::GetRenderer()->RenderFPS();
 
 		//static float y = 0;
 		//y += elapseT * 0.03f;

@@ -94,7 +94,6 @@
     <ClCompile Include="base\material.cpp" />
     <ClCompile Include="base\texture.cpp" />
     <ClCompile Include="base\vertexbuffer.cpp" />
-    <ClCompile Include="base\vertexformat.cpp" />
     <ClCompile Include="importer\modelimporter.cpp" />
     <ClCompile Include="manager\Renderer.cpp" />
     <ClCompile Include="manager\resourcemanager.cpp" />

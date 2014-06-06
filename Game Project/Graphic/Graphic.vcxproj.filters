@@ -91,9 +91,6 @@
     <ClCompile Include="manager\Renderer.cpp">
       <Filter>manager</Filter>
     </ClCompile>
-    <ClCompile Include="base\vertexformat.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
     <ClCompile Include="model\track.cpp">
       <Filter>model</Filter>
     </ClCompile>

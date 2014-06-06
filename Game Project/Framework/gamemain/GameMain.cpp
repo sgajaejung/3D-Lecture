@@ -145,12 +145,14 @@ void cGameMain::Run()
 
 		Update(t);
 		Render(t);
+		Sleep(0);
 	}
 }
 
 
 void cGameMain::Update(const float elapseT)
 {
+	graphic::GetRenderer()->Update(elapseT);
 	OnUpdate(elapseT);
 }
 

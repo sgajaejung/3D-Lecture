@@ -11,7 +11,9 @@ namespace graphic
 
 		bool CreateDirectX(HWND hWnd, const int width, const int height);
 		LPDIRECT3DDEVICE9 GetDevice() { return m_pDevice; }
+		void Update(const float elpaseT);
 		void RenderAxis();
+		void RenderFPS();
 
 
 	protected:
@@ -19,6 +21,10 @@ namespace graphic
 
 	private:
 		LPDIRECT3DDEVICE9 m_pDevice;
+		ID3DXFont *m_font;
+		string m_fpsText;
+		float m_elapseTime;
+		int m_fps;
 	};
 
 
