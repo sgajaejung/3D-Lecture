@@ -38,6 +38,7 @@
 #include <map>
 #include <vector>
 #include <algorithm>
+#include <fstream>
 #include <boost/foreach.hpp>
 
 using std::string;

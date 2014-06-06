@@ -35,6 +35,12 @@
     <ClInclude Include="manager\resourcemanager.h">
       <Filter>manager</Filter>
     </ClInclude>
+    <ClInclude Include="model\rawmesh.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="importer\modelimporter.h">
+      <Filter>importer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -69,6 +75,12 @@
     <ClCompile Include="manager\resourcemanager.cpp">
       <Filter>manager</Filter>
     </ClCompile>
+    <ClCompile Include="model\rawmesh.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="importer\modelimporter.cpp">
+      <Filter>importer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="model">
@@ -79,6 +91,9 @@
     </Filter>
     <Filter Include="manager">
       <UniqueIdentifier>{804bc56f-36fa-4643-8c34-4d4bc353e013}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="importer">
+      <UniqueIdentifier>{bb4cb441-0f33-418f-a38f-2d1a634991c6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
