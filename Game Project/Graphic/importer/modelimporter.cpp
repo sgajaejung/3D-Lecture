@@ -91,6 +91,7 @@ bool graphic::ReadRawMeshFileV1( const string &fileName, sRawMesh &raw )
 	string norm;
 	int numNormal;
 	fin >> norm >> eq >> numNormal;
+	raw.normals.resize(vtxSize);
 
 	if (numNormal > 0)
 	{

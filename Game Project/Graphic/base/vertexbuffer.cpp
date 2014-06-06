@@ -17,7 +17,7 @@ cVertexBuffer::~cVertexBuffer()
 }
 
 
-bool cVertexBuffer::Create(int vertexCount, int sizeofVertex, int fvf)
+bool cVertexBuffer::Create(int vertexCount, int sizeofVertex, DWORD fvf)
 {
 	if (FAILED(GetDevice()->CreateVertexBuffer( vertexCount*sizeofVertex,
 		D3DUSAGE_WRITEONLY, 

@@ -8,13 +8,16 @@
 #include "../Common/common.h"
 using namespace common;
 
-#include "Renderer.h"
+
+#include "manager/Renderer.h"
 #include "base/material.h"
 #include "base/light.h"
 #include "base/vertexbuffer.h"
 #include "base/indexbuffer.h"
 #include "base/texture.h"
+#include "base/vertexformat.h"
 #include "model/rawmesh.h"
+#include "model/model.h"
 
 
 #pragma comment( lib, "d3d9.lib" )

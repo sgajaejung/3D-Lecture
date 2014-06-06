@@ -4,7 +4,6 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="graphic.h" />
-    <ClInclude Include="Renderer.h" />
     <ClInclude Include="model\node.h">
       <Filter>model</Filter>
     </ClInclude>
@@ -41,10 +40,15 @@
     <ClInclude Include="importer\modelimporter.h">
       <Filter>importer</Filter>
     </ClInclude>
+    <ClInclude Include="manager\Renderer.h">
+      <Filter>manager</Filter>
+    </ClInclude>
+    <ClInclude Include="base\vertexformat.h">
+      <Filter>base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="model\node.cpp">
       <Filter>model</Filter>
     </ClCompile>
@@ -80,6 +84,12 @@
     </ClCompile>
     <ClCompile Include="importer\modelimporter.cpp">
       <Filter>importer</Filter>
+    </ClCompile>
+    <ClCompile Include="manager\Renderer.cpp">
+      <Filter>manager</Filter>
+    </ClCompile>
+    <ClCompile Include="base\vertexformat.cpp">
+      <Filter>base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

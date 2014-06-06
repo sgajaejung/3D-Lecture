@@ -21,10 +21,10 @@ namespace graphic
 		void Clear();
 
 		virtual bool Move(const float elapseTime) {return true;}
-		virtual void Render() {}
+		virtual void Render(const Matrix44 &parentTm) {}
 
 
-	private:
+	protected:
 		int m_id;
 		cNode *m_parent;
 		vector<cNode*> m_children;
@@ -32,7 +32,7 @@ namespace graphic
 		int m_materialId;
 		Matrix44 m_matLocal;
 		Matrix44 m_matAni;
-		Matrix44 m_matTM;		
+		Matrix44 m_matTM;
 	};
 
 

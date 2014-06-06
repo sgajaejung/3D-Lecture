@@ -1,7 +1,8 @@
 
 #include "stdafx.h"
 #include "Renderer.h"
-#include "base/DxInit.h"
+#include "../base/DxInit.h"
+#include "resourcemanager.h"
 
 using namespace graphic;
 
@@ -18,16 +19,7 @@ bool graphic::InitRenderer(HWND hWnd, const int width, const int height)
 void graphic::ReleaseRenderer()
 {
 	cRenderer::Release();
-}
-
-cRenderer* graphic::GetRenderer()
-{
-	return cRenderer::Get();
-}
-
-LPDIRECT3DDEVICE9 graphic::GetDevice()
-{
-	return cRenderer::Get()->GetDevice();
+	cResourceManager::Release();
 }
 
 

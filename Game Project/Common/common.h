@@ -31,9 +31,10 @@
 #define BRK(exp)		{if((exp)) break; }			// exp가 break
 
 
+typedef unsigned int    u_int;
+
 
 // 포함 파일들.
-
 #include <string>
 #include <map>
 #include <vector>

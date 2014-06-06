@@ -31,7 +31,7 @@ sRawMesh* cResourceManager::LoadModel( const string &fileName )
 	// store
 	m_meshes[ fileName] = new sRawMesh;
 	*m_meshes[ fileName] = raw;
-	return NULL;
+	return m_meshes[ fileName];
 }
 
 
