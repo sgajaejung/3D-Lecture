@@ -22,14 +22,10 @@ protected:
 private:
 	graphic::cLight m_light;
 
-	graphic::cVertexBuffer m_vtxBuff;
-	graphic::cIndexBuffer m_idxBuff;
 	graphic::cMaterial m_mtrl;
 	graphic::cTexture m_texture;
-
 	graphic::cModel m_model;
 	
-
 	string m_filePath;
 
 	POINT m_curPos;
@@ -79,7 +75,6 @@ bool cViewer::OnInit()
 {
 	DragAcceptFiles(m_hWnd, TRUE);
 
-	//ReadModelFile("../media/cube.dat", m_vtxBuff, m_idxBuff, m_texture);
 	m_filePath = "../media/data.dat";
 	m_model.Create( m_filePath );
 
@@ -130,31 +125,8 @@ void cViewer::OnRender(const float elapseT)
 		//화면 청소가 성공적으로 이루어 졌다면... 랜더링 시작
 		graphic::GetDevice()->BeginScene();
 
-		graphic::GetRenderer()->RenderAxis();
 		graphic::GetRenderer()->RenderFPS();
-
-		//static float y = 0;
-		//y += elapseT * 0.03f;
-		//// 각도가 2*PI 에 이르면 0으로 초기화한다.
-		//if (y >= 6.28f)
-		//	y = 0;
-
-		//Matrix44 rx, ry, r;
-		////rx.SetRotationX(MATH_PI/4.f); 	// x축으로 45도 회전시킨다.
-		//ry.SetRotationY(y); // y축으로 회전
-		//r = rx*ry;
-
-		//Matrix44 tm;
-		//tm = m_rotateTm;
-		//graphic::GetDevice()->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&tm);
-
-		//m_mtrl.Bind();
-		//m_texture.Bind(0);
-		//m_idxBuff.Bind();
-		//m_vtxBuff.Bind();
-		//graphic::GetDevice()->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, 
-		//	m_vtxBuff.GetVertexCount(), 0, m_idxBuff.GetFaceCount());
-
+		graphic::GetRenderer()->RenderAxis();
 		m_model.SetTM(m_rotateTm);
 		m_model.Render();
 
@@ -185,10 +157,6 @@ void cViewer::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 				return;// handle error...
 
 			m_filePath = filePath;
-			//m_texture.Clear();
-			//m_vtxBuff.Clear();
-			//m_idxBuff.Clear();
-			//ReadModelFile(filePath, m_vtxBuff, m_idxBuff, m_texture);
 			m_model.Create(filePath);
 		}
 		break;
