@@ -64,59 +64,14 @@ void cRenderer::RenderAxis()
 {
 	RET(!m_pDevice);
 
-	m_pDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
+	if (m_axis.empty())
+		MakeAxis(500.f,  D3DXCOLOR(1,0,0,0),  D3DXCOLOR(0,1,0,0),  D3DXCOLOR(0,0,1,0), m_axis);
 
+	m_pDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
 	Matrix44 identity;
 	m_pDevice->SetTransform( D3DTS_WORLD, (D3DXMATRIX*)&identity );
-
-	const float length = 500.f;
-	const int axis_size = 6;
-	sVertexDiffuse axisLine[ axis_size];
-
-	// x axis
-	axisLine[ 0].p = Vector3( 0.f, 0.f, 0.f );
-	axisLine[ 1].p = Vector3( length, 0.f, 0.f );
-	axisLine[ 0].c = D3DXCOLOR( 1, 0, 0, 0 );
-	axisLine[ 1].c = D3DXCOLOR( 1, 0, 0, 0 );
-	// y axis
-	axisLine[ 2].p = Vector3( 0.f, 0.f, 0.f );
-	axisLine[ 3].p = Vector3( 0.f, length, 0.f );
-	axisLine[ 2].c = D3DXCOLOR( 0, 1, 0, 0 );
-	axisLine[ 3].c = D3DXCOLOR( 0, 1, 0, 0 );
-	// z axis
-	axisLine[ 4].p = Vector3( 0.f, 0.f, 0.f );
-	axisLine[ 5].p = Vector3( 0.f, 0.f, length );
-	axisLine[ 4].c = D3DXCOLOR( 0, 0, 1, 0 );
-	axisLine[ 5].c = D3DXCOLOR( 0, 0, 1, 0 );
 	m_pDevice->SetFVF( sVertexDiffuse::FVF );
-	m_pDevice->DrawPrimitiveUP( D3DPT_LINELIST, axis_size/2, axisLine, sizeof(sVertexDiffuse) );
-
-
-	const float w = 5.f;
-	sVertexDiffuse tri[ 9];
-	tri[ 0].p = Vector3( 0.f, 0.f, 0.f );
-	tri[ 0].c = D3DXCOLOR( 1, 0, 0, 0 );
-	tri[ 2].p = Vector3( w*2, 0.f, 0.f );
-	tri[ 2].c = D3DXCOLOR( 0, 1, 0, 0 );
-	tri[ 1].p = Vector3( w, w, 0.f );
-	tri[ 1].c = D3DXCOLOR( 0, 0, 1, 0 );
-
-	tri[ 3].p = Vector3( 0.f, 0.f, 0.f );
-	tri[ 3].c = D3DXCOLOR( 1, 0, 0, 0 );
-	tri[ 5].p = Vector3( -w, w, 0.f );
-	tri[ 5].c = D3DXCOLOR( 0, 0, 1, 0 );
-	tri[ 4].p = Vector3( -w*w, 0.f, 0.f );
-	tri[ 4].c = D3DXCOLOR( 0, 1, 0, 0 );
-
-	tri[ 6].p = Vector3( 0.f, 0.f, 0.f );
-	tri[ 6].c = D3DXCOLOR( 1, 0, 0, 0 );
-	tri[ 8].p = Vector3( w, w, 0.f );
-	tri[ 8].c = D3DXCOLOR( 0, 1, 0, 0 );
-	tri[ 7].p = Vector3( -w, w, 0.f );
-	tri[ 7].c = D3DXCOLOR( 0, 0, 1, 0 );
-	m_pDevice->SetFVF( sVertexDiffuse::FVF );
-	m_pDevice->DrawPrimitiveUP( D3DPT_TRIANGLELIST, 3, tri, sizeof(sVertexDiffuse) );
-
+	m_pDevice->DrawPrimitiveUP( D3DPT_LINELIST, 3, &m_axis[0], sizeof(sVertexDiffuse) );
 	m_pDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 }
 
@@ -205,3 +160,43 @@ void cRenderer::MakeGrid( const float width, const int count, DWORD color, vecto
 		}
 	}
 }
+
+
+// x, y, z 축을 만든다.
+void cRenderer::MakeAxis( const float length, DWORD xcolor, DWORD ycolor, DWORD zcolor, 
+	vector<sVertexDiffuse> &out )
+{
+	RET(!out.empty());
+
+	out.reserve(6);
+
+	sVertexDiffuse v;
+
+	// x axis
+	v.p = Vector3( 0.f, 0.f, 0.f );
+	v.c = xcolor;
+	out.push_back(v);
+
+	v.p = Vector3( length, 0.f, 0.f );
+	v.c = xcolor;
+	out.push_back(v);
+
+	// y axis
+	v.p = Vector3( 0.f, 0.f, 0.f );
+	v.c = ycolor;
+	out.push_back(v);
+
+	v.p = Vector3( 0.f, length, 0.f );
+	v.c = ycolor;
+	out.push_back(v);
+
+	// z axis
+	v.p = Vector3( 0.f, 0.f, 0.f );
+	v.c = zcolor;
+	out.push_back(v);
+
+	v.p = Vector3( 0.f, 0.f, length );
+	v.c = zcolor;
+	out.push_back(v);
+}
+

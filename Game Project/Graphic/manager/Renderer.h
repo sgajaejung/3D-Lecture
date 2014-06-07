@@ -19,6 +19,7 @@ namespace graphic
 
 	protected:
 		void MakeGrid( const float width, const int count, DWORD color, vector<sVertexDiffuse> &out );
+		void MakeAxis( const float length, DWORD xcolor, DWORD ycolor, DWORD zcolor, vector<sVertexDiffuse> &out );
 
 
 	private:
@@ -26,6 +27,9 @@ namespace graphic
 
 		// Grid
 		vector<sVertexDiffuse> m_grid;
+
+		// Axis
+		vector<sVertexDiffuse> m_axis;
 
 		// Display FPS 
 		ID3DXFont *m_font;		
