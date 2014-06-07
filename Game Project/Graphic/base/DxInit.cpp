@@ -45,7 +45,7 @@ bool graphic::InitDirectX(HWND hWnd, const int width, const int height, OUT LPDI
 	d3dpp.hDeviceWindow = hWnd;					//Device 가 출력될 윈도우 핸들
 	d3dpp.MultiSampleQuality = 0;						//멀티 샘플링 질
 	d3dpp.MultiSampleType = D3DMULTISAMPLE_NONE;		//멀티 샘플링 타입 
-	d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;	//화면 전송 간격 ( 그냥 D3DPRESENT_INTERVAL_ONE 모니터 주사율과 동일시 )
+	d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;	//화면 전송 간격 ( 그냥 D3DPRESENT_INTERVAL_ONE 모니터 주사율과 동일시 )
 	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;	//화면 스왑 체인 방식
 	d3dpp.Windowed = true;						//윈도우 모드냐? ( 이게 false 면 풀스크린 된다! )
 
