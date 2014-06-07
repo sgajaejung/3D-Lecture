@@ -6,12 +6,6 @@
 using namespace common;
 
 
-const float MATH_EPSILON = 0.0005F;//1.0e-5F;
-#define SQR(x)		( (x) * (x) )
-#define LIMIT_RANGE(low, value, high)	{	if (value < low)	value = low;	else if(value > high)	value = high;	}
-#define FLOAT_EQ(x,v)	(fabs((x)-(v)) < (MATH_EPSILON))
-
-
 //--------------------------------
 //	Constructor
 //--------------------------------
