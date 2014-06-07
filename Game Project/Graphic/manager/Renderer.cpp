@@ -55,6 +55,7 @@ bool cRenderer::CreateDirectX(HWND hWnd, const int width, const int height)
 	if (FAILED(hr))
 		return false;
 
+	m_hWnd = hWnd;
 	return true;
 }
 

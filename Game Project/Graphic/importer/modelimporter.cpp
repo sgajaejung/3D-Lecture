@@ -16,13 +16,17 @@
 
 namespace graphic { namespace importer {
 
-	bool ReadRawMeshFileV1( const string &fileName, OUT sRawMesh &rawMesh );
-	bool ReadRawMeshFileV2( const string &fileName, OUT sRawMesh &rawMesh );
-	bool ReadRawMeshFileV3( const string &fileName, OUT sRawMesh &rawMesh, OUT sRawAni &rawAni );
+	bool ReadRawMeshFileV1( const string &fileName, OUT sRawMeshGroup &rawMesh );
+	bool ReadRawMeshFileV2( const string &fileName, OUT sRawMeshGroup &rawMesh );
+	bool ReadRawMeshFileV3( const string &fileName, OUT sRawMeshGroup &rawMesh, OUT sRawAni &rawAni );
+	bool ReadRawMeshFileV4( const string &fileName, OUT sRawMeshGroup &rawMesh, OUT sRawAni &rawAni );
+
 
 	bool ReadVertexIndexNormal( std::ifstream &fin, OUT sRawMesh &rawMesh );
 	bool ReadTextureCoordinate( std::ifstream &fin, const string &fileName, OUT sRawMesh &rawMesh );
 	bool ReadAnimation(std::ifstream &fin, OUT sRawMesh &rawMesh, OUT sRawAni &rawAni );
+	bool ReadBone(std::ifstream &fin, OUT sRawMeshGroup &rawMeshes, OUT sRawAni &rawAni );
+	bool ReadTM(std::ifstream &fin, OUT sRawMesh &rawMesh );
 }}
 
 using namespace graphic;
@@ -31,7 +35,7 @@ using namespace importer;
 
 // load all exporter version
 bool importer::ReadRawMeshFile( const string &fileName, 
-	OUT sRawMesh &rawMesh, OUT sRawAni &rawAni )
+	OUT sRawMeshGroup &rawMesh, OUT sRawAni &rawAni )
 {
 	using namespace std;
 	ifstream fin(fileName.c_str());
@@ -53,13 +57,21 @@ bool importer::ReadRawMeshFile( const string &fileName,
 	{
 		return ReadRawMeshFileV3(fileName, rawMesh, rawAni);
 	}
+	else if (version == "EXPORTER_V4")
+	{
+		return ReadRawMeshFileV4(fileName, rawMesh, rawAni);
+	}
+	else
+	{
+		::MessageBoxA(GetRenderer()->GetHwnd(), "지원하지 않는 포맷 입니다.", "Error", MB_OK);
+	}
 
 	return true;
 }
 
 
 // load exporter version 1
-bool importer::ReadRawMeshFileV1( const string &fileName, OUT sRawMesh &rawMesh )
+bool importer::ReadRawMeshFileV1( const string &fileName, OUT sRawMeshGroup &rawMeshes )
 {
 	using namespace std;
 	ifstream fin(fileName.c_str());
@@ -69,13 +81,14 @@ bool importer::ReadRawMeshFileV1( const string &fileName, OUT sRawMesh &rawMesh 
 	string exporterVersion;
 	fin >> exporterVersion;
 
-	ReadVertexIndexNormal(fin, rawMesh);
+	rawMeshes.meshes.push_back( sRawMesh() );
+	ReadVertexIndexNormal(fin, rawMeshes.meshes.back());
 	return true;
 }
 
 
 // load exporter version 2
-bool importer::ReadRawMeshFileV2( const string &fileName, OUT sRawMesh &rawMesh )
+bool importer::ReadRawMeshFileV2( const string &fileName, OUT sRawMeshGroup &rawMeshes )
 {
 	using namespace std;
 	ifstream fin(fileName.c_str());
@@ -85,15 +98,17 @@ bool importer::ReadRawMeshFileV2( const string &fileName, OUT sRawMesh &rawMesh 
 	string exporterVersion;
 	fin >> exporterVersion;
 
-	ReadVertexIndexNormal(fin, rawMesh);
-	ReadTextureCoordinate(fin, fileName, rawMesh);
+	rawMeshes.meshes.push_back( sRawMesh() );
+	ReadVertexIndexNormal(fin, rawMeshes.meshes.back());
+	ReadTextureCoordinate(fin, fileName, rawMeshes.meshes.back());
+
 	return true;
 }
 
 
 // load exporter version 3
 bool importer::ReadRawMeshFileV3( const string &fileName, 
-	OUT sRawMesh &rawMesh, OUT sRawAni &rawAni )
+	OUT sRawMeshGroup &rawMeshes, OUT sRawAni &rawAni )
 {
 	using namespace std;
 	ifstream fin(fileName.c_str());
@@ -103,9 +118,42 @@ bool importer::ReadRawMeshFileV3( const string &fileName,
 	string exporterVersion;
 	fin >> exporterVersion;
 
-	ReadVertexIndexNormal(fin, rawMesh);
-	ReadTextureCoordinate(fin, fileName, rawMesh);
-	ReadAnimation(fin, rawMesh, rawAni);
+	rawMeshes.meshes.push_back( sRawMesh() );
+	ReadVertexIndexNormal(fin, rawMeshes.meshes.back());
+	ReadTextureCoordinate(fin, fileName, rawMeshes.meshes.back());
+	ReadAnimation(fin, rawMeshes.meshes.back(), rawAni);
+
+	return true;
+}
+
+
+bool importer::ReadRawMeshFileV4( const string &fileName, OUT sRawMeshGroup &rawMeshes, 
+	OUT sRawAni &rawAni )
+{
+	using namespace std;
+	ifstream fin(fileName.c_str());
+	if (!fin.is_open())
+		return false;
+
+	string exporterVersion;
+	fin >> exporterVersion;
+	
+	string geomObject, eq;
+	int geomObjectCount;
+	fin >> geomObject >> eq >> geomObjectCount;
+
+	rawMeshes.meshes.reserve(geomObjectCount);
+
+	for (int i=0; i < geomObjectCount; ++i)
+	{
+		rawMeshes.meshes.push_back( sRawMesh() );
+		ReadVertexIndexNormal(fin, rawMeshes.meshes.back());
+		ReadTextureCoordinate(fin, fileName, rawMeshes.meshes.back());
+		ReadAnimation(fin, rawMeshes.meshes.back(), rawAni);
+	}
+
+	ReadBone(fin, rawMeshes, rawAni);
+
 	return true;
 }
 
@@ -370,6 +418,58 @@ bool importer::ReadAnimation(std::ifstream &fin, OUT sRawMesh &rawMesh, OUT sRaw
 			rawAni.scale[ i].t = t;
 			rawAni.scale[ i].s = Vector3(x, y, z);
 		}
+	}
+
+	return true;
+}
+
+
+// Bone 정보를 읽어온다.
+bool importer::ReadBone(std::ifstream &fin, OUT sRawMeshGroup &rawMeshes, OUT sRawAni &rawAni )
+{
+	string boneObject, eq;
+	int boneObjectCount;
+	fin >> boneObject >> eq >> boneObjectCount;
+
+	rawMeshes.bones.reserve(boneObjectCount);
+
+	for (int i=0; i < boneObjectCount; ++i)
+	{
+		rawMeshes.bones.push_back( sRawMesh() );
+		ReadVertexIndexNormal(fin, rawMeshes.bones.back());
+		ReadTM(fin, rawMeshes.bones.back());
+		ReadAnimation(fin, rawMeshes.bones.back(), rawAni);
+	}
+
+	return true;
+}
+
+
+// 로컬, 월드 행렬을 읽어서 저장한다.
+bool importer::ReadTM(std::ifstream &fin, OUT sRawMesh &rawMesh )
+{
+	string local, world, mat;
+
+	{ // LocalTM
+		fin >> local;
+
+		Matrix44 tm;
+		fin >> mat >> tm._11 >> tm._12 >> tm._13 >> tm._14;
+		fin >> mat >> tm._21 >> tm._22 >> tm._23 >> tm._24;
+		fin >> mat >> tm._31 >> tm._32 >> tm._33 >> tm._34;
+		fin >> mat >> tm._41 >> tm._42 >> tm._43 >> tm._44;
+		rawMesh.localTm = tm;
+	}
+
+	{ // WorldTM
+		fin >> world;
+
+		Matrix44 tm;
+		fin >> mat >> tm._11 >> tm._12 >> tm._13 >> tm._14;
+		fin >> mat >> tm._21 >> tm._22 >> tm._23 >> tm._24;
+		fin >> mat >> tm._31 >> tm._32 >> tm._33 >> tm._34;
+		fin >> mat >> tm._41 >> tm._42 >> tm._43 >> tm._44;
+		rawMesh.worldTm = tm;
 	}
 
 	return true;

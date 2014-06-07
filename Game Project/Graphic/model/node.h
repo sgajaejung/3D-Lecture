@@ -11,10 +11,15 @@ namespace graphic
 		cNode( const int id);
 		virtual ~cNode();
 
-		int GetId();
+		int GetId() const;
 		cNode* GetParent();
-		int GetMaterialId();
-		const Matrix44& GetTM();
+		int GetMaterialId() const;
+
+		const Matrix44& GetTM() const;
+		const Matrix44& GetLocalTM() const;
+		void SetTM(const Matrix44 &tm);
+		void SetLocalTM(const Matrix44 &tm);
+
 		bool InsertChild(cNode *node);
 		cNode* FindNode(const int id);
 		bool RemoveNode(const int id);
@@ -30,14 +35,18 @@ namespace graphic
 		vector<cNode*> m_children;
 		NODE_TYPE m_nodeType;
 		int m_materialId;
-		Matrix44 m_matLocal;
-		Matrix44 m_matAni;
-		Matrix44 m_matTM;
+		Matrix44 m_localTM;
+		Matrix44 m_aniTM;
+		Matrix44 m_tm;
 	};
 
 
-	inline int cNode::GetId() { return m_id; }
+	inline int cNode::GetId() const { return m_id; }
 	inline cNode* cNode::GetParent() { return m_parent; }
-	inline int cNode::GetMaterialId() { return m_materialId; }
-	inline const Matrix44& cNode::GetTM() { return m_matTM; }
+	inline int cNode::GetMaterialId() const { return m_materialId; }
+	inline const Matrix44& cNode::GetTM() const { return m_tm; }
+	inline void cNode::SetTM(const Matrix44 &tm) { m_tm = tm; }
+	inline const Matrix44& cNode::GetLocalTM() const { return m_localTM; }
+	inline void cNode::SetLocalTM(const Matrix44 &tm) { m_localTM = tm; }
+
 }

@@ -13,9 +13,6 @@ namespace graphic
 		void Clear();
 		
 
-	protected:
-
-
 	private:
 		IDirect3DTexture9* m_texture;
 	};

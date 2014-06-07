@@ -21,8 +21,12 @@ namespace graphic
 		const Matrix44& GetTM();
 
 
+	protected:
+		void LoadSkeletone(const sRawMeshGroup &rawMeshes);
+
+
 	private:
-		cMesh *m_root;
+		vector<cNode*> m_meshes;
 		Matrix44 m_matTM;
 	};
 

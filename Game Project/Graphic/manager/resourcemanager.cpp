@@ -19,32 +19,32 @@ cResourceManager::~cResourceManager()
 
 
 // load model file
-sRawMesh* cResourceManager::LoadModel( const string &fileName )
+sRawMeshGroup* cResourceManager::LoadModel( const string &fileName )
 {
-	if (sRawMesh *data = FindModel(fileName))
+	if (sRawMeshGroup *data = FindModel(fileName))
 		return data;
 
-	sRawMesh *mesh = new sRawMesh;
-	mesh->name = fileName;
+	sRawMeshGroup *meshes = new sRawMeshGroup;
+	meshes->name = fileName;
 	sRawAni *ani = new sRawAni;
 	ani->name = fileName;
 
-	if (!importer::ReadRawMeshFile(fileName, *mesh, *ani))
+	if (!importer::ReadRawMeshFile(fileName, *meshes, *ani))
 	{
-		delete mesh;
+		delete meshes;
 		delete ani;
 		return NULL;
 	}
 
 	// store
-	m_meshes[ fileName] = mesh;
+	m_meshes[ fileName] = meshes;
 	m_anies[ fileName] = ani;
 	return m_meshes[ fileName];
 }
 
 
 // find model data
-sRawMesh* cResourceManager::FindModel( const string &fileName )
+sRawMeshGroup* cResourceManager::FindModel( const string &fileName )
 {
 	auto it = m_meshes.find(fileName);
 	if (m_meshes.end() == it)

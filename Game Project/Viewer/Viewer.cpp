@@ -150,12 +150,16 @@ void cViewer::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			int fwKeys = GET_KEYSTATE_WPARAM(wParam);
 			int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-			//dbg::Print( "%d %d", fwKeys, zDelta);
+			dbg::Print( "%d %d", fwKeys, zDelta);
 
 			Vector3 dir = m_lookAtPos - m_camPos;
 			dir.Normalize();
 
-			m_camPos += (zDelta<0)? dir*-50.f : dir*50.f;
+			float zoomLen = 50;
+			if (fwKeys & 0x4)
+				zoomLen = 1;
+
+			m_camPos += (zDelta<0)? dir*-zoomLen : dir*zoomLen;
 			UpdateCamera();
 		}
 		break;

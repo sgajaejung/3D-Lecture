@@ -29,7 +29,7 @@ namespace graphic
 		int m_aniEnd;
 		int m_aniFrame;
 		float m_aniTime;
-		Matrix44 m_matAniTM;
+		//Matrix44 m_matAniTM;
 	};
 
 }

@@ -59,8 +59,8 @@ bool cMesh::Move(const float elapseTime)
 		m_track->InitAnimation();
 	}
 
-	m_matAniTM.SetIdentity();
-	m_track->Move(m_aniFrame, m_matAniTM);
+	m_aniTM.SetIdentity();
+	m_track->Move(m_aniFrame, m_aniTM);
 	return true;
 }
 
@@ -72,7 +72,7 @@ void cMesh::Render(const Matrix44 &parentTm)
 	m_vtxBuff.Bind();
 	m_idxBuff.Bind();
 
-	const Matrix44 tm = m_matAniTM * m_matTM * parentTm;
+	const Matrix44 tm = m_aniTM * m_tm * m_localTM * parentTm;
 	GetDevice()->MultiplyTransform( D3DTS_WORLD, (D3DXMATRIX*)&tm );
 	GetDevice()->DrawIndexedPrimitive( 
 		D3DPT_TRIANGLELIST, 0, 0, 

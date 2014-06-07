@@ -9,8 +9,7 @@
 using namespace graphic;
 
 
-cModel::cModel() :
-	m_root(NULL)
+cModel::cModel()
 {
 	
 }
@@ -23,41 +22,67 @@ cModel::~cModel()
 
 bool cModel::Create(const string &modelName)
 {
-	sRawMesh *rawMesh = cResourceManager::Get()->LoadModel(modelName);
-	RETV(!rawMesh, false);
+	sRawMeshGroup *rawMeshes = cResourceManager::Get()->LoadModel(modelName);
+	RETV(!rawMeshes, false);
 
-	SAFE_DELETE(m_root);
-	m_root = new cMesh(0, *rawMesh);
+	Clear();
 
-	if (sRawAni *rawAni = cResourceManager::Get()->FindAni(modelName))
+	//LoadSkeletone(*rawMeshes);
+
+	BOOST_FOREACH (auto &mesh, rawMeshes->meshes)
 	{
-		m_root->LoadAnimation(*rawAni);
+		cMesh *p = new cMesh(0, mesh);
+		if (sRawAni *rawAni = cResourceManager::Get()->FindAni(modelName))
+		{
+			p->LoadAnimation(*rawAni);
+		}
+		m_meshes.push_back(p);
 	}
 
 	return true;
 }
 
 
+// 뼈대 메쉬를 화면에 출력한다.
+void cModel::LoadSkeletone(const sRawMeshGroup &rawMeshes)
+{
+	BOOST_FOREACH (auto &bone, rawMeshes.bones)
+	{
+		cMesh *p = new cMesh(0, bone);
+
+		Matrix44 w = bone.worldTm;
+		Matrix44 iw = w.Inverse();
+		Matrix44 tm = iw;
+		p->SetLocalTM(tm);
+		m_meshes.push_back(p);
+	}
+}
+
+
 bool cModel::Move(const float elapseTime)
 {
-	RETV(!m_root, false);
-	return m_root->Move(elapseTime);
+	BOOST_FOREACH (auto node, m_meshes)
+		return node->Move(elapseTime);
+	return true;
 }
 
 
 void cModel::Render()
 {
-	RET(!m_root);
-	
 	Matrix44 identity;
 	GetDevice()->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&identity);
 
-	m_root->Render(m_matTM);
+	BOOST_FOREACH (auto node, m_meshes)
+		node->Render(m_matTM);
 }
 
 
 // remove all data
 void cModel::Clear()
 {
-	SAFE_DELETE(m_root);
+	BOOST_FOREACH (auto mesh, m_meshes)
+	{
+		SAFE_DELETE(mesh);
+	}
+	m_meshes.clear();
 }

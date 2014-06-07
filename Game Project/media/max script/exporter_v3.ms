@@ -314,7 +314,7 @@ fn ExporterStart =
 
 	Outfile = createfile g_FilePath
 	
-	format "EXPORTER_V3\n" to:Outfile	
+	format "EXPORTER_V4\n" to:Outfile	
 
 	for i=1 to g_varSetMeshes.count do
 	(
