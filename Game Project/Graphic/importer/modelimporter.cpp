@@ -101,7 +101,7 @@ bool importer::ReadRawMeshFileV3( const string &fileName,
 		return false;
 
 	string exporterVersion;
-	fin >>exporterVersion;
+	fin >> exporterVersion;
 
 	ReadVertexIndexNormal(fin, rawMesh);
 	ReadTextureCoordinate(fin, fileName, rawMesh);

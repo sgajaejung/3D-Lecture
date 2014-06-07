@@ -40,23 +40,6 @@ private:
 INIT_FRAMEWORK(cViewer);
 
 
-
-// 버텍스 구조체
-struct Vertex
-{
-	Vertex() {}
-	Vertex(float x0, float y0, float z0) : p(Vector3(x0, y0, z0)), n(Vector3(0,0,0))
-		,u(-100), v(-100)
-	{}
-	Vector3 p;
-	Vector3 n;
-	float u,v;
-	static const DWORD FVF;
-};
-//버텍스 구조체 포맷.
-const DWORD Vertex::FVF  = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
-
-
 cViewer::cViewer()
 {
 	m_windowName = L"Viewer";
@@ -230,28 +213,21 @@ void cViewer::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEMOVE:
 		if (m_LButtonDown)
 		{
-			POINT pos;
-			pos.x = LOWORD(lParam);
-			pos.y = HIWORD(lParam);
-
+			POINT pos = {LOWORD(lParam), HIWORD(lParam)};
 			const int x = pos.x - m_curPos.x;
 			const int y = pos.y - m_curPos.y;
+			m_curPos = pos;
 
 			Matrix44 mat1;
 			mat1.SetRotationY( -x * 0.01f );
 			Matrix44 mat2;
 			mat2.SetRotationX( -y * 0.01f );
 
-			m_curPos = pos;
-
 			m_rotateTm *= (mat1 * mat2);
 		}
 		else if (m_RButtonDown)
 		{
-			POINT pos;
-			pos.x = LOWORD(lParam);
-			pos.y = HIWORD(lParam);
-
+			POINT pos = {LOWORD(lParam), HIWORD(lParam)};
 			const int x = pos.x - m_curPos.x;
 			const int y = pos.y - m_curPos.y;
 			m_curPos = pos;
