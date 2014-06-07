@@ -30,6 +30,7 @@ namespace common
 		void SetView( const Vector3& pos, const Vector3& dir0, const Vector3& up0);
 		void	SetProjection( const float fov, const float aspect, const float nearPlane, const float farPlane );
 		Quaternion GetQuaternion() const;
+		Matrix44 Inverse() const;
 
 		Matrix44 operator * ( const Matrix44& rhs ) const;
 		Matrix44& operator *= ( const Matrix44& rhs );

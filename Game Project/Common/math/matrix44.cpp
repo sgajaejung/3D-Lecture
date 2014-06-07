@@ -1,6 +1,7 @@
 
 #include "stdafx.h"
 #include "math.h"
+#include "d3dx9.h"
 
 using namespace common;
 
@@ -206,4 +207,13 @@ Quaternion Matrix44::GetQuaternion() const
 	}
 
 	return q;
+}
+
+
+// 역행렬을 리턴한다.
+Matrix44 Matrix44::Inverse() const
+{
+	Matrix44 matInverse;
+	D3DXMatrixInverse((D3DXMATRIX*)&matInverse, 0, (D3DXMATRIX*)this);
+	return matInverse;
 }
