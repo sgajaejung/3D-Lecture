@@ -19,7 +19,7 @@ namespace graphic
 		bool GetPosKey( const int curFrame, OUT Vector3 &out );
 		bool GetRotKey( const int curFrame, OUT Quaternion &out );
 		bool GetScaleKey( const int curFrame, OUT Vector3 &out );
-		float GetAlpha( float f1, float f2, float frame ) const;
+		inline float GetAlpha( float f1, float f2, float frame ) const;
 
 
 	private:
@@ -46,5 +46,4 @@ namespace graphic
 
 
 	inline int cTrack::GetCurrentFrame() const { return m_curFrame; }
-	inline float cTrack::GetAlpha(float f1, float f2, float frame ) const { return ( (frame-f1) / (f2-f1) ); }
 }

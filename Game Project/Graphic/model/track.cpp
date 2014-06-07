@@ -28,8 +28,8 @@ void cTrack::Move( const int curFrame, OUT Matrix44 &out )
 	m_curFrame = curFrame;
 
 	Quaternion q;
-	//if (GetRotKey(curFrame, q))
-	//	out = q.GetMatrix();
+	if (GetRotKey(curFrame, q))
+		out = q.GetMatrix();
 
 	Vector3 p(0,0,0);
 	if (GetPosKey(curFrame, p))
@@ -180,4 +180,13 @@ void cTrack::InitAnimation()
 		if (2 <= m_rawAni.scale.size())
 			m_curKeyScale[ 1] = (sKeyScale*)&m_rawAni.scale[ 1];
 	}
+}
+
+
+// Get Alpha
+float cTrack::GetAlpha(float f1, float f2, float frame ) const 
+{
+	if (FLOAT_EQ(f1, f2))
+		return 0;
+	return (frame-f1) / (f2-f1); 
 }
