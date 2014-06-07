@@ -14,14 +14,21 @@ namespace graphic
 		void Update(const float elpaseT);
 		void RenderAxis();
 		void RenderFPS();
+		void RenderGrid();
 
 
 	protected:
+		void MakeGrid( const float width, const int count, DWORD color, vector<sVertexDiffuse> &out );
 
 
 	private:
-		LPDIRECT3DDEVICE9 m_pDevice;
-		ID3DXFont *m_font;
+		LPDIRECT3DDEVICE9 m_pDevice;		
+
+		// Grid
+		vector<sVertexDiffuse> m_grid;
+
+		// Display FPS 
+		ID3DXFont *m_font;		
 		string m_fpsText;
 		float m_elapseTime;
 		int m_fps;

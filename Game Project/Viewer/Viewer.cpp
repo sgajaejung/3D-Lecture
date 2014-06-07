@@ -126,7 +126,9 @@ void cViewer::OnRender(const float elapseT)
 		graphic::GetDevice()->BeginScene();
 
 		graphic::GetRenderer()->RenderFPS();
+		graphic::GetRenderer()->RenderGrid();
 		graphic::GetRenderer()->RenderAxis();
+
 		m_model.SetTM(m_rotateTm);
 		m_model.Render();
 
