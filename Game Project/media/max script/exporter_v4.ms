@@ -553,7 +553,7 @@ fn ExporterStart =
 
 	
 	-- Write Geometric Mesh
-	format "GEOMOBJECT = %\n" g_varSetMeshes.count to:Outfile
+	format "GEOMOBJECT_COUNT = %\n" g_varSetMeshes.count to:Outfile
 	for i=1 to g_varSetMeshes.count do
 	(
 		print g_varSetMeshes[i].name 
@@ -573,7 +573,7 @@ fn ExporterStart =
 	
 	
 	-- Write Bone
-	format "BONEOBJECT = %\n" g_varSetBones.count to:Outfile
+	format "BONEOBJECT_COUNT = %\n" g_varSetBones.count to:Outfile
 	for i=1 to g_varSetBones.count do
 	(
 		print g_varSetBones[i].name 
