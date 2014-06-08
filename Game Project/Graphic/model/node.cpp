@@ -5,7 +5,9 @@
 using namespace graphic;
 
 
-cNode::cNode( const int id) : m_id(id)
+cNode::cNode( const int id) : 
+	m_id(id)
+,	m_parent(NULL)
 {
 
 }

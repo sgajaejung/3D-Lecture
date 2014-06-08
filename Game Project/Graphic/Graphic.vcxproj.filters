@@ -52,6 +52,12 @@
     <ClInclude Include="model\rawani.h">
       <Filter>model</Filter>
     </ClInclude>
+    <ClInclude Include="model\bonenode.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="model\bone.h">
+      <Filter>model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -92,6 +98,12 @@
       <Filter>manager</Filter>
     </ClCompile>
     <ClCompile Include="model\track.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="model\bonenode.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="model\bone.cpp">
       <Filter>model</Filter>
     </ClCompile>
   </ItemGroup>

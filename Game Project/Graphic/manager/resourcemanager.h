@@ -14,14 +14,14 @@ namespace graphic
 		
 		sRawMeshGroup* LoadModel( const string &fileName );
 		sRawMeshGroup* FindModel( const string &fileName );
-		sRawAni* FindAni( const string &fileName );
+		sRawAniGroup* FindAni( const string &fileName );
 		cTexture* LoadTexture( const string &fileName );
 		void Clear();
 
 
 	private:
 		map<string, sRawMeshGroup*> m_meshes; // key = fileName
-		map<string, sRawAni*> m_anies;	// key = fileName
+		map<string, sRawAniGroup*> m_anies;	// key = fileName
 		map<string, cTexture*> m_textures; // key = fileName
 	};
 

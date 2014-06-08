@@ -16,16 +16,17 @@
 
 namespace graphic { namespace importer {
 
-	bool ReadRawMeshFileV1( const string &fileName, OUT sRawMeshGroup &rawMesh );
-	bool ReadRawMeshFileV2( const string &fileName, OUT sRawMeshGroup &rawMesh );
-	bool ReadRawMeshFileV3( const string &fileName, OUT sRawMeshGroup &rawMesh, OUT sRawAni &rawAni );
-	bool ReadRawMeshFileV4( const string &fileName, OUT sRawMeshGroup &rawMesh, OUT sRawAni &rawAni );
+	bool ReadRawMeshFileV1( const string &fileName, OUT sRawMeshGroup &rawMeshes );
+	bool ReadRawMeshFileV2( const string &fileName, OUT sRawMeshGroup &rawMeshes );
+	bool ReadRawMeshFileV3( const string &fileName, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies );
+	bool ReadRawMeshFileV4( const string &fileName, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies );
 
 
 	bool ReadVertexIndexNormal( std::ifstream &fin, OUT sRawMesh &rawMesh );
 	bool ReadTextureCoordinate( std::ifstream &fin, const string &fileName, OUT sRawMesh &rawMesh );
 	bool ReadAnimation(std::ifstream &fin, OUT sRawMesh &rawMesh, OUT sRawAni &rawAni );
-	bool ReadBone(std::ifstream &fin, OUT sRawMeshGroup &rawMeshes, OUT sRawAni &rawAni );
+	bool ReadBone(std::ifstream &fin, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies );
+	bool ReadBoneInfo(std::ifstream &fin, OUT sRawMesh &rawMesh );
 	bool ReadTM(std::ifstream &fin, OUT sRawMesh &rawMesh );
 }}
 
@@ -35,7 +36,7 @@ using namespace importer;
 
 // load all exporter version
 bool importer::ReadRawMeshFile( const string &fileName, 
-	OUT sRawMeshGroup &rawMesh, OUT sRawAni &rawAni )
+	OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies )
 {
 	using namespace std;
 	ifstream fin(fileName.c_str());
@@ -47,19 +48,19 @@ bool importer::ReadRawMeshFile( const string &fileName,
 
 	if (version == "EXPORTER_V1")
 	{
-		return ReadRawMeshFileV1(fileName, rawMesh);
+		return ReadRawMeshFileV1(fileName, rawMeshes);
 	}
 	else if (version == "EXPORTER_V2")
 	{
-		return ReadRawMeshFileV2(fileName, rawMesh);
+		return ReadRawMeshFileV2(fileName, rawMeshes);
 	}
 	else if (version == "EXPORTER_V3")
 	{
-		return ReadRawMeshFileV3(fileName, rawMesh, rawAni);
+		return ReadRawMeshFileV3(fileName, rawMeshes, rawAnies);
 	}
 	else if (version == "EXPORTER_V4")
 	{
-		return ReadRawMeshFileV4(fileName, rawMesh, rawAni);
+		return ReadRawMeshFileV4(fileName, rawMeshes, rawAnies);
 	}
 	else
 	{
@@ -108,7 +109,7 @@ bool importer::ReadRawMeshFileV2( const string &fileName, OUT sRawMeshGroup &raw
 
 // load exporter version 3
 bool importer::ReadRawMeshFileV3( const string &fileName, 
-	OUT sRawMeshGroup &rawMeshes, OUT sRawAni &rawAni )
+	OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies )
 {
 	using namespace std;
 	ifstream fin(fileName.c_str());
@@ -121,14 +122,17 @@ bool importer::ReadRawMeshFileV3( const string &fileName,
 	rawMeshes.meshes.push_back( sRawMesh() );
 	ReadVertexIndexNormal(fin, rawMeshes.meshes.back());
 	ReadTextureCoordinate(fin, fileName, rawMeshes.meshes.back());
-	ReadAnimation(fin, rawMeshes.meshes.back(), rawAni);
+
+	rawAnies.anies.push_back( sRawAni() );
+	rawAnies.type = sRawAniGroup::MESH_ANI;
+	ReadAnimation(fin, rawMeshes.meshes.back(), rawAnies.anies.back());
 
 	return true;
 }
 
 
 bool importer::ReadRawMeshFileV4( const string &fileName, OUT sRawMeshGroup &rawMeshes, 
-	OUT sRawAni &rawAni )
+	OUT sRawAniGroup &rawAnies )
 {
 	using namespace std;
 	ifstream fin(fileName.c_str());
@@ -144,15 +148,19 @@ bool importer::ReadRawMeshFileV4( const string &fileName, OUT sRawMeshGroup &raw
 
 	rawMeshes.meshes.reserve(geomObjectCount);
 
+	rawAnies.type = sRawAniGroup::MESH_ANI;
+
 	for (int i=0; i < geomObjectCount; ++i)
 	{
 		rawMeshes.meshes.push_back( sRawMesh() );
 		ReadVertexIndexNormal(fin, rawMeshes.meshes.back());
 		ReadTextureCoordinate(fin, fileName, rawMeshes.meshes.back());
-		ReadAnimation(fin, rawMeshes.meshes.back(), rawAni);
+
+		rawAnies.anies.push_back( sRawAni() );
+		ReadAnimation(fin, rawMeshes.meshes.back(), rawAnies.anies.back());
 	}
 
-	ReadBone(fin, rawMeshes, rawAni);
+	ReadBone(fin, rawMeshes, rawAnies);
 
 	return true;
 }
@@ -425,7 +433,7 @@ bool importer::ReadAnimation(std::ifstream &fin, OUT sRawMesh &rawMesh, OUT sRaw
 
 
 // Bone 정보를 읽어온다.
-bool importer::ReadBone(std::ifstream &fin, OUT sRawMeshGroup &rawMeshes, OUT sRawAni &rawAni )
+bool importer::ReadBone(std::ifstream &fin, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies )
 {
 	string boneObject, eq;
 	int boneObjectCount;
@@ -433,13 +441,43 @@ bool importer::ReadBone(std::ifstream &fin, OUT sRawMeshGroup &rawMeshes, OUT sR
 
 	rawMeshes.bones.reserve(boneObjectCount);
 
+	if (boneObjectCount > 0)
+	{
+		rawAnies.type = sRawAniGroup::BONE_ANI;
+		rawAnies.anies.clear();
+	}
+
 	for (int i=0; i < boneObjectCount; ++i)
 	{
 		rawMeshes.bones.push_back( sRawMesh() );
 		ReadVertexIndexNormal(fin, rawMeshes.bones.back());
+		ReadBoneInfo(fin, rawMeshes.bones.back());
 		ReadTM(fin, rawMeshes.bones.back());
-		ReadAnimation(fin, rawMeshes.bones.back(), rawAni);
+
+		rawAnies.anies.push_back( sRawAni() );
+		ReadAnimation(fin, rawMeshes.bones.back(), rawAnies.anies.back());
 	}
+
+	return true;
+}
+
+
+// Bone 정보를 읽는다.
+bool importer::ReadBoneInfo(std::ifstream &fin, OUT sRawMesh &rawMesh )
+{
+	string cmd, eq, boneName;
+	int id, parentId;
+	fin >> cmd >> eq >> id;
+
+	fin >> cmd >> eq;
+	std::getline(fin, boneName);
+	boneName = common::trim(boneName);
+
+	fin >> cmd >> eq >> parentId;	
+
+	rawMesh.id = id;
+	rawMesh.parentId = parentId;
+	rawMesh.name = boneName;
 
 	return true;
 }

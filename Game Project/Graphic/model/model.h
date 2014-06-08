@@ -4,6 +4,7 @@
 namespace graphic
 {
 	class cNode;
+	class cBone;
 
 	class cModel
 	{
@@ -21,12 +22,9 @@ namespace graphic
 		const Matrix44& GetTM();
 
 
-	protected:
-		void LoadSkeletone(const sRawMeshGroup &rawMeshes);
-
-
 	private:
 		vector<cNode*> m_meshes;
+		cBone *m_bone;
 		Matrix44 m_matTM;
 	};
 

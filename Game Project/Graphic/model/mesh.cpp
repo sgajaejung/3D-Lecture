@@ -72,8 +72,9 @@ void cMesh::Render(const Matrix44 &parentTm)
 	m_vtxBuff.Bind();
 	m_idxBuff.Bind();
 
-	const Matrix44 tm = m_aniTM * m_tm * m_localTM * parentTm;
-	GetDevice()->MultiplyTransform( D3DTS_WORLD, (D3DXMATRIX*)&tm );
+	const Matrix44 tm = m_aniTM * m_TM * m_localTM * parentTm;
+	//GetDevice()->MultiplyTransform( D3DTS_WORLD, (D3DXMATRIX*)&tm );
+	GetDevice()->SetTransform( D3DTS_WORLD, (D3DXMATRIX*)&tm );
 	GetDevice()->DrawIndexedPrimitive( 
 		D3DPT_TRIANGLELIST, 0, 0, 
 		m_vtxBuff.GetVertexCount(), 0, m_idxBuff.GetFaceCount());

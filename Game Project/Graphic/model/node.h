@@ -23,6 +23,7 @@ namespace graphic
 		bool InsertChild(cNode *node);
 		cNode* FindNode(const int id);
 		bool RemoveNode(const int id);
+		vector<cNode*>& GetChildren();
 		void Clear();
 
 		virtual bool Move(const float elapseTime) {return true;}
@@ -37,16 +38,17 @@ namespace graphic
 		int m_materialId;
 		Matrix44 m_localTM;
 		Matrix44 m_aniTM;
-		Matrix44 m_tm;
+		Matrix44 m_TM;
 	};
 
 
 	inline int cNode::GetId() const { return m_id; }
 	inline cNode* cNode::GetParent() { return m_parent; }
 	inline int cNode::GetMaterialId() const { return m_materialId; }
-	inline const Matrix44& cNode::GetTM() const { return m_tm; }
-	inline void cNode::SetTM(const Matrix44 &tm) { m_tm = tm; }
+	inline const Matrix44& cNode::GetTM() const { return m_TM; }
+	inline void cNode::SetTM(const Matrix44 &tm) { m_TM = tm; }
 	inline const Matrix44& cNode::GetLocalTM() const { return m_localTM; }
 	inline void cNode::SetLocalTM(const Matrix44 &tm) { m_localTM = tm; }
+	inline vector<cNode*>& cNode::GetChildren() { return m_children; }
 
 }

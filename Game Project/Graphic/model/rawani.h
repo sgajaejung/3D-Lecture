@@ -35,4 +35,15 @@ namespace graphic
 		vector<sKeyScale> scale;
 	};
 
+
+	// 모델에서 하나의 애니메이션 정보를 저장하는 자료구조.
+	struct sRawAniGroup
+	{
+		enum ANITYPE { MESH_ANI, BONE_ANI };
+
+		ANITYPE type;
+		string name;		
+		vector<sRawAni> anies;
+	};
+
 }

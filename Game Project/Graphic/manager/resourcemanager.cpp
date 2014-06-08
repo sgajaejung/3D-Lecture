@@ -26,19 +26,19 @@ sRawMeshGroup* cResourceManager::LoadModel( const string &fileName )
 
 	sRawMeshGroup *meshes = new sRawMeshGroup;
 	meshes->name = fileName;
-	sRawAni *ani = new sRawAni;
-	ani->name = fileName;
+	sRawAniGroup *anies = new sRawAniGroup;
+	anies->name = fileName;
 
-	if (!importer::ReadRawMeshFile(fileName, *meshes, *ani))
+	if (!importer::ReadRawMeshFile(fileName, *meshes, *anies))
 	{
 		delete meshes;
-		delete ani;
+		delete anies;
 		return NULL;
 	}
 
 	// store
 	m_meshes[ fileName] = meshes;
-	m_anies[ fileName] = ani;
+	m_anies[ fileName] = anies;
 	return m_meshes[ fileName];
 }
 
@@ -54,7 +54,7 @@ sRawMeshGroup* cResourceManager::FindModel( const string &fileName )
 
 
 // find animation data
-sRawAni* cResourceManager::FindAni( const string &fileName )
+sRawAniGroup* cResourceManager::FindAni( const string &fileName )
 {
 	auto it = m_anies.find(fileName);
 	if (m_anies.end() == it)

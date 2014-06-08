@@ -12,11 +12,15 @@ namespace graphic
 		vector<Vector3> tex;
 		vector<int> indices;
 		string texturePath;
+		
+		int id; // only bone
+		int parentId; // only bone
 		Matrix44 localTm; // only bone
 		Matrix44 worldTm; // only bone
 	};
 
 
+	// 모델하나의 정보를 저장하는 자료구조.
 	struct sRawMeshGroup
 	{
 		string name;

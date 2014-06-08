@@ -8,7 +8,7 @@ namespace graphic
 	{
 
 		bool ReadRawMeshFile( const string &fileName, 
-			OUT sRawMeshGroup &raw, OUT sRawAni &rawAni );
+			OUT sRawMeshGroup &raw, OUT sRawAniGroup &rawAni );
 
 	}
 }

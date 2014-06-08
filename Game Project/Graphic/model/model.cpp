@@ -4,12 +4,14 @@
 #include "node.h"
 #include "../manager/resourcemanager.h"
 #include "mesh.h"
+#include "bone.h"
 
 
 using namespace graphic;
 
 
-cModel::cModel()
+cModel::cModel() :
+	m_bone(NULL)
 {
 	
 }
@@ -27,35 +29,20 @@ bool cModel::Create(const string &modelName)
 
 	Clear();
 
-	//LoadSkeletone(*rawMeshes);
-
 	BOOST_FOREACH (auto &mesh, rawMeshes->meshes)
 	{
 		cMesh *p = new cMesh(0, mesh);
-		if (sRawAni *rawAni = cResourceManager::Get()->FindAni(modelName))
+		if (sRawAniGroup *rawAnies = cResourceManager::Get()->FindAni(modelName))
 		{
-			p->LoadAnimation(*rawAni);
+			if (!rawAnies->anies.empty())
+				p->LoadAnimation(rawAnies->anies[0]);
 		}
 		m_meshes.push_back(p);
 	}
 
+	m_bone = new cBone(0, *rawMeshes);
+
 	return true;
-}
-
-
-// 뼈대 메쉬를 화면에 출력한다.
-void cModel::LoadSkeletone(const sRawMeshGroup &rawMeshes)
-{
-	BOOST_FOREACH (auto &bone, rawMeshes.bones)
-	{
-		cMesh *p = new cMesh(0, bone);
-
-		Matrix44 w = bone.worldTm;
-		Matrix44 iw = w.Inverse();
-		Matrix44 tm = iw;
-		p->SetLocalTM(tm);
-		m_meshes.push_back(p);
-	}
 }
 
 
@@ -63,6 +50,10 @@ bool cModel::Move(const float elapseTime)
 {
 	BOOST_FOREACH (auto node, m_meshes)
 		return node->Move(elapseTime);
+
+	if (m_bone)
+		m_bone->Move(elapseTime);
+
 	return true;
 }
 
@@ -74,6 +65,9 @@ void cModel::Render()
 
 	BOOST_FOREACH (auto node, m_meshes)
 		node->Render(m_matTM);
+
+	if (m_bone)
+		m_bone->Render(m_matTM);
 }
 
 
@@ -85,4 +79,6 @@ void cModel::Clear()
 		SAFE_DELETE(mesh);
 	}
 	m_meshes.clear();
+
+	SAFE_DELETE(m_bone);
 }
