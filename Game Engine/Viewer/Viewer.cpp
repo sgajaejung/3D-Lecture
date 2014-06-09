@@ -1,8 +1,12 @@
 
 #include "stdafx.h"
+#include "../wxMemMonitorLib/wxMemMonitor.h"
+MEMORYMONITOR_INNER_PROCESS();
 
 
+DECLARE_TYPE_NAME(cViewer)
 class cViewer : public framework::cGameMain
+						, public memmonitor::Monitor<cViewer, TYPE_NAME(cViewer)>
 {
 public:
 	cViewer();
