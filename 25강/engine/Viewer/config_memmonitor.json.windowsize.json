@@ -1,4 +1,12 @@
 {
-    "main window": "805 374 711 677",
-    "memory tree": "1 18 113 458"
+    "main window": "800 400 711 677",
+    "memory tree": "1 18 113 458",
+    "cViewer#1":
+    {
+        "m_mtrl":
+        {
+            "m_mtrl": "1476 85 474 400"
+        },
+        "m_camPos": "1490 492 400 400"
+    }
 }
