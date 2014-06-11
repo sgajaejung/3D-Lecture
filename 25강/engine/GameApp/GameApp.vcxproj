@@ -94,6 +94,9 @@
     <ProjectReference Include="..\Graphic\Graphic.vcxproj">
       <Project>{3a91e3aa-18df-4733-9f41-ed09a61f97e3}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\wxMemMonitorLib\compiler\vc10win32\wxMemMonitorLib.vcxproj">
+      <Project>{937b4bdb-2bc4-43de-9e32-ba36aee888eb}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

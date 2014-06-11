@@ -40,7 +40,7 @@ bool cModel::Create(const string &modelName)
 bool cModel::Move(const float elapseTime)
 {
 	BOOST_FOREACH (auto node, m_meshes)
-		return node->Move(elapseTime);
+		node->Move(elapseTime);
 	return true;
 }
 

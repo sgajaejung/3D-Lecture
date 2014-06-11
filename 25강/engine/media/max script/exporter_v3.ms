@@ -314,8 +314,8 @@ fn ExporterStart =
 
 	Outfile = createfile g_FilePath
 	
-	format "EXPORTER_V4\n" to:Outfile	
-
+	format "EXPORTER_V3\n" to:Outfile	
+	format "GEOMOBJECT_COUNT = %\n" g_varSetMeshes.count to:Outfile
 	for i=1 to g_varSetMeshes.count do
 	(
 		print g_varSetMeshes[i].name 

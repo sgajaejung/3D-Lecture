@@ -18,6 +18,7 @@ namespace graphic { namespace importer {
 
 	bool ReadRawMeshFileV1( const string &fileName, OUT sRawMeshGroup &rawMeshes );
 	bool ReadRawMeshFileV2( const string &fileName, OUT sRawMeshGroup &rawMeshes );
+	bool ReadRawMeshFileV3( const string &fileName, OUT sRawMeshGroup &rawMeshes );
 
 	bool ReadVertexIndexNormal( std::ifstream &fin, OUT sRawMesh &rawMesh );
 	bool ReadTextureCoordinate( std::ifstream &fin, const string &fileName, OUT sRawMesh &rawMesh );
@@ -49,7 +50,7 @@ bool importer::ReadRawMeshFile( const string &fileName,
 	}
 	else if (version == "EXPORTER_V3")
 	{
-		return ReadRawMeshFileV2(fileName, rawMeshes);
+		return ReadRawMeshFileV3(fileName, rawMeshes);
 	}
 	else
 	{
@@ -91,6 +92,35 @@ bool importer::ReadRawMeshFileV2( const string &fileName, OUT sRawMeshGroup &raw
 	rawMeshes.meshes.push_back( sRawMesh() );
 	ReadVertexIndexNormal(fin, rawMeshes.meshes.back());
 	ReadTextureCoordinate(fin, fileName, rawMeshes.meshes.back());
+
+	return true;
+}
+
+
+// load exporter version 3
+bool importer::ReadRawMeshFileV3( const string &fileName, 
+	OUT sRawMeshGroup &rawMeshes )
+{
+	using namespace std;
+	ifstream fin(fileName.c_str());
+	if (!fin.is_open())
+		return false;
+
+	string exporterVersion;
+	fin >> exporterVersion;
+
+	string geomObject, eq;
+	int geomObjectCount;
+	fin >> geomObject >> eq >> geomObjectCount;
+
+	rawMeshes.meshes.reserve(geomObjectCount);
+
+	for (int i=0; i < geomObjectCount; ++i)
+	{
+		rawMeshes.meshes.push_back( sRawMesh() );
+		ReadVertexIndexNormal(fin, rawMeshes.meshes.back());
+		ReadTextureCoordinate(fin, fileName, rawMeshes.meshes.back());
+	}
 
 	return true;
 }
