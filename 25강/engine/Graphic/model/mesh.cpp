@@ -52,7 +52,7 @@ void cMesh::Render(const Matrix44 &parentTm)
 	m_vtxBuff.Bind();
 	m_idxBuff.Bind();
 
-	const Matrix44 tm = m_aniTM * m_TM * m_localTM * parentTm;
+	const Matrix44 tm = m_localTM * m_aniTM * m_TM * parentTm;
 	GetDevice()->SetTransform( D3DTS_WORLD, (D3DXMATRIX*)&tm );
 	GetDevice()->DrawIndexedPrimitive( 
 		D3DPT_TRIANGLELIST, 0, 0, 
