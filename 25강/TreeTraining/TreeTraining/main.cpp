@@ -21,9 +21,9 @@ void print(sNode *node)
 	if (!node)
 		return;
 
-	cout << node->name << endl;
 	print(node->left);
 	print(node->right);
+	cout << node->name << endl;
 }
 
 void main()
