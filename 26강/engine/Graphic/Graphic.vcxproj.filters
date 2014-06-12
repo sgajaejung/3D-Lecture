@@ -49,6 +49,9 @@
     <ClInclude Include="model\rawani.h">
       <Filter>model</Filter>
     </ClInclude>
+    <ClInclude Include="model\track.h">
+      <Filter>model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -87,6 +90,9 @@
     </ClCompile>
     <ClCompile Include="manager\Renderer.cpp">
       <Filter>manager</Filter>
+    </ClCompile>
+    <ClCompile Include="model\track.cpp">
+      <Filter>model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
