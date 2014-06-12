@@ -33,7 +33,7 @@ ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
-void				print(HDC hdc, sNode *node, int x, int y);
+int				print(HDC hdc, sNode *node, int x, int y);
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -219,14 +219,21 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	return (INT_PTR)FALSE;
 }
 
-void print(HDC hdc, sNode *node, int x, int y)
+int print(HDC hdc, sNode *node, int x, int y)
 {
 	if (!node)
-		return;
+		return x - 50;
 
-	Ellipse(hdc, x, y, x+100, y+100);
-	TextOutA(hdc, x+50, y+50, node->name.c_str(), node->name.length() );
+	Ellipse(hdc, x, y, x+50, y+50);
+	TextOutA(hdc, x+20, y+20, node->name.c_str(), node->name.length() );
 
-	print(hdc, node->left, x - 200, y + 100 );
-	print(hdc, node->right, x + 200, y + 100 );
+	const int leftPos = print(hdc, node->left, x, y + 100 );
+
+	int rightPos = x + 100;
+	if (leftPos > rightPos)
+		rightPos = leftPos + 100;
+
+	int finalPos = print(hdc, node->right, rightPos, y + 100 );
+
+	return finalPos;
 }
