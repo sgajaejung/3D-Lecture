@@ -3,8 +3,6 @@
 
 namespace graphic
 {
-	class cBone;
-
 	class cModel
 	{
 	public:
@@ -23,7 +21,6 @@ namespace graphic
 
 	private:
 		vector<cNode*> m_meshes;
-		cBone *m_bone;
 		Matrix44 m_matTM;
 	};
 
