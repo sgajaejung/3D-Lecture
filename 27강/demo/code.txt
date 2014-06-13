@@ -1,0 +1,65 @@
+
+
+@@item 애니메이션 추가 --------------------------------------------
+
+
+@@item 1. 애니메이션 객체와 프레임 계산 변수 추가.
+		// animation
+		cTrack *m_track;
+		int m_aniStart;
+		int m_aniEnd;
+		int m_aniFrame;
+		float m_aniTime;
+
+
+@@item 2. 애니메이션 로딩 함수 선언
+		void LoadAnimation( const sRawAni &rawAni );
+
+
+@@item 3. 애니메이션 변수 초기화.
+,	m_track(NULL)
+,	m_aniTime(0)
+,	m_aniStart(0)
+,	m_aniEnd(0)
+,	m_aniFrame(0)
+
+
+@@item 4. 애니메이션 로딩함수 구현.
+// Load Animation
+void cMesh::LoadAnimation( const sRawAni &rawAni )
+{
+	SAFE_DELETE(m_track);
+
+	m_track = new cTrack(rawAni);
+	m_aniStart = (int)rawAni.start;
+	m_aniEnd = (int)rawAni.end;
+	m_aniFrame = (int)rawAni.start;
+}
+
+
+@@item 5. 애니메이션 행렬 적용.
+	RETV(!m_track, false);
+
+	//  프레임 단위로 변환한다.
+	m_aniTime += elapseTime;
+	m_aniFrame = (int)(m_aniTime * 30.f);
+
+	if (m_aniFrame > m_aniEnd)
+	{
+		m_aniTime = m_aniStart * 30.f;
+		m_aniFrame = m_aniStart;
+		m_track->InitAnimation();
+	}
+
+	m_aniTM.SetIdentity();
+	m_track->Move(m_aniFrame, m_aniTM);
+
+
+@@item 6. 애니메이션 로딩
+		if (sRawAniGroup *rawAnies = cResourceManager::Get()->FindAni(modelName))
+		{
+			if (!rawAnies->anies.empty())
+				p->LoadAnimation(rawAnies->anies[0]);
+		}
+
+
