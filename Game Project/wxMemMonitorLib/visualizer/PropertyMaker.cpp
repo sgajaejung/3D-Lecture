@@ -653,8 +653,17 @@ bool visualizer::MakePropertyGVisStmt( SGVis_Stmt *pGVis_stmt, const SMakerData 
 	SMakerData newMakerData = makerData;
 	newMakerData.alignGraph = (GVis_Horizontal==pGVis_stmt->kind)? GRAPH_ALIGN_HORZ : GRAPH_ALIGN_VERT; // save align type
 	newMakerData.symbol.isNotRelease = true;
-	//MakePropertyExpression(pGVis_stmt->expr, newMakerData);
-	MakePropertyStatements(pGVis_stmt->stmts, newMakerData, " ");
+
+	SVisDispDesc visDesc(makerData.propertyWindow, makerData.parentProperty, makerData.graphWindow, 
+		makerData.circle, makerData.alignGraph);
+	visDesc.alignGraph = newMakerData.alignGraph;
+	const SVisDispDesc parentVisDesc = MakeProperty_Dummy( visDesc, "-");
+
+	SMakerData childMakerData = newMakerData;
+	childMakerData.parentProperty = parentVisDesc.prop;
+	childMakerData.circle = parentVisDesc.circle;
+	childMakerData.alignGraph = newMakerData.alignGraph;
+	MakePropertyStatements(pGVis_stmt->stmts, childMakerData, "");
 	
 	return true;
 }

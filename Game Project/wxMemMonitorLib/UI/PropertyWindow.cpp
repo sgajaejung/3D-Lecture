@@ -79,7 +79,7 @@ void CPropertyWindow::UpdateSymbol( const wxString &symbolName )
 
 	std::string tmpStr = symbolName;
 	std::string str = ParseObjectName(tmpStr);
-	const bool result = visualizer::MakeProperty_DefaultForm(visualizer::SVisDispDesc(this,NULL), tmpStr, true, 2);
+	visualizer::MakeProperty_DefaultForm(visualizer::SVisDispDesc(this,NULL), tmpStr, true, 2);
 
 	// root node expand
 	wxPGVIterator it;
@@ -441,7 +441,7 @@ void CPropertyWindow::OnKeyDown(wxKeyEvent& event)
 		if (pRoot)
 		{
 			const std::string symbolName = m_CurrentSymbolName;
-			const bool result = visualizer::MakeProperty_DefaultForm(visualizer::SVisDispDesc(this,pRoot), symbolName, true, 2);
+			visualizer::MakeProperty_DefaultForm(visualizer::SVisDispDesc(this,pRoot), symbolName, true, 2);
 			Refresh();
 		}
 

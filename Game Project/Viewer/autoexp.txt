@@ -28,11 +28,10 @@ common::Matrix44|Matrix44|_D3DMATRIX{
 	graph
 	(
 		#(
-			#horz(
-				$e._11,
-				$e._12
-
-			)
+			#horz( $e._11, $e._12, $e._13, $e._14 ),
+			#horz( $e._21, $e._22, $e._23, $e._24 ),
+			#horz( $e._31, $e._32, $e._33, $e._34 ),
+			#horz( $e._41, $e._42, $e._43, $e._44 )
 		)
 
 	)
@@ -58,19 +57,11 @@ D3DMATERIAL9|_D3DMATERIAL9 {
 	graph
 	(
 		#(
-			#horz(
-				expr : $e.Diffuse
-			),
-			#horz(
-				expr : $e.Ambient
-			),
-			#horz(
-				expr : $e.Specular
-			),
-			#horz(
-				expr : $e.Emissive
-			),
-			power : $e.Power
+			#horz( $e.Diffuse ),
+			#horz( $e.Ambient ),
+			#horz( $e.Specular ),
+			#horz( $e.Emissive ),
+			$e.Power
 		)
 	)
 }
@@ -81,21 +72,11 @@ _D3DLIGHT9 | D3DLIGHT9 {
 	graph
 	(
 		#(
-			#horz(
-				expr : $e.Diffuse
-			),
-			#horz(
-				expr : $e.Ambient
-			),
-			#horz(
-				expr : $e.Specular
-			),
-			#horz(
-				expr : $e.Position
-			),
-			#horz(
-				expr : $e.Direction
-			)
+			#horz( $e.Diffuse ),
+			#horz( $e.Ambient ),
+			#horz( $e.Specular ),
+			#horz( $e.Position ),
+			#horz( $e.Direction )
 		)
 	)
 }

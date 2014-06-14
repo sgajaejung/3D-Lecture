@@ -138,9 +138,6 @@ void CGraphWindow::UpdateSymbol( const string &symbolName, const string &varName
 	GetLogWindow()->PrintText( "GVis UpdateSymbol = " +  symbolName  + "\n" );
 
 	visualizer::MakePropertyChild_DefaultForm( visualizer::SVisDispDesc(NULL, NULL, this, NULL), symbol, true, 2 );
-
-
-
 }
 
 
