@@ -4,6 +4,9 @@
 #include <MMSystem.h>
 #include "../window/utility.h"
 
+#include "../../wxMemMonitorLib/wxMemMonitor.h"
+MEMORYMONITOR_INNER_PROCESS();
+
 
 using namespace framework;
 
@@ -18,6 +21,11 @@ int framework::FrameWorkWinMain(HINSTANCE hInstance,
 	LPSTR lpCmdLine, 
 	int nCmdShow)
 {
+	if (!memmonitor::Init(memmonitor::INNER_PROCESS,hInstance,"config_memmonitor.json" ))
+	{
+		MessageBoxA(NULL, memmonitor::GetLastError().c_str(), "ERROR", MB_OK);
+	}
+
 	const HWND hWnd = InitWindow(hInstance, 
 		cGameMain::Get()->GetWindowName(), 
 		cGameMain::Get()->GetWindowRect(), 
@@ -33,6 +41,7 @@ int framework::FrameWorkWinMain(HINSTANCE hInstance,
 	cGameMain::Get()->Run();
 	cGameMain::Get()->ShutDown();
 	cGameMain::Release();
+	memmonitor::Cleanup();
 	return 0;
 }
 

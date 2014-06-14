@@ -8,6 +8,9 @@
 #include "../Common/common.h"
 using namespace common;
 
+#include "../wxMemMonitorLib/wxMemMonitor.h" // debug library
+
+
 
 #include "base/material.h"
 #include "base/light.h"

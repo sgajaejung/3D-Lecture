@@ -1,8 +1,11 @@
 
 #include "stdafx.h"
+#include "../wxMemMonitorLib/wxMemMonitor.h"
 
 
+DECLARE_TYPE_NAME(cViewer)
 class cViewer : public framework::cGameMain
+						, public memmonitor::Monitor<cViewer, TYPE_NAME(cViewer)>
 {
 public:
 	cViewer();
@@ -24,7 +27,7 @@ private:
 
 	graphic::cMaterial m_mtrl;
 	graphic::cTexture m_texture;
-	graphic::cModel m_model;
+	graphic::cModel *m_model;
 	
 	string m_filePath;
 
@@ -40,7 +43,8 @@ private:
 INIT_FRAMEWORK(cViewer);
 
 
-cViewer::cViewer()
+cViewer::cViewer() :
+	m_model(NULL)
 {
 	m_windowName = L"Viewer";
 	const RECT r = {0, 0, 800, 600};
@@ -51,6 +55,7 @@ cViewer::cViewer()
 
 cViewer::~cViewer()
 {
+	SAFE_DELETE(m_model);
 }
 
 
@@ -59,7 +64,8 @@ bool cViewer::OnInit()
 	DragAcceptFiles(m_hWnd, TRUE);
 
 	m_filePath = "../media/data.dat";
-	m_model.Create( m_filePath );
+	m_model = new graphic::cModel();
+	m_model->Create( m_filePath );
 
 	m_mtrl.InitWhite();
 
@@ -89,7 +95,7 @@ bool cViewer::OnInit()
 
 void cViewer::OnUpdate(const float elapseT)
 {
-	m_model.Move(elapseT);
+	m_model->Move(elapseT);
 }
 
 
@@ -112,8 +118,8 @@ void cViewer::OnRender(const float elapseT)
 		graphic::GetRenderer()->RenderGrid();
 		graphic::GetRenderer()->RenderAxis();
 
-		m_model.SetTM(m_rotateTm);
-		m_model.Render();
+		m_model->SetTM(m_rotateTm);
+		m_model->Render();
 
 		//랜더링 끝
 		graphic::GetDevice()->EndScene();
@@ -142,7 +148,7 @@ void cViewer::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 				return;// handle error...
 
 			m_filePath = filePath;
-			m_model.Create(filePath);
+			m_model->Create(filePath);
 		}
 		break;
 
@@ -171,13 +177,13 @@ void cViewer::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				if (m_filePath.empty())
 					return;
-				m_model.Create(m_filePath);
+				m_model->Create(m_filePath);
 			}
 			break;
 		case VK_BACK:
 			// 회전 행렬 초기화.
 			m_rotateTm.SetIdentity();
-			m_model.SetTM(m_rotateTm);
+			m_model->SetTM(m_rotateTm);
 			break;
 		case VK_TAB:
 			{

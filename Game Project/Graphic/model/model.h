@@ -5,7 +5,8 @@ namespace graphic
 {
 	class cBone;
 
-	class cModel
+	DECLARE_TYPE_NAME_SCOPE(graphic, cModel)
+	class cModel : public memmonitor::Monitor<cModel, TYPE_NAME(cModel)>
 	{
 	public:
 		cModel();

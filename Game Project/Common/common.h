@@ -38,8 +38,10 @@ typedef unsigned int    u_int;
 #include <string>
 #include <map>
 #include <vector>
+#include <list>
 #include <algorithm>
 #include <fstream>
+#include <sstream>
 #include <boost/foreach.hpp>
 
 using std::string;

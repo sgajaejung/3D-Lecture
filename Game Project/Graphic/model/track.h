@@ -4,7 +4,8 @@
 namespace graphic
 {
 
-	class cTrack
+	DECLARE_TYPE_NAME_SCOPE(graphic, cTrack)
+	class cTrack : public memmonitor::Monitor<cTrack, TYPE_NAME(cTrack)>
 	{
 	public:
 		cTrack(const sRawAni &rawAni);
