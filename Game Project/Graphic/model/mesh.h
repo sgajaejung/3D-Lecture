@@ -16,7 +16,7 @@ namespace graphic
 		void RenderBBox();
 
 
-	private:
+	protected:
 		bool m_isSkinned;
 		cMaterial m_mtrl;
 		cVertexBuffer m_vtxBuff;

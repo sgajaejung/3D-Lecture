@@ -10,13 +10,14 @@ cBone::cBone(const int id, const sRawMeshGroup &rawMeshes) :
 	m_root(NULL)
 ,	m_id(id)
 {
+	m_palette.resize(rawMeshes.bones.size());
 
 	vector<cBoneNode*> vec(rawMeshes.bones.size(), NULL);
 	for (u_int i=0; i < rawMeshes.bones.size(); ++i)
 	{
 		const int id = rawMeshes.bones[ i].id;
 		const int parentId = rawMeshes.bones[ i].parentId;
-		cBoneNode *bone = new cBoneNode(id, rawMeshes.bones[ i]);
+		cBoneNode *bone = new cBoneNode(id, m_palette, rawMeshes.bones[ i]);
 		SAFE_DELETE(vec[ id]);
 		vec[ id] = bone;
 
@@ -47,7 +48,7 @@ void cBone::SetAnimationRec( cBoneNode *node, const sRawAniGroup &rawAnies, int 
 	RET(!node);
 	RET(node->GetId() >= (int)rawAnies.anies.size());
 
-	node->SetAnimation( rawAnies.anies[ node->GetId()], nAniFrame );
+	node->SetAnimation( rawAnies.anies[ node->GetId()], nAniFrame, true );
 	BOOST_FOREACH (auto p, node->GetChildren())
 	{
 		SetAnimationRec((cBoneNode*)p, rawAnies, nAniFrame );
@@ -68,7 +69,7 @@ bool cBone::MoveRec( cBoneNode *node, const float elapseTime)
 	const bool reval = node->Move( elapseTime );
 	BOOST_FOREACH (auto p, node->GetChildren())
 		MoveRec((cBoneNode*)p, elapseTime );
-	return reval;
+	return true;
 }
 
 

@@ -6,10 +6,11 @@
 using namespace graphic;
 
 
-cBoneNode::cBoneNode(const int id, const sRawMesh &rawMesh) :
+cBoneNode::cBoneNode(const int id, vector<Matrix44> &palette, const sRawMesh &rawMesh) :
 	cNode(id)
 ,	m_track(NULL)
 ,	m_mesh(NULL)
+,	m_palette(palette)
 ,	m_aniStart(0)
 ,	m_aniEnd(0)
 ,	m_curPlayFrame(0)
@@ -84,6 +85,7 @@ bool cBoneNode::Move(const float elapseTime)
 		if (m_isLoop)
 		{
 			m_curPlayFrame = (int)(m_aniStart * 30.f);
+			m_curPlayTime = 0;
 			m_track->InitAnimation();
 		}
 		else
@@ -94,6 +96,7 @@ bool cBoneNode::Move(const float elapseTime)
 			if (ani_loop_end)
 			{
 				m_curPlayFrame = (int)(m_aniStart * 30.f);
+				m_curPlayTime = 0;
 
 				// 총 에니메이션이 끝나지 않았다면 에니메이션 정보를 처음으로 되돌린다.
 				// 총 에니메이션이 끝났다면 정보를 되돌리지 않고 마지막 프레임을 향하게 내버려둔다.
@@ -108,7 +111,6 @@ bool cBoneNode::Move(const float elapseTime)
 			}
 		}
 	}
-
 
 	m_aniTM.SetIdentity();
 
@@ -133,7 +135,7 @@ bool cBoneNode::Move(const float elapseTime)
 	if (m_parent)
 		m_accTM = m_accTM * ((cBoneNode*)m_parent)->m_accTM;
 
-	//m_pPalette[ m_id] = m_offset * m_accTM;
+	m_palette[ m_id] = m_offset * m_accTM;
 
 	//if (m_pBox)
 	//	m_pBox->SetWorldTM(&m_pPalette[ m_nId]);
@@ -145,13 +147,5 @@ bool cBoneNode::Move(const float elapseTime)
 void cBoneNode::Render(const Matrix44 &parentTm)
 {
 	RET(!m_mesh);
-
-	//Matrix44 mat = m_offset * m_accTM * parentTm;
-	//m_accTM = m_localTM * m_aniTM * m_tm;
-	//if (m_parent)
-	//	m_accTM = m_accTM * ((cBoneNode*)m_parent)->m_accTM;
-
-	//Matrix44 mat = m_offset * m_accTM * parentTm;
-	//m_mesh->SetTM(mat);
-	m_mesh->Render(parentTm);
+	m_mesh->Render(m_offset * m_accTM * parentTm);
 }

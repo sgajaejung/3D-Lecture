@@ -15,7 +15,7 @@ namespace graphic
 	{
 		int vtxIdx;
 		int size;
-		sWeight w[4];
+		sWeight w[6];
 	};
 	
 

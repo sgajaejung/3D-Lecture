@@ -18,6 +18,7 @@ namespace graphic
 
 
 	private:
+		const sRawMesh &m_rawMesh;
 		const vector<Matrix44> &m_palette;
 	};
 }

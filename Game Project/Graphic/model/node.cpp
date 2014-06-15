@@ -24,6 +24,7 @@ bool cNode::InsertChild(cNode *node)
 	RETV(!node, false);
 	RETV(FindNode(node->GetId()), false); // Already Exist
 	
+	node->m_parent = this;
 	m_children.push_back(node);
 	return true;
 }

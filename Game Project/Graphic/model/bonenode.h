@@ -7,7 +7,7 @@ namespace graphic
 	class cBoneNode : public cNode
 	{
 	public:
-		cBoneNode(const int id, const sRawMesh &rawMesh);
+		cBoneNode(const int id, vector<Matrix44> &palette, const sRawMesh &rawMesh);
 		virtual ~cBoneNode();
 
 		void SetAnimation( const sRawAni &rawAni, int nAniFrame, bool bLoop=false );
@@ -19,7 +19,7 @@ namespace graphic
 	private:
 		cTrack *m_track;
 		cMesh *m_mesh;
-		Matrix44 *m_pPalette;
+		vector<Matrix44> &m_palette;
 		Matrix44 m_accTM;	// 누적된 TM
 		Matrix44 m_offset;	// inverse( m_matWorld )
 		int m_aniStart; // 프래임 시작시간 (프레임)

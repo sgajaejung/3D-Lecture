@@ -210,10 +210,287 @@ Quaternion Matrix44::GetQuaternion() const
 }
 
 
+
+//---------------------------
+// Matrix44x4_Inverse
+//---------------------------
+static void Matrix4x4_Inverse( const float b[][4], float a[][4] )
+{
+	long	indxc[4], indxr[4], ipiv[4];
+	long	i = 0, icol = 0, irow = 0, j = 0, ir = 0, ic = 0;
+	float	big, dum, pivinv, temp, bb;
+
+	ipiv[0] = -1;
+	ipiv[1] = -1;
+	ipiv[2] = -1;
+	ipiv[3] = -1;
+
+	a[0][0] = b[0][0];
+	a[1][0] = b[1][0];
+	a[2][0] = b[2][0];
+	a[3][0] = b[3][0];
+
+	a[0][1] = b[0][1];
+	a[1][1] = b[1][1];
+	a[2][1] = b[2][1];
+	a[3][1] = b[3][1];
+
+	a[0][2] = b[0][2];
+	a[1][2] = b[1][2];
+	a[2][2] = b[2][2];
+	a[3][2] = b[3][2];
+
+	a[0][3] = b[0][3];
+	a[1][3] = b[1][3];
+	a[2][3] = b[2][3];
+	a[3][3] = b[3][3];
+
+	for (i = 0; i < 4; i++) {
+		big = 0.0f;
+		for (j = 0; j < 4; j++) {
+			if (ipiv[j] != 0) {
+				if (ipiv[0] == -1) {
+					if ((bb = ( float) fabs(a[j][0])) > big) {
+						big = bb;
+						irow = j;
+						icol = 0;
+					} //if
+				} else if (ipiv[0] > 0) {
+					return;
+				} //if..else if..
+				if (ipiv[1] == -1) {
+					if ((bb = ( float) fabs(( float) a[j][1])) > big) {
+						big = bb;
+						irow = j;
+						icol = 1;
+					} //if
+				} else if (ipiv[1] > 0) {
+					return;
+				} //if..else if..
+				if (ipiv[2] == -1) {
+					if ((bb = ( float) fabs(( float) a[j][2])) > big) {
+						big = bb;
+						irow = j;
+						icol = 2;
+					} //if
+				} else if (ipiv[2] > 0) {
+					return;
+				} //if..else if..
+				if (ipiv[3] == -1) {
+					if ((bb = ( float) fabs(( float) a[j][3])) > big) {
+						big = bb;
+						irow = j;
+						icol = 3;
+					} //if
+				} else if (ipiv[3] > 0) {
+					return;
+				} //if..else if..
+			} //if
+		} //for
+
+		++(ipiv[icol]);
+
+		if (irow != icol) {
+
+			temp = a[irow][0];
+			a[irow][0] = a[icol][0];
+			a[icol][0] = temp;
+
+			temp = a[irow][1];
+			a[irow][1] = a[icol][1];
+			a[icol][1] = temp;
+
+			temp = a[irow][2];
+			a[irow][2] = a[icol][2];
+			a[icol][2] = temp;
+
+			temp = a[irow][3];
+			a[irow][3] = a[icol][3];
+			a[icol][3] = temp;
+		} //if
+
+		indxr[i] = irow;
+		indxc[i] = icol;
+
+		if (a[icol][icol] == 0.0) {
+			return;
+		} //if
+
+		pivinv = 1.0f / a[icol][icol];
+		a[icol][icol] = 1.0f;
+		a[icol][0] *= pivinv;
+		a[icol][1] *= pivinv;
+		a[icol][2] *= pivinv;
+		a[icol][3] *= pivinv;
+
+		if (icol != 0) {
+			dum = a[0][icol];
+			a[0][icol] = 0.0f;
+			a[0][0] -= a[icol][0] * dum;
+			a[0][1] -= a[icol][1] * dum;
+			a[0][2] -= a[icol][2] * dum;
+			a[0][3] -= a[icol][3] * dum;
+		} //if
+		if (icol != 1) {
+			dum = a[1][icol];
+			a[1][icol] = 0.0f;
+			a[1][0] -= a[icol][0] * dum;
+			a[1][1] -= a[icol][1] * dum;
+			a[1][2] -= a[icol][2] * dum;
+			a[1][3] -= a[icol][3] * dum;
+		} //if
+		if (icol != 2) {
+			dum = a[2][icol];
+			a[2][icol] = 0.0f;
+			a[2][0] -= a[icol][0] * dum;
+			a[2][1] -= a[icol][1] * dum;
+			a[2][2] -= a[icol][2] * dum;
+			a[2][3] -= a[icol][3] * dum;
+		} //if
+		if (icol != 3) {
+			dum = a[3][icol];
+			a[3][icol] = 0.0f;
+			a[3][0] -= a[icol][0] * dum;
+			a[3][1] -= a[icol][1] * dum;
+			a[3][2] -= a[icol][2] * dum;
+			a[3][3] -= a[icol][3] * dum;
+		} //if
+	} //for
+	if (indxr[3] != indxc[3]) {
+		ir = indxr[3];
+		ic = indxc[3];
+
+		temp = a[0][ir];
+		a[0][ir] = a[0][ic];
+		a[0][ic] = temp;
+
+		temp = a[1][ir];
+		a[1][ir] = a[1][ic];
+		a[1][ic] = temp;
+
+		temp = a[2][ir];
+		a[2][ir] = a[2][ic];
+		a[2][ic] = temp;
+
+		temp = a[3][ir];
+		a[3][ir] = a[3][ic];
+		a[3][ic] = temp;
+	} //if
+	if (indxr[2] != indxc[2]) {
+		ir = indxr[2];
+		ic = indxc[2];
+
+		temp = a[0][ir];
+		a[0][ir] = a[0][ic];
+		a[0][ic] = temp;
+
+		temp = a[1][ir];
+		a[1][ir] = a[1][ic];
+		a[1][ic] = temp;
+
+		temp = a[2][ir];
+		a[2][ir] = a[2][ic];
+		a[2][ic] = temp;
+
+		temp = a[3][ir];
+		a[3][ir] = a[3][ic];
+		a[3][ic] = temp;
+	} //if
+	if (indxr[1] != indxc[1]) {
+		ir = indxr[1];
+		ic = indxc[1];
+
+		temp = a[0][ir];
+		a[0][ir] = a[0][ic];
+		a[0][ic] = temp;
+
+		temp = a[1][ir];
+		a[1][ir] = a[1][ic];
+		a[1][ic] = temp;
+
+		temp = a[2][ir];
+		a[2][ir] = a[2][ic];
+		a[2][ic] = temp;
+
+		temp = a[3][ir];
+		a[3][ir] = a[3][ic];
+		a[3][ic] = temp;
+	} //if
+	if (indxr[0] != indxc[0]) {
+		ir = indxr[0];
+		ic = indxc[0];
+
+		temp = a[0][ir];
+		a[0][ir] = a[0][ic];
+		a[0][ic] = temp;
+
+		temp = a[1][ir];
+		a[1][ir] = a[1][ic];
+		a[1][ic] = temp;
+
+		temp = a[2][ir];
+		a[2][ir] = a[2][ic];
+		a[2][ic] = temp;
+
+		temp = a[3][ir];
+		a[3][ir] = a[3][ic];
+		a[3][ic] = temp;
+	} //if
+} //Matrix44x4_Invert
+
+
 // 역행렬을 리턴한다.
 Matrix44 Matrix44::Inverse() const
 {
-	Matrix44 matInverse;
-	D3DXMatrixInverse((D3DXMATRIX*)&matInverse, 0, (D3DXMATRIX*)this);
+	//Matrix44 matInverse;
+	//D3DXMatrixInverse((D3DXMATRIX*)&matInverse, 0, (D3DXMATRIX*)this);
+	//return matInverse;
+
+	Matrix44		matInverse;
+
+	if( fabs( _44 - 1.0F ) > 0.001F )
+	{
+		Matrix4x4_Inverse( this->m, matInverse.m );
+		return matInverse;
+	} //if
+
+	if( fabs( _14 ) > 0.001F || fabs( _24 ) > 0.001F || fabs( _34 ) > 0.001F )
+	{
+		Matrix4x4_Inverse( this->m, matInverse.m );
+		return matInverse;
+	} //if
+
+	float det =   _11 * ( _22 * _33 - _23 * _32 )
+		- _12 * ( _21 * _33 - _23 * _31 )
+		+ _13 * ( _21 * _32 - _22 * _31 );
+
+	if( ABS( det ) < MATH_EPSILON )
+	{
+		Matrix4x4_Inverse( this->m, matInverse.m );
+		return matInverse;
+	} //if
+
+	det = 1.0F / det;
+
+	matInverse._11 =  det * ( _22 * _33 - _23 * _32 );
+	matInverse._12 = -det * ( _12 * _33 - _13 * _32 );
+	matInverse._13 =  det * ( _12 * _23 - _13 * _22 );
+	matInverse._14 = 0.0F;
+
+	matInverse._21 = -det * ( _21 * _33 - _23 * _31 );
+	matInverse._22 =  det * ( _11 * _33 - _13 * _31 );
+	matInverse._23 = -det * ( _11 * _23 - _13 * _21 );
+	matInverse._24 = 0.0F;
+
+	matInverse._31 =  det * ( _21 * _32 - _22 * _31 );
+	matInverse._32 = -det * ( _11 * _32 - _12 * _31 );
+	matInverse._33 =  det * ( _11 * _22 - _12 * _21 );
+	matInverse._34 = 0.0F;
+
+	matInverse._41 = -( _41 * matInverse._11 + _42 * matInverse._21 + _43 * matInverse._31 );
+	matInverse._42 = -( _41 * matInverse._12 + _42 * matInverse._22 + _43 * matInverse._32 );
+	matInverse._43 = -( _41 * matInverse._13 + _42 * matInverse._23 + _43 * matInverse._33 );
+	matInverse._44 = 1.0F;
+
 	return matInverse;
 }

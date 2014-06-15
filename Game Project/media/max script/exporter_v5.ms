@@ -283,14 +283,23 @@ fn CollectObject =
 		(
 			append g_varSetBones objects[i]
 		)
-		else if (dummy == (classof objects[i])) then
+		else if ( (dummy == (classof objects[i])) or 
+			(targetCamera ==  (classof objects[i])) or
+			(omniLight ==  (classof objects[i])) or
+			(targetObject ==  (classof objects[i]))
+				) then
 		(
 			-- dummy는 처리되지 않는다.
 			--print "dummy"
 			--print (objects[i].name)
 		)		
-		else
+		else if ((editable_mesh == (classof objects[i])) or 
+			(editable_poly == (classof objects[i])) or
+			(EditablePolyMesh  == (classof objects[i])) or
+			(PolyMeshObject  == (classof objects[i]))				
+			) then
 		(
+			print objects[i]
 			append g_varSetMeshes objects[i]
 		)
 	)
