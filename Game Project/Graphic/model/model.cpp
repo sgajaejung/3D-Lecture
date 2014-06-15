@@ -29,18 +29,41 @@ bool cModel::Create(const string &modelName)
 
 	Clear();
 
-	BOOST_FOREACH (auto &mesh, rawMeshes->meshes)
+	const bool isSkinnedMesh = !rawMeshes->bones.empty();
+
+	// 스키닝 애니메이션이면 Bone을 생성한다.
+	if (isSkinnedMesh)
 	{
-		cMesh *p = new cMesh(0, mesh);
+		m_bone = new cBone(0, *rawMeshes);
+
 		if (sRawAniGroup *rawAnies = cResourceManager::Get()->FindAni(modelName))
 		{
 			if (!rawAnies->anies.empty())
-				p->LoadAnimation(rawAnies->anies[0]);
+				m_bone->SetAnimation(*rawAnies, 0);
 		}
-		m_meshes.push_back(p);
 	}
 
-	m_bone = new cBone(0, *rawMeshes);
+	// 메쉬 생성.
+	BOOST_FOREACH (auto &mesh, rawMeshes->meshes)
+	{
+		cMesh *p = NULL;
+		if (isSkinnedMesh)
+		{
+			p = new cSkinnedMesh(0, m_bone->GetPalette(), mesh);
+		}
+		else
+		{
+			p = new cRigidMesh(0, mesh);
+			if (sRawAniGroup *rawAnies = cResourceManager::Get()->FindAni(modelName))
+			{
+				if (!rawAnies->anies.empty())
+					((cRigidMesh*)p)->LoadAnimation(rawAnies->anies[0]);
+			}
+		}
+
+		if (p)
+			m_meshes.push_back(p);
+	}
 
 	return true;
 }
@@ -49,7 +72,7 @@ bool cModel::Create(const string &modelName)
 bool cModel::Move(const float elapseTime)
 {
 	BOOST_FOREACH (auto node, m_meshes)
-		return node->Move(elapseTime);
+		node->Move(elapseTime);
 
 	if (m_bone)
 		m_bone->Move(elapseTime);

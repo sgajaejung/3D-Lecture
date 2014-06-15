@@ -24,6 +24,8 @@ using namespace common;
 #include "model/rawani.h"
 #include "model/track.h"
 #include "model/mesh.h"
+#include "model/rigidmesh.h"
+#include "model/skinnedmesh.h"
 #include "model/model.h"
 #include "manager/Renderer.h"
 

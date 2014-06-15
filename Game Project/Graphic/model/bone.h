@@ -15,6 +15,7 @@ namespace graphic
 		bool Move(const float elapseTime);
 		void Render(const Matrix44 &parentTm);
 		void Clear();	
+		vector<Matrix44>& GetPalette();
 
 
 	protected:
@@ -26,6 +27,9 @@ namespace graphic
 	private:
 		cBoneNode *m_root;
 		int m_id;
+		vector<Matrix44> m_palette;
 	};
 
+
+	inline vector<Matrix44>& cBone::GetPalette() { return m_palette; }
 }

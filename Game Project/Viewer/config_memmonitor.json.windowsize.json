@@ -1,14 +1,4 @@
 {
     "main window": "830 354 621 593",
-    "memory tree": "1 18 166 374",
-    "cViewer#1":
-    {
-        "m_rotateTm": "1987 350 531 375",
-        "m_camPos": "1348 643 400 400",
-        "m_curPos": "919 731 400 400",
-        "m_light":
-        {
-            "m_light": "1440 131 469 508"
-        }
-    }
+    "memory tree": "1 18 166 374"
 }
