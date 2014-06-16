@@ -20,6 +20,7 @@ namespace graphic
 		void SetTM(const Matrix44 &tm);
 		void MultiplyTM(const Matrix44 &tm);
 		const Matrix44& GetTM();
+		cBone* GetBone();
 
 
 	private:
@@ -32,4 +33,5 @@ namespace graphic
 	inline void cModel::SetTM(const Matrix44 &tm) { m_matTM = tm; }
 	inline void cModel::MultiplyTM(const Matrix44 &tm) { m_matTM *= tm; }
 	inline const Matrix44& cModel::GetTM() { return m_matTM; }
+	inline cBone* cModel::GetBone() { return m_bone; }
 }
