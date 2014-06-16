@@ -35,25 +35,15 @@ bool cModel::Create(const string &modelName)
 	if (isSkinnedMesh)
 	{
 		m_bone = new cBone(0, *rawMeshes);
-
-		if (sRawAniGroup *rawAnies = cResourceManager::Get()->FindAni(modelName))
-		{
-			if (!rawAnies->anies.empty())
-				m_bone->SetAnimation(*rawAnies, 0);
-		}
 	}
 
 	// 메쉬 생성.
 	BOOST_FOREACH (auto &mesh, rawMeshes->meshes)
 	{
-		cMesh *p = NULL;
-		if (isSkinnedMesh)
+		cMesh *p = new cRigidMesh(0, mesh);
+
+		if (!isSkinnedMesh)
 		{
-			p = new cSkinnedMesh(0, m_bone->GetPalette(), mesh);
-		}
-		else
-		{
-			p = new cRigidMesh(0, mesh);
 			if (sRawAniGroup *rawAnies = cResourceManager::Get()->FindAni(modelName))
 			{
 				if (!rawAnies->anies.empty())
@@ -61,8 +51,7 @@ bool cModel::Create(const string &modelName)
 			}
 		}
 
-		if (p)
-			m_meshes.push_back(p);
+		m_meshes.push_back(p);
 	}
 
 	return true;

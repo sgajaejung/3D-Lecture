@@ -61,9 +61,6 @@
     <ClInclude Include="model\rigidmesh.h">
       <Filter>model</Filter>
     </ClInclude>
-    <ClInclude Include="model\skinnedmesh.h">
-      <Filter>model</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -113,9 +110,6 @@
       <Filter>model</Filter>
     </ClCompile>
     <ClCompile Include="model\rigidmesh.cpp">
-      <Filter>model</Filter>
-    </ClCompile>
-    <ClCompile Include="model\skinnedmesh.cpp">
       <Filter>model</Filter>
     </ClCompile>
   </ItemGroup>
