@@ -126,54 +126,6 @@ fn FindObject name =
 )
 
 
--- 정의 : Biped나 IK사용시 키값을 추출하기 위해서 TM샘플링을 사용하고 있다.
---        이때, snapshot으로 임시 오브젝트를 생성하여 TM값을 샘플링(Sampling or Dump)한다.
-fn DumpObjects obj =
-(
-	origbiped = #()
-	snapset = #()
-
-	format "DumpObjects Root : %...\n" obj.name
-	a = "$'" + obj.name + "'"
-	select (execute (a + "...*"))
-	selectionSets ["OrigBiped"] = selection
-
-	for i in selection do 
-	(
-	    append origbiped i
-	    b = snapshot i name:(i.name as string + "_snap")
-	    b.parent = undefined
-	    b.transform = i.transform
-	    b.position.track = bezier_position()
-	    b.rotation.track = tcb_rotation()
-	    append snapset b
-	)
-	selectionSets ["Snapset"] = Snapset
-
-	for i in 1 to snapset.count do
-	(
-	    try
-	    ( 
-			snapset[i].parent = execute ("$'" + origbiped[i].parent.name + "_snap'")
-			snapset[i].position.track = bezier_position()
-	   	   	snapset[i].rotation.track = tcb_rotation()
-	    )
-	    catch()
-	)
-
-	animate on
-	undo off
-	for t = animationRange.start to animationRange.end by g_nSampling do at time t
-	(
-	    for i in 1 to Snapset.count do
-	    (
-	        snapset[i].transform = origbiped[i].transform
-	    )
-	)
-	
-	snapset
-)
-
 
 fn GetBoneId name =
 (
@@ -269,14 +221,23 @@ fn CollectObject =
 		(
 			append g_varSetBones objects[i]
 		)
-		else if (dummy == (classof objects[i])) then
+		else if ( (dummy == (classof objects[i])) or 
+			(targetCamera ==  (classof objects[i])) or
+			(omniLight ==  (classof objects[i])) or
+			(targetObject ==  (classof objects[i]))
+				) then
 		(
 			-- dummy는 처리되지 않는다.
-			print "dummy"
-			print (objects[i].name)
+			--print "dummy"
+			--print (objects[i].name)
 		)		
-		else
+		else if ((editable_mesh == (classof objects[i])) or 
+			(editable_poly == (classof objects[i])) or
+			(EditablePolyMesh  == (classof objects[i])) or
+			(PolyMeshObject  == (classof objects[i]))				
+			) then
 		(
+			print objects[i]
 			append g_varSetMeshes objects[i]
 		)
 	)
@@ -595,22 +556,10 @@ fn ExporterStart =
 		
 		-- Write Bone localTM, worldTM
 		WriteBoneTM g_varSetBones[ i] 
-		
-		
-		-- Write Animation
-		-- snapshot
-		DumpObjects g_varSetBones[ i] 
-		snapobj = FindObject (g_varSetBones[ i].name + "_snap")
-		if snapobj == undefined then 
-			continue
-		
-		WriteAni snapobj
+
 	)
 
 	
-	if $ != undefined then deselect $
-	select $'*snap'
-	delete selection	
 	close Outfile
 )
 
