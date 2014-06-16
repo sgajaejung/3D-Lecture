@@ -14,10 +14,6 @@
 
 	EXPORTER_V4
 	- vertex, index, normal, texture, animation, bone
-
-	EXPORTER_V5
-	- vertex, index, normal, texture, animation, bone, vertex weight
-
 */
 
 namespace graphic { namespace importer {
@@ -26,7 +22,6 @@ namespace graphic { namespace importer {
 	bool ReadRawMeshFileV2( const string &fileName, OUT sRawMeshGroup &rawMeshes );
 	bool ReadRawMeshFileV3( const string &fileName, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies );
 	bool ReadRawMeshFileV4( const string &fileName, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies );
-	bool ReadRawMeshFileV5( const string &fileName, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies );
 
 
 	bool ReadVertexIndexNormal( std::ifstream &fin, OUT sRawMesh &rawMesh );
@@ -35,7 +30,6 @@ namespace graphic { namespace importer {
 	bool ReadBone(std::ifstream &fin, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies );
 	bool ReadBoneInfo(std::ifstream &fin, OUT sRawMesh &rawMesh );
 	bool ReadTM(std::ifstream &fin, OUT sRawMesh &rawMesh );
-	bool ReadVertexWeight(std::ifstream &fin, OUT sRawMesh &rawMesh );
 }}
 
 using namespace graphic;
@@ -69,10 +63,6 @@ bool importer::ReadRawMeshFile( const string &fileName,
 	else if (version == "EXPORTER_V4")
 	{
 		return ReadRawMeshFileV4(fileName, rawMeshes, rawAnies);
-	}
-	else if (version == "EXPORTER_V5")
-	{
-		return ReadRawMeshFileV5(fileName, rawMeshes, rawAnies);
 	}
 	else
 	{
@@ -176,43 +166,6 @@ bool importer::ReadRawMeshFileV4( const string &fileName, OUT sRawMeshGroup &raw
 
 	return true;
 }
-
-
-bool importer::ReadRawMeshFileV5( const string &fileName, OUT sRawMeshGroup &rawMeshes, 
-	OUT sRawAniGroup &rawAnies )
-{
-	using namespace std;
-	ifstream fin(fileName.c_str());
-	if (!fin.is_open())
-		return false;
-
-	string exporterVersion;
-	fin >> exporterVersion;
-
-	string geomObject, eq;
-	int geomObjectCount;
-	fin >> geomObject >> eq >> geomObjectCount;
-
-	rawMeshes.meshes.reserve(geomObjectCount);
-
-	rawAnies.type = sRawAniGroup::MESH_ANI;
-
-	for (int i=0; i < geomObjectCount; ++i)
-	{
-		rawMeshes.meshes.push_back( sRawMesh() );
-		ReadVertexIndexNormal(fin, rawMeshes.meshes.back());
-		ReadTextureCoordinate(fin, fileName, rawMeshes.meshes.back());
-
-		rawAnies.anies.push_back( sRawAni() );
-		ReadAnimation(fin, rawMeshes.meshes.back(), rawAnies.anies.back());
-		ReadVertexWeight(fin, rawMeshes.meshes.back());
-	}
-
-	ReadBone(fin, rawMeshes, rawAnies);
-
-	return true;
-}
-
 
 
 // Read Vertex, Index, Normal Buffer
@@ -563,41 +516,3 @@ bool importer::ReadTM(std::ifstream &fin, OUT sRawMesh &rawMesh )
 
 	return true;
 }
-
-
-// 스킨애니메이션 버텍스 가중치 정보를 읽어서 저장한다.
-bool importer::ReadVertexWeight(std::ifstream &fin, OUT sRawMesh &rawMesh )
-{
-	string id, eq;
-	int vtxWeightCount;
-	fin >> id >> eq >> vtxWeightCount; //  VERTEXWEIGHT_COUNT = 0
-
-	rawMesh.weights.reserve(vtxWeightCount);
-
-	for (int i=0; i < vtxWeightCount; ++i)
-	{
-		int vtxIdx, size;
-		fin >> id >> eq >> vtxIdx >> size; // VTXWEIGHT_VERTEX_COUNT = 0 2
-		
-		sVertexWeight vtxWeight;
-		for (int k=0; k < size; ++k)
-		{
-			int bone;
-			float w;
-			fin >> bone >> w;
-
-			sWeight weight;
-			weight.bone = bone;
-			weight.weight = w;
-			if (k < 6)
-				vtxWeight.w[ k] = weight;
-		}
-
-		vtxWeight.vtxIdx = vtxIdx;
-		vtxWeight.size = min(size, 6);
-		rawMesh.weights.push_back(vtxWeight);
-	}
-
-	return true;
-}
-
