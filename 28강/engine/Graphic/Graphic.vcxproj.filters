@@ -52,13 +52,13 @@
     <ClInclude Include="model\rawani.h">
       <Filter>model</Filter>
     </ClInclude>
-    <ClInclude Include="model\bonenode.h">
+    <ClInclude Include="model\rigidmesh.h">
       <Filter>model</Filter>
     </ClInclude>
     <ClInclude Include="model\bone.h">
       <Filter>model</Filter>
     </ClInclude>
-    <ClInclude Include="model\rigidmesh.h">
+    <ClInclude Include="model\bonenode.h">
       <Filter>model</Filter>
     </ClInclude>
   </ItemGroup>
@@ -68,9 +68,6 @@
       <Filter>model</Filter>
     </ClCompile>
     <ClCompile Include="model\mesh.cpp">
-      <Filter>model</Filter>
-    </ClCompile>
-    <ClCompile Include="model\model.cpp">
       <Filter>model</Filter>
     </ClCompile>
     <ClCompile Include="base\DxInit.cpp">
@@ -94,23 +91,26 @@
     <ClCompile Include="manager\resourcemanager.cpp">
       <Filter>manager</Filter>
     </ClCompile>
-    <ClCompile Include="importer\modelimporter.cpp">
-      <Filter>importer</Filter>
-    </ClCompile>
     <ClCompile Include="manager\Renderer.cpp">
       <Filter>manager</Filter>
     </ClCompile>
     <ClCompile Include="model\track.cpp">
       <Filter>model</Filter>
     </ClCompile>
-    <ClCompile Include="model\bonenode.cpp">
+    <ClCompile Include="model\rigidmesh.cpp">
       <Filter>model</Filter>
     </ClCompile>
     <ClCompile Include="model\bone.cpp">
       <Filter>model</Filter>
     </ClCompile>
-    <ClCompile Include="model\rigidmesh.cpp">
+    <ClCompile Include="model\bonenode.cpp">
       <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="model\model.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="importer\modelimporter.cpp">
+      <Filter>importer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

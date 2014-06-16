@@ -457,6 +457,9 @@ bool importer::ReadBone(std::ifstream &fin, OUT sRawMeshGroup &rawMeshes, OUT sR
 		ReadVertexIndexNormal(fin, rawMeshes.bones.back());
 		ReadBoneInfo(fin, rawMeshes.bones.back());
 		ReadTM(fin, rawMeshes.bones.back());
+
+		rawAnies.anies.push_back( sRawAni() );
+		ReadAnimation(fin, rawMeshes.bones.back(), rawAnies.anies.back());
 	}
 
 	return true;
