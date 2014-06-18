@@ -38,21 +38,8 @@ cBone::~cBone()
 // 에니메이션 설정.
 void cBone::SetAnimation( const sRawAniGroup &rawAnies, int nAniFrame )
 {
-	SetAnimationRec( m_root, rawAnies, nAniFrame );
-}
-
-
-// 애니메이션 설정.
-void cBone::SetAnimationRec( cBoneNode *node, const sRawAniGroup &rawAnies, int nAniFrame )
-{
-	RET(!node);
-	RET(node->GetId() >= (int)rawAnies.anies.size());
-
-	node->SetAnimation( rawAnies.anies[ node->GetId()], nAniFrame, true );
-	BOOST_FOREACH (auto p, node->GetChildren())
-	{
-		SetAnimationRec((cBoneNode*)p, rawAnies, nAniFrame );
-	}
+	RET(!m_root);
+	m_root->SetAnimation( rawAnies, nAniFrame, true );
 }
 
 
@@ -60,7 +47,7 @@ void cBone::SetAnimationRec( cBoneNode *node, const sRawAniGroup &rawAnies, int 
 bool cBone::Move(const float elapseTime)
 {
 	RETV(!m_root, false);
-	m_root->Move(elapseTime);
+	return m_root->Move(elapseTime);
 }
 
 

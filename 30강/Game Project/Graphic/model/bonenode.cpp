@@ -36,18 +36,21 @@ cBoneNode::~cBoneNode()
 
 
 // 애니메이션 설정.
-void cBoneNode::SetAnimation( const sRawAni &rawAni, int nAniFrame, bool bLoop)
+void cBoneNode::SetAnimation( const sRawAniGroup &rawAnies, int nAniFrame, bool bLoop)
 {
+	RET(GetId() >= (int)rawAnies.anies.size());
+	const sRawAni &ani = rawAnies.anies[ GetId()];
+
 	int aniend = 0;
 	if (0 == nAniFrame)
 	{
-		m_totalPlayTime = (int)rawAni.end;
-		aniend = (int)rawAni.end;
+		m_totalPlayTime = (int)ani.end;
+		aniend = (int)ani.end;
 	}
 	else
 	{
 		m_totalPlayTime = nAniFrame;
-		aniend = (int)rawAni.end;
+		aniend = (int)ani.end;
 	}
 
 	m_aniStart = 0;
@@ -60,7 +63,15 @@ void cBoneNode::SetAnimation( const sRawAni &rawAni, int nAniFrame, bool bLoop)
 	m_curPlayFrame = 0;
 
 	SAFE_DELETE(m_track)
-	m_track = new cTrack(rawAni);
+	m_track = new cTrack(ani);
+
+
+	// child setting
+	BOOST_FOREACH (auto p, GetChildren())
+	{
+		((cBoneNode*)p)->SetAnimation(rawAnies, nAniFrame, bLoop);
+	}
+
 }
 
 
@@ -117,7 +128,7 @@ bool cBoneNode::Move(const float elapseTime)
 	m_track->Move( m_curPlayFrame, m_aniTM );
 
 	m_accTM = m_localTM * m_aniTM * m_TM;
-	/*
+
 	// 만약 pos키값이 없으면 local TM의 좌표를 사용한다
 	if( m_aniTM._41 == 0.0f && m_aniTM._42 == 0.0f && m_aniTM._43 == 0.0f )
 	{
@@ -154,7 +165,4 @@ void cBoneNode::Render(const Matrix44 &parentTm)
 
 	BOOST_FOREACH (auto p, GetChildren())
 		p->Render(parentTm);
-
-
-//		RenderRec((cBoneNode*)p, parentTm );
 }

@@ -18,10 +18,6 @@ namespace graphic
 		vector<Matrix44>& GetPalette();
 
 
-	protected:
-		void SetAnimationRec( cBoneNode *node, const sRawAniGroup &rawAni, int nAniFrame );
-
-
 	private:
 		cBoneNode *m_root;
 		int m_id;

@@ -10,7 +10,7 @@ namespace graphic
 		cBoneNode(const int id, vector<Matrix44> &palette, const sRawMesh &rawMesh);
 		virtual ~cBoneNode();
 
-		void SetAnimation( const sRawAni &rawAni, int nAniFrame, bool bLoop=false );
+		void SetAnimation( const sRawAniGroup &rawAnies, int nAniFrame, bool bLoop=false );
 		const Matrix44& GetAccTM() const;
 		virtual bool Move(const float elapseTime) override;
 		virtual void Render(const Matrix44 &parentTm) override;
