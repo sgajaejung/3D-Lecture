@@ -337,7 +337,7 @@ bool importer::ReadTextureCoordinate( std::ifstream &fin, const string &fileName
 			vtxIdxMap[ i] = varray;
 		}
 
-/*
+
 		// 텍스쳐 좌표를 버텍스 버퍼에 저장한다. 
 		// 버텍스 버퍼의 uv 값이 초기화 되지 않았다면, 초기화 한다.
 		// 버텍스에 하나 이상의 uv값이 존재한다면, 버텍스를 추가하고, 인덱스버퍼를 수정한다.

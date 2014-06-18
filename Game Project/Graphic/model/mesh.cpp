@@ -16,6 +16,8 @@ cMesh::cMesh(const int id, const sRawMesh &raw) :
 		{
 			vertices[ i].p = raw.vertices[ i];
 			vertices[ i].n = raw.normals[ i];
+			vertices[ i].u = raw.tex[ i].x;
+			vertices[ i].v = raw.tex[ i].y;
 		}
 		m_vtxBuff.Unlock();
 	}

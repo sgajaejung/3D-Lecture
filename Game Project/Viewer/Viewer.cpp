@@ -63,9 +63,11 @@ bool cViewer::OnInit()
 {
 	DragAcceptFiles(m_hWnd, TRUE);
 
-	m_filePath = "../media/data.dat";
+	m_filePath = "../media/cube.dat";
 	m_model = new graphic::cModel();
 	m_model->Create( m_filePath );
+	//m_texture.Create("../media/001 copy.jpg");
+	m_texture.Create("../media/강소라.jpg");
 
 	m_mtrl.InitWhite();
 
@@ -119,6 +121,7 @@ void cViewer::OnRender(const float elapseT)
 		graphic::GetRenderer()->RenderAxis();
 
 		m_model->SetTM(m_rotateTm);
+		m_texture.Bind(0);
 		m_model->Render();
 
 		//랜더링 끝
