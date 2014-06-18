@@ -6,6 +6,7 @@ global g_nSampling = 10 -- »ùÇÃ¸µ °£°Ý (default = 1)
 
 global g_varSetMeshes = #()
 global g_varSetBones = #()
+global g_varSetMaterials = #()
 
 
 -- [MAX quaterion]            [D3D quaternion]
@@ -304,6 +305,77 @@ fn CollectObject =
 		)
 	)
 		
+)
+
+
+fn CollectMaterial = 
+(
+	temp = standard()
+	Append g_varSetMaterials temp
+
+	for i=1 to objects.count do
+	(
+		if objects[i].material == undefined do continue
+
+		if classof objects[i].material == standardmaterial then
+		(
+			Append g_varSetMaterials objects[i].material
+		)
+
+		if classof objects[i].material == multimaterial then
+		(
+			for j=1 to objects[i].material.count do
+			(
+				Append g_varSetMaterials objects[i].material[j]
+			)
+		)
+	)
+
+	varSetMaterials
+)
+
+
+fn WriteMaterial = 
+(
+	format "MATERIALGROUP %\n" g_varSetMaterials.count to:Outfile
+
+	for i=1 to g_varSetMaterials.count do
+	(
+		format "MATERIAL %\n" (i-1) to:Outfile
+
+		format "DIFFUSE % % % 1\n"  (g_varSetMaterials[i].Diffuse.r/255) (g_varSetMaterials[i].Diffuse.g/255) (g_varSetMaterials[i].Diffuse.b/255) to:Outfile
+		format "AMBIENT % % % 1\n"  (g_varSetMaterials[i].Ambient.r/255) (g_varSetMaterials[i].Ambient.g/255) (g_varSetMaterials[i].Ambient.b/255) to:Outfile
+		format "SPECULAR % % % 1\n" (g_varSetMaterials[i].Specular.r/255) (g_varSetMaterials[i].Specular.g/255) (g_varSetMaterials[i].Specular.b/255) to:Outfile
+		format "EMISSIVE % % % 0\n" (g_varSetMaterials[i].Diffuse.r/255) (g_varSetMaterials[i].Diffuse.g/255) (g_varSetMaterials[i].Diffuse.b/255) to:Outfile
+		format "POWER %\n"  g_varSetMaterials[i].SpecularLevel to:Outfile
+
+		-- Diffuse Map
+		if g_varSetMaterials[i].DiffuseMap != undefined then
+		(
+			format "TEXTURE %\n" g_varSetMaterials[i].DiffuseMap.filename to:Outfile
+		)
+	)
+)
+
+
+fn GetObjectMaterialId obj =
+(
+	if classOf obj.material == UndefinedClass then
+	(
+		return 0
+	)
+	
+	if classOf obj.material == Standardmaterial then
+	(
+		for i=1 to g_varSetMaterials.count do
+		(
+			if obj.material == g_varSetMaterials[i] then
+			(
+				return i
+			)
+		)
+	)
+	return 0
 )
 
 
@@ -732,11 +804,17 @@ fn WriteVertexWeightFromSkin obj =
 fn ExporterStart = 
 (
 	CollectObject()
+	CollectMaterial()
 
 	Outfile = createfile g_FilePath
 	
 	format "EXPORTER_V5\n" to:Outfile	
-
+	
+	
+	-- Write Material
+	print "---------- Write Material ----------"
+	WriteMaterial()
+	
 	
 	-- Write Geometric Mesh
 	print "---------- Write Geometric ----------"
