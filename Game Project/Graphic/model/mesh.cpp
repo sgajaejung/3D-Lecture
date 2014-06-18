@@ -9,6 +9,8 @@ cMesh::cMesh(const int id, const sRawMesh &raw) :
 	cNode(id)
 {
 	// 버텍스 버퍼 생성.
+	const bool isTexture = !raw.tex.empty();
+
 	if (m_vtxBuff.Create(raw.vertices.size(), sizeof(sVertexNormTex), sVertexNormTex::FVF))
 	{
 		sVertexNormTex* vertices = (sVertexNormTex*)m_vtxBuff.Lock();
@@ -16,8 +18,11 @@ cMesh::cMesh(const int id, const sRawMesh &raw) :
 		{
 			vertices[ i].p = raw.vertices[ i];
 			vertices[ i].n = raw.normals[ i];
-			vertices[ i].u = raw.tex[ i].x;
-			vertices[ i].v = raw.tex[ i].y;
+			if (isTexture)
+			{
+				vertices[ i].u = raw.tex[ i].x;
+				vertices[ i].v = raw.tex[ i].y;
+			}
 		}
 		m_vtxBuff.Unlock();
 	}

@@ -63,11 +63,11 @@ bool cViewer::OnInit()
 {
 	DragAcceptFiles(m_hWnd, TRUE);
 
-	m_filePath = "../media/cube.dat";
+	m_filePath = "../media/data.dat";
 	m_model = new graphic::cModel();
 	m_model->Create( m_filePath );
-	//m_texture.Create("../media/001 copy.jpg");
-	m_texture.Create("../media/강소라.jpg");
+	m_texture.Create("../media/001 copy.jpg");
+	//m_texture.Create("../media/강소라.jpg");
 
 	m_mtrl.InitWhite();
 
@@ -83,7 +83,7 @@ bool cViewer::OnInit()
 	const int WINSIZE_X = 1024;		//초기 윈도우 가로 크기
 	const int WINSIZE_Y = 768;	//초기 윈도우 세로 크기
 	Matrix44 proj;
-	proj.SetProjection(D3DX_PI * 0.5f, (float)WINSIZE_X / (float) WINSIZE_Y, 1.f, 1000.0f) ;
+	proj.SetProjection(D3DX_PI / 4.f, (float)WINSIZE_X / (float) WINSIZE_Y, 1.f, 1000.0f) ;
 	graphic::GetDevice()->SetTransform(D3DTS_PROJECTION, (D3DXMATRIX*)&proj) ;
 
 

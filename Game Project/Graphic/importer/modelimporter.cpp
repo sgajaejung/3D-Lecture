@@ -308,6 +308,7 @@ bool importer::ReadTextureCoordinate( std::ifstream &fin, const string &fileName
 		{
 			fin >> fnum1 >> fnum2;
 			texVertices[ i] = Vector3(fnum1, fnum2, 0);
+			rawMesh.tex[ i] = Vector3(fnum1, fnum2, 0);
 		}
 
 		string strTexFace;
@@ -327,7 +328,7 @@ bool importer::ReadTextureCoordinate( std::ifstream &fin, const string &fileName
 				texFaces.push_back( num3 );
 			}
 		}
-
+/*
 		map<int, vector<int> > vtxIdxMap; // vertex index, vertex index array
 		for (int i=0; i < vtxSize; ++i)
 		{

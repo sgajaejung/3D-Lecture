@@ -310,18 +310,41 @@ fn CollectObject =
 fn CollectVertex obj = 
 (
 	varSetVertex= #()
-	for i=1 to obj.numverts do
+	
+	if (obj.numTVerts >= obj.numVerts) then
 	(
-		v = getvert obj i
-		append varSetVertex v
+		for i=1 to obj.numTVerts do
+		(
+			vnt = getvert obj 1
+			append varSetVertex vnt
+		)
+		
+		for i=1 to obj.faces.count do
+		(
+			local tvfaceidx = getTVFace obj i
+			local faceidx = getFace obj i
+
+			varSetVertex[ tvfaceidx[ 1]] = copy (getvert obj faceidx[ 1])
+			varSetVertex[ tvfaceidx[ 2]] = copy (getvert obj faceidx[ 2])
+			varSetVertex[ tvfaceidx[ 3]] = copy (getvert obj faceidx[ 3])
+		)
 	)
+	else
+	(
+		for i=1 to obj.numverts do
+		(
+			v = getvert obj i
+			append varSetVertex v
+		)
+	)
+	
 	varSetVertex
 )
 
 
 fn CollectNormals obj = 
 (
-	varSetNormal = #()
+	varSetNormal = #()	
 	for i=1 to obj.numfaces do
 	(
 		local normal = normalize (getFaceNormal obj i)
@@ -334,11 +357,25 @@ fn CollectNormals obj =
 fn CollectIndex obj = 
 (
 	varSetIndex = #()
-	for i=1 to obj.numfaces do
+	
+
+	if (obj.numTVerts >= obj.numVerts) then
 	(
-		v = copy (getface obj i)
-		append varSetIndex v
+		for i=1 to obj.numfaces do
+		(
+			local v = copy (getTVFace obj i)
+			append varSetIndex v
+		)
 	)
+	else
+	(
+		for i=1 to obj.numfaces do
+		(
+			local v = copy (getface obj i)
+			append varSetIndex v
+		)
+	)
+	
 	varSetIndex
 )
 
@@ -618,7 +655,43 @@ fn CollectVertexWeightFromSkin obj =
 
 
 	setVarRet = #()
-	setVarRet = setVarPhysique
+	undo on
+	(
+		ConvertToMesh obj
+
+		if (obj.numTVerts >= obj.numVerts) then
+		(
+			for i=1 to obj.numTVerts do
+			(
+				local phys = PHYSIQDATA #()
+				append setVarRet phys
+			)
+
+			for i=1 to obj.faces.count do
+			(
+				local tvfaceidx = getTVFace obj i
+				local faceidx = getFace obj i
+				
+				phys1 = copy (setVarPhysique[ faceidx[ 1]])
+				phys1.vtxidx = tvfaceidx[ 1]
+				setVarRet[ tvfaceidx[ 1]] = phys1
+
+				phys2 = copy (setVarPhysique[ faceidx[ 2]])
+				phys2.vtxidx = tvfaceidx[ 2]
+				setVarRet[ tvfaceidx[ 2]] = phys2
+
+				phys3 = copy (setVarPhysique[ faceidx[ 3]])
+				phys3.vtxidx = tvfaceidx[ 3]
+				setVarRet[ tvfaceidx[ 3]] = phys3
+			)
+		)
+		else
+		(
+			setVarRet = setVarPhysique
+		)
+	)
+	max undo	
+	--setVarRet = setVarPhysique
 
 	setVarRet		
 )
