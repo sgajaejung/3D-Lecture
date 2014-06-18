@@ -117,7 +117,7 @@ bool cBoneNode::Move(const float elapseTime)
 	m_track->Move( m_curPlayFrame, m_aniTM );
 
 	m_accTM = m_localTM * m_aniTM * m_TM;
-
+	/*
 	// 만약 pos키값이 없으면 local TM의 좌표를 사용한다
 	if( m_aniTM._41 == 0.0f && m_aniTM._42 == 0.0f && m_aniTM._43 == 0.0f )
 	{
@@ -131,7 +131,7 @@ bool cBoneNode::Move(const float elapseTime)
 		m_accTM._42 = m_aniTM._42;
 		m_accTM._43 = m_aniTM._43;
 	}
-
+	/**/
 	if (m_parent)
 		m_accTM = m_accTM * ((cBoneNode*)m_parent)->m_accTM;
 
@@ -139,6 +139,9 @@ bool cBoneNode::Move(const float elapseTime)
 
 	//if (m_pBox)
 	//	m_pBox->SetWorldTM(&m_pPalette[ m_nId]);
+
+	BOOST_FOREACH (auto p, GetChildren())
+		p->Move( elapseTime );
 
 	return true;
 }
@@ -148,4 +151,10 @@ void cBoneNode::Render(const Matrix44 &parentTm)
 {
 	RET(!m_mesh);
 	//m_mesh->Render(m_offset * m_accTM * parentTm);
+
+	BOOST_FOREACH (auto p, GetChildren())
+		p->Render(parentTm);
+
+
+//		RenderRec((cBoneNode*)p, parentTm );
 }
