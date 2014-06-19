@@ -21,8 +21,8 @@ cSkinnedMesh::~cSkinnedMesh()
 
 void cSkinnedMesh::Render(const Matrix44 &parentTm)
 {
-	ApplyPalette();
-	cMesh::Render(parentTm);
+	//ApplyPalette();
+	//cMesh::Render(parentTm);
 }
 
 

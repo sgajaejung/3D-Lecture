@@ -337,7 +337,7 @@ fn CollectMaterial =
 
 fn WriteMaterial = 
 (
-	format "MATERIALGROUP %\n" g_varSetMaterials.count to:Outfile
+	format "MATERIALGROUP = %\n" g_varSetMaterials.count to:Outfile
 
 	for i=1 to g_varSetMaterials.count do
 	(
@@ -353,6 +353,10 @@ fn WriteMaterial =
 		if g_varSetMaterials[i].DiffuseMap != undefined then
 		(
 			format "TEXTURE %\n" g_varSetMaterials[i].DiffuseMap.filename to:Outfile
+		)
+		else
+		(
+			format "TEXTURE  \n"  to:Outfile
 		)
 	)
 )
@@ -808,7 +812,7 @@ fn ExporterStart =
 
 	Outfile = createfile g_FilePath
 	
-	format "EXPORTER_V5\n" to:Outfile	
+	format "EXPORTER_V6\n" to:Outfile
 	
 	
 	-- Write Material

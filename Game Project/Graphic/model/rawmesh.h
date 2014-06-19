@@ -4,6 +4,16 @@
 namespace graphic
 {
 
+	struct sMaterial
+	{
+		Vector4 ambient;
+		Vector4 diffuse;
+		Vector4 specular;
+		Vector4 emissive;
+		float power;
+		string texture;
+	};
+
 	struct sWeight
 	{
 		int bone;
@@ -40,6 +50,7 @@ namespace graphic
 	struct sRawMeshGroup
 	{
 		string name;
+		vector<sMaterial> mtrls;
 		vector<sRawMesh> meshes;
 		vector<sRawMesh> bones;
 	};

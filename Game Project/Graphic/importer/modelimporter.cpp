@@ -27,6 +27,7 @@ namespace graphic { namespace importer {
 	bool ReadRawMeshFileV3( const string &fileName, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies );
 	bool ReadRawMeshFileV4( const string &fileName, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies );
 	bool ReadRawMeshFileV5( const string &fileName, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies );
+	bool ReadRawMeshFileV6( const string &fileName, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies );
 
 
 	bool ReadVertexIndexNormal( std::ifstream &fin, OUT sRawMesh &rawMesh );
@@ -36,6 +37,7 @@ namespace graphic { namespace importer {
 	bool ReadBoneInfo(std::ifstream &fin, OUT sRawMesh &rawMesh );
 	bool ReadTM(std::ifstream &fin, OUT sRawMesh &rawMesh );
 	bool ReadVertexWeight(std::ifstream &fin, OUT sRawMesh &rawMesh );
+	bool ReadMaterial(std::ifstream &fin, const string &fileName, OUT sMaterial &mtrl);
 }}
 
 using namespace graphic;
@@ -73,6 +75,10 @@ bool importer::ReadRawMeshFile( const string &fileName,
 	else if (version == "EXPORTER_V5")
 	{
 		return ReadRawMeshFileV5(fileName, rawMeshes, rawAnies);
+	}
+	else if (version == "EXPORTER_V6")
+	{
+		return ReadRawMeshFileV6(fileName, rawMeshes, rawAnies);
 	}
 	else
 	{
@@ -213,6 +219,52 @@ bool importer::ReadRawMeshFileV5( const string &fileName, OUT sRawMeshGroup &raw
 	return true;
 }
 
+
+bool importer::ReadRawMeshFileV6( const string &fileName, OUT sRawMeshGroup &rawMeshes, 
+	OUT sRawAniGroup &rawAnies )
+{
+	using namespace std;
+	ifstream fin(fileName.c_str());
+	if (!fin.is_open())
+		return false;
+
+	string exporterVersion;
+	fin >> exporterVersion;
+
+	string material, eq;
+	int mtrlCount;
+	fin >> material >> eq >> mtrlCount;
+
+	rawMeshes.mtrls.resize(mtrlCount);
+
+	for (int i=0; i < mtrlCount; ++i)
+	{
+		ReadMaterial(fin, fileName, rawMeshes.mtrls[ i]);
+	}
+
+	string geomObject;
+	int geomObjectCount;
+	fin >> geomObject >> eq >> geomObjectCount;
+
+	rawMeshes.meshes.reserve(geomObjectCount);
+
+	rawAnies.type = sRawAniGroup::MESH_ANI;
+
+	for (int i=0; i < geomObjectCount; ++i)
+	{
+		rawMeshes.meshes.push_back( sRawMesh() );
+		ReadVertexIndexNormal(fin, rawMeshes.meshes.back());
+		ReadTextureCoordinate(fin, fileName, rawMeshes.meshes.back());
+
+		rawAnies.anies.push_back( sRawAni() );
+		ReadAnimation(fin, rawMeshes.meshes.back(), rawAnies.anies.back());
+		ReadVertexWeight(fin, rawMeshes.meshes.back());
+	}
+
+	ReadBone(fin, rawMeshes, rawAnies);
+
+	return true;
+}
 
 
 // Read Vertex, Index, Normal Buffer
@@ -602,3 +654,36 @@ bool importer::ReadVertexWeight(std::ifstream &fin, OUT sRawMesh &rawMesh )
 	return true;
 }
 
+
+// 매터리얼 정보 로딩.
+bool importer::ReadMaterial(std::ifstream &fin, const string &fileName, OUT sMaterial &mtrl)
+{
+	string id, eq;
+
+	int idx;
+	fin >> id >> idx;
+
+	Vector4 v;
+	fin >> id >> v.x >> v.y >> v.z >> v.w;
+	mtrl.diffuse = v;
+	fin >> id >> v.x >> v.y >> v.z >> v.w;
+	mtrl.ambient = v;
+	fin >> id >> v.x >> v.y >> v.z >> v.w;
+	mtrl.specular = v;
+	fin >> id >> v.x >> v.y >> v.z >> v.w;
+	mtrl.emissive = v;
+
+	float f;
+	fin >> id >> f;
+	mtrl.power = f;
+
+	string textureTok, texFilePath;
+	fin >> textureTok; // TEXTURE
+
+	std::getline(fin, texFilePath);
+	string  textureFileName = common::GetFilePathExceptFileName(fileName) + "\\" + 
+		common::trim(texFilePath);
+	mtrl.texture = textureFileName;
+
+	return true;
+}
