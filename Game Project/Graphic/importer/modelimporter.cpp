@@ -30,10 +30,10 @@ namespace graphic { namespace importer {
 	bool ReadRawMeshFileV6( const string &fileName, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies );
 
 
-	bool ReadVertexIndexNormal( std::ifstream &fin, OUT sRawMesh &rawMesh );
+	bool ReadVertexIndexNormal( std::ifstream &fin, OUT sRawMesh &rawMesh, bool flag=false );
 	bool ReadTextureCoordinate( std::ifstream &fin, const string &fileName, OUT sRawMesh &rawMesh );
 	bool ReadAnimation(std::ifstream &fin, OUT sRawMesh &rawMesh, OUT sRawAni &rawAni );
-	bool ReadBone(std::ifstream &fin, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies );
+	bool ReadBone(std::ifstream &fin, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies, bool flag=false );
 	bool ReadBoneInfo(std::ifstream &fin, OUT sRawMesh &rawMesh );
 	bool ReadTM(std::ifstream &fin, OUT sRawMesh &rawMesh );
 	bool ReadVertexWeight(std::ifstream &fin, OUT sRawMesh &rawMesh );
@@ -253,7 +253,7 @@ bool importer::ReadRawMeshFileV6( const string &fileName, OUT sRawMeshGroup &raw
 	for (int i=0; i < geomObjectCount; ++i)
 	{
 		rawMeshes.meshes.push_back( sRawMesh() );
-		ReadVertexIndexNormal(fin, rawMeshes.meshes.back());
+		ReadVertexIndexNormal(fin, rawMeshes.meshes.back(), true);
 		ReadTextureCoordinate(fin, fileName, rawMeshes.meshes.back());
 
 		rawAnies.anies.push_back( sRawAni() );
@@ -261,7 +261,7 @@ bool importer::ReadRawMeshFileV6( const string &fileName, OUT sRawMeshGroup &raw
 		ReadVertexWeight(fin, rawMeshes.meshes.back());
 	}
 
-	ReadBone(fin, rawMeshes, rawAnies);
+	ReadBone(fin, rawMeshes, rawAnies, true);
 
 	return true;
 }
@@ -269,11 +269,17 @@ bool importer::ReadRawMeshFileV6( const string &fileName, OUT sRawMeshGroup &raw
 
 // Read Vertex, Index, Normal Buffer
 // Normal 은 face 갯수만큼 존재해야 한다.
-bool importer::ReadVertexIndexNormal( std::ifstream &fin, OUT sRawMesh &rawMesh )
+bool importer::ReadVertexIndexNormal( std::ifstream &fin, OUT sRawMesh &rawMesh, bool flag )
 {
 	string vtx, eq;
 	int vtxSize;
 	fin >> vtx >> eq >> vtxSize;
+	if (flag)
+	{
+		int materialId;
+		fin >> materialId;
+		rawMesh.mtrlId = materialId;
+	}
 
 	if (vtxSize <= 0)
 		return  false;
@@ -537,7 +543,7 @@ bool importer::ReadAnimation(std::ifstream &fin, OUT sRawMesh &rawMesh, OUT sRaw
 
 
 // Bone 정보를 읽어온다.
-bool importer::ReadBone(std::ifstream &fin, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies )
+bool importer::ReadBone(std::ifstream &fin, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies, bool flag )
 {
 	string boneObject, eq;
 	int boneObjectCount;
@@ -554,7 +560,7 @@ bool importer::ReadBone(std::ifstream &fin, OUT sRawMeshGroup &rawMeshes, OUT sR
 	for (int i=0; i < boneObjectCount; ++i)
 	{
 		rawMeshes.bones.push_back( sRawMesh() );
-		ReadVertexIndexNormal(fin, rawMeshes.bones.back());
+		ReadVertexIndexNormal(fin, rawMeshes.bones.back(), flag);
 		ReadBoneInfo(fin, rawMeshes.bones.back());
 		ReadTM(fin, rawMeshes.bones.back());
 

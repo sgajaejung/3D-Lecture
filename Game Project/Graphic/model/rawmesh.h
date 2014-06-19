@@ -37,6 +37,7 @@ namespace graphic
 		vector<Vector3> tex;
 		vector<int> indices;
 		vector<sVertexWeight> weights;
+		int mtrlId;
 		string texturePath;
 		
 		int id; // only bone

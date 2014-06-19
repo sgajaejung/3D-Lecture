@@ -308,6 +308,28 @@ fn CollectObject =
 )
 
 
+fn GetMtrlId obj =
+(
+	if classOf obj.material == UndefinedClass then
+	(
+		return 0
+	)
+	
+	if classOf obj.material == Standardmaterial then
+	(
+		for i=1 to g_varSetMaterials.count do
+		(
+			if obj.material == g_varSetMaterials[i] then
+			(
+				return (i as integer)
+			)
+		)
+	)
+	
+	return 0
+)
+
+
 fn CollectMaterial = 
 (
 	temp = standard()
@@ -359,27 +381,6 @@ fn WriteMaterial =
 			format "TEXTURE  \n"  to:Outfile
 		)
 	)
-)
-
-
-fn GetObjectMaterialId obj =
-(
-	if classOf obj.material == UndefinedClass then
-	(
-		return 0
-	)
-	
-	if classOf obj.material == Standardmaterial then
-	(
-		for i=1 to g_varSetMaterials.count do
-		(
-			if obj.material == g_varSetMaterials[i] then
-			(
-				return i
-			)
-		)
-	)
-	return 0
 )
 
 
@@ -460,7 +461,7 @@ fn WriteVertex obj =
 (
 	varSetVertice = CollectVertex obj
 
-	format "VERTEX = %\n" varSetVertice.count to:Outfile
+	format "VERTEX = % %\n" varSetVertice.count ((GetMtrlId obj)-1) to:Outfile
 	for i=1 to varSetVertice.count do
 	(
 		vtx = (ConvertToD3D_POS varSetVertice[ i]) 
