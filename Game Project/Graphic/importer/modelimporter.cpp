@@ -18,6 +18,9 @@
 	EXPORTER_V5
 	- vertex, index, normal, texture, animation, bone, vertex weight
 
+	EXPORTER_V6
+	- vertex, index, normal, texture, animation, bone, vertex weight, material
+
 */
 
 namespace graphic { namespace importer {
