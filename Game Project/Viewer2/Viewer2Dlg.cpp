@@ -241,4 +241,3 @@ void CViewer2Dlg::OnBnClickedCheckWireframe()
 	graphic::GetDevice()->SetRenderState(D3DRS_FILLMODE, !m_WireFrame? D3DFILL_SOLID : D3DFILL_WIREFRAME);
 }
 
-

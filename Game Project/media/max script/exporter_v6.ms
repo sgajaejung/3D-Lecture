@@ -2,7 +2,7 @@
 global Outfile -- 盪濰腆 file
 global g_FilePath
 global g_fEpsilon = 0.0001
-global g_nSampling = 10 -- 價Ы葭 除問 (default = 1)
+global g_nSampling = 1 -- 價Ы葭 除問 (default = 1)
 
 global g_varSetMeshes = #()
 global g_varSetBones = #()

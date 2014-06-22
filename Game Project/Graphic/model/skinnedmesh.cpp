@@ -21,8 +21,8 @@ cSkinnedMesh::~cSkinnedMesh()
 
 void cSkinnedMesh::Render(const Matrix44 &parentTm)
 {
-	//ApplyPalette();
-	//cMesh::Render(parentTm);
+	ApplyPalette();
+	cMesh::Render(parentTm);
 }
 
 
@@ -35,12 +35,15 @@ void cSkinnedMesh::ApplyPalette()
 	{
 		const int vtxIdx = weight.vtxIdx;
 		vertices[ vtxIdx].p = Vector3(0,0,0);
+		vertices[ vtxIdx].n = Vector3(0,0,0);
 
 		for( int k=0; k < weight.size; ++k )
 		{
 			const sWeight *w = &weight.w[ k];
 			Vector3 v = m_rawMesh.vertices[ vtxIdx] * m_palette[ w->bone];
+			Vector3 n = m_rawMesh.normals[ vtxIdx].MultiplyNormal( m_palette[ w->bone] );
 			vertices[ vtxIdx].p += v * w->weight;
+			vertices[ vtxIdx].n += n * w->weight;
 		}
 	}
 

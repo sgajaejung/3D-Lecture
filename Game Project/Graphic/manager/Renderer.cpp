@@ -68,12 +68,18 @@ void cRenderer::RenderAxis()
 	if (m_axis.empty())
 		MakeAxis(500.f,  D3DXCOLOR(1,0,0,0),  D3DXCOLOR(0,1,0,0),  D3DXCOLOR(0,0,1,0), m_axis);
 
+
+	// 가장 위에 출력되기 위해서 zbuffer 를 끈다.
+	graphic::GetDevice()->SetRenderState(D3DRS_ZENABLE, 0);
+
 	m_pDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
 	Matrix44 identity;
 	m_pDevice->SetTransform( D3DTS_WORLD, (D3DXMATRIX*)&identity );
 	m_pDevice->SetFVF( sVertexDiffuse::FVF );
 	m_pDevice->DrawPrimitiveUP( D3DPT_LINELIST, 3, &m_axis[0], sizeof(sVertexDiffuse) );
 	m_pDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
+
+	graphic::GetDevice()->SetRenderState(D3DRS_ZENABLE, 1);
 }
 
 

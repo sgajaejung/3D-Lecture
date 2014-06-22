@@ -316,6 +316,7 @@ bool importer::ReadVertexIndexNormal( std::ifstream &fin, OUT sRawMesh &rawMesh,
 		}
 	}
 
+	// 법선 벡터를 읽어온다.
 	string norm;
 	int numNormal;
 	fin >> norm >> eq >> numNormal;
@@ -324,7 +325,6 @@ bool importer::ReadVertexIndexNormal( std::ifstream &fin, OUT sRawMesh &rawMesh,
 	if (numNormal > 0)
 	{
 		float num1, num2, num3;
-		vector<int> vertCount(vtxSize, 0);
 		for (int i = 0; i < numNormal; i++)
 		{
 			fin >> num1 >> num2 >> num3;
@@ -335,15 +335,11 @@ bool importer::ReadVertexIndexNormal( std::ifstream &fin, OUT sRawMesh &rawMesh,
 			{
 				const int vtxIdx = rawMesh.indices[ i*3 + k];
 				rawMesh.normals[ vtxIdx] += n;
-				++vertCount[ vtxIdx];
 			}
 		}
 
 		for (int i=0; i < vtxSize; ++i)
-		{
-			rawMesh.normals[ i] /= (float)vertCount[ i];
 			rawMesh.normals[ i].Normalize();
-		}
 	}
 
 	return true;

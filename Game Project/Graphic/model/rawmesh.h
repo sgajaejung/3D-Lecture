@@ -33,7 +33,7 @@ namespace graphic
 	{
 		string name;
 		vector<Vector3> vertices;
-		vector<Vector3> normals;
+		vector<Vector3> normals; // vertex 갯수만큼 저장된다.
 		vector<Vector3> tex;
 		vector<int> indices;
 		vector<sVertexWeight> weights;
