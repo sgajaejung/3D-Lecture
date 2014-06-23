@@ -69,6 +69,7 @@ void CMfcControlDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LIST1, m_ListBox);
 	DDX_Control(pDX, IDC_STATIC_PICKTURE, m_Picture);
 	DDX_Radio(pDX, IDC_RADIO1, m_Radio1);
+	DDX_Control(pDX, IDC_SPIN1, m_Spin);
 }
 
 BEGIN_MESSAGE_MAP(CMfcControlDlg, CDialogEx)
@@ -81,6 +82,7 @@ BEGIN_MESSAGE_MAP(CMfcControlDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_RADIO1, &CMfcControlDlg::OnBnClickedRadio1)
 	ON_BN_CLICKED(IDC_RADIO2, &CMfcControlDlg::OnBnClickedRadio2)
 	ON_BN_CLICKED(IDC_RADIO3, &CMfcControlDlg::OnBnClickedRadio3)
+	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN1, &CMfcControlDlg::OnDeltaposSpin1)
 END_MESSAGE_MAP()
 
 
@@ -134,6 +136,7 @@ BOOL CMfcControlDlg::OnInitDialog()
 	CRect cr;
 	m_Picture.GetWindowRect(cr);	
 
+	m_Spin.SetRange(100, 200);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -238,4 +241,19 @@ void CMfcControlDlg::OnBnClickedRadio2()
 void CMfcControlDlg::OnBnClickedRadio3()
 {
 	
+}
+
+
+void CMfcControlDlg::OnDeltaposSpin1(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData();
+
+	pNMUpDown->iDelta; // change value
+	pNMUpDown->iPos; // current pos
+	int p = m_Spin.GetPos32();
+	int b = m_Spin.GetBase();
+
+	*pResult = 0;
 }

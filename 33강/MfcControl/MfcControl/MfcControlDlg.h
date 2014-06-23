@@ -4,6 +4,7 @@
 
 #pragma once
 #include "afxwin.h"
+#include "afxcmn.h"
 
 
 // CMfcControlDlg 대화 상자
@@ -44,4 +45,6 @@ public:
 	afx_msg void OnBnClickedRadio2();
 	afx_msg void OnBnClickedRadio3();
 	BOOL m_Radio1;
+	afx_msg void OnDeltaposSpin1(NMHDR *pNMHDR, LRESULT *pResult);
+	CSpinButtonCtrl m_Spin;
 };
