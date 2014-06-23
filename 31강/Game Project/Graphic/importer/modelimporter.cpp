@@ -269,7 +269,8 @@ bool importer::ReadRawMeshFileV6( const string &fileName, OUT sRawMeshGroup &raw
 
 // Read Vertex, Index, Normal Buffer
 // Normal 은 face 갯수만큼 존재해야 한다.
-bool importer::ReadVertexIndexNormal( std::ifstream &fin, OUT sRawMesh &rawMesh, bool flag )
+bool importer::ReadVertexIndexNormal( std::ifstream &fin, OUT sRawMesh &rawMesh, 
+	bool flag )
 {
 	string vtx, eq;
 	int vtxSize;
