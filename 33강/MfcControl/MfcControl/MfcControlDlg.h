@@ -47,4 +47,10 @@ public:
 	BOOL m_Radio1;
 	afx_msg void OnDeltaposSpin1(NMHDR *pNMHDR, LRESULT *pResult);
 	CSpinButtonCtrl m_Spin;
+	CSliderCtrl m_Slider;
+	afx_msg void OnNMCustomdrawSlider1(NMHDR *pNMHDR, LRESULT *pResult);
+	CTreeCtrl m_Tree;
+	afx_msg void OnSelchangingTree1(NMHDR *pNMHDR, LRESULT *pResult);
+	CTabCtrl m_Tab;
+	afx_msg void OnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult);
 };

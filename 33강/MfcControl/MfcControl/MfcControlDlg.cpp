@@ -70,6 +70,9 @@ void CMfcControlDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_PICKTURE, m_Picture);
 	DDX_Radio(pDX, IDC_RADIO1, m_Radio1);
 	DDX_Control(pDX, IDC_SPIN1, m_Spin);
+	DDX_Control(pDX, IDC_SLIDER1, m_Slider);
+	DDX_Control(pDX, IDC_TREE1, m_Tree);
+	DDX_Control(pDX, IDC_TAB1, m_Tab);
 }
 
 BEGIN_MESSAGE_MAP(CMfcControlDlg, CDialogEx)
@@ -83,6 +86,9 @@ BEGIN_MESSAGE_MAP(CMfcControlDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_RADIO2, &CMfcControlDlg::OnBnClickedRadio2)
 	ON_BN_CLICKED(IDC_RADIO3, &CMfcControlDlg::OnBnClickedRadio3)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN1, &CMfcControlDlg::OnDeltaposSpin1)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER1, &CMfcControlDlg::OnNMCustomdrawSlider1)
+	ON_NOTIFY(TVN_SELCHANGING, IDC_TREE1, &CMfcControlDlg::OnSelchangingTree1)
+	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB1, &CMfcControlDlg::OnSelchangeTab1)
 END_MESSAGE_MAP()
 
 
@@ -137,6 +143,19 @@ BOOL CMfcControlDlg::OnInitDialog()
 	m_Picture.GetWindowRect(cr);	
 
 	m_Spin.SetRange(100, 200);
+
+	m_Slider.SetRange(0, 500);
+
+
+	HTREEITEM hParent = m_Tree.InsertItem(L"Parent");
+	m_Tree.InsertItem(L"Child1", hParent);
+	m_Tree.InsertItem(L"Child2", hParent);
+	HTREEITEM hChild =  m_Tree.InsertItem(L"Child3", hParent);
+	m_Tree.InsertItem(L"Child4", hChild);
+
+	m_Tab.InsertItem(0, L"Tab1" );
+	m_Tab.InsertItem(1, L"Tab2" );
+	m_Tab.InsertItem(2, L"Tab3" );
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -254,6 +273,38 @@ void CMfcControlDlg::OnDeltaposSpin1(NMHDR *pNMHDR, LRESULT *pResult)
 	pNMUpDown->iPos; // current pos
 	int p = m_Spin.GetPos32();
 	int b = m_Spin.GetBase();
+
+	*pResult = 0;
+}
+
+
+void CMfcControlDlg::OnNMCustomdrawSlider1(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+
+	int p = m_Slider.GetPos();
+
+	*pResult = 0;
+}
+
+
+void CMfcControlDlg::OnSelchangingTree1(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+
+	HTREEITEM hItem = pNMTreeView->itemNew.hItem;
+	CString str = m_Tree.GetItemText(hItem);	
+	AfxMessageBox(str);
+	*pResult = 0;
+}
+
+
+void CMfcControlDlg::OnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	int sel = m_Tab.GetCurSel();
 
 	*pResult = 0;
 }
