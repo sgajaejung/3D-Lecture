@@ -6,6 +6,8 @@
 #include "MiniFrame.h"
 #include "MiniFrameDlg.h"
 #include "afxdialogex.h"
+#include "BoxDlg.h"
+#include "MainPanelFrame.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -156,11 +158,16 @@ HCURSOR CMiniFrameDlg::OnQueryDragIcon()
 
 void CMiniFrameDlg::OnBnClickedButton1()
 {
-	CMiniFrameWnd *dlg = new CMiniFrameWnd();
+	CMainPanelFrame *dlg = new CMainPanelFrame();
 	CString StrClassName = AfxRegisterWndClass( CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS,
 		LoadCursor(NULL, IDC_ARROW), (HBRUSH)GetStockObject(COLOR_BTNFACE+1), LoadIcon(NULL, IDI_APPLICATION) );
 	dlg->CreateEx(0, StrClassName, L"ÆÐ³Î", 
 		WS_POPUP | WS_CAPTION | WS_SYSMENU | MFS_THICKFRAME, CRect(10, 0, 240, 800), this );
+
+	dlg->Init();
 	dlg->ShowWindow(SW_SHOW);
+
+
+	//dlg2.DoModal();
 
 }
