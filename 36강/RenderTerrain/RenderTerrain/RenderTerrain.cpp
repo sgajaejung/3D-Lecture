@@ -449,9 +449,9 @@ bool Pick(int x, int y)
 	const int size = g_IdxBuff.GetFaceCount()*3;
 	for( int i=0; i < size; i+=3 )
 	{
-		Vector3 v1 = vertices[ indices[ i+0]].p;
-		Vector3 v2 = vertices[ indices[ i+1]].p;
-		Vector3 v3 = vertices[ indices[ i+2]].p;
+		const Vector3 v1 = vertices[ indices[ i+0]].p;
+		const Vector3 v2 = vertices[ indices[ i+1]].p;
+		const Vector3 v3 = vertices[ indices[ i+2]].p;
 
 		float t, u, v;
 		if (IntersectTriangle(
@@ -468,7 +468,6 @@ bool Pick(int x, int y)
 		}
 	}
 
-
 	g_VtxBuff.Unlock();
 	g_IdxBuff.Unlock();
 	return true;
@@ -477,8 +476,8 @@ bool Pick(int x, int y)
 
 void GetRay(int sx, int sy, Vector3 &orig, Vector3 &dir)
 {
-	float x =  ( (sx * 2.0F / WINSIZE_X ) - 1.0F );
-	float y = -( (sy * 2.0F / WINSIZE_Y) - 1.0F );
+	const float x =  ( (sx * 2.0F / WINSIZE_X ) - 1.0F );
+	const float y = -( (sy * 2.0F / WINSIZE_Y) - 1.0F );
 
 	Vector3 v;
 	v.x = x / g_matProj._11;
