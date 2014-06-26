@@ -24,8 +24,8 @@ protected:
 									///              2------3
 									/// BottomLeft(BL)      BottomRight(BR)
 public:
-	BOOL Build( SVtxNormTex *pHeightMap );
-	int GenerateIndex( LPVOID pIB, SVtxNormTex* pHeightMap, CFrustum* pFrustum, float fLODRatio );
+	BOOL Build();
+	int GenerateIndex( LPVOID pIB );
 
 protected:
 	cQuadTree* AddChild( int nCornerTL, int nCornerTR, int nCornerBL, int nCornerBR );	
@@ -37,7 +37,7 @@ protected:
 	void GetCorner( int& _0, int& _1, int& _2, int& _3 ) // 코너 인덱스 값을 얻어온다.
 		{ _0 = m_nCorner[0]; _1 = m_nCorner[1]; _2 = m_nCorner[2]; _3 = m_nCorner[3]; }
 
-	BOOL BuildQuadTree( SVtxNormTex* pHeightMap );
+	BOOL BuildQuadTree();
 
 };
 
