@@ -22,7 +22,7 @@ namespace graphic
 
 
 	private:
-		 m_pVtxBuff;
+		LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;
 		DWORD m_fvf;
 		int m_sizeOfVertex;
 		int m_vertexCount;
