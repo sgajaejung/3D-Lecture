@@ -31,10 +31,11 @@ namespace graphic { namespace importer {
 	bool ReadRawMeshFileV4( const string &fileName, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies );
 	bool ReadRawMeshFileV5( const string &fileName, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies );
 	bool ReadRawMeshFileV6( const string &fileName, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies );
+	bool ReadRawMeshFileV7( const string &fileName, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies );
 
 
 	bool ReadVertexIndexNormal( std::ifstream &fin, OUT sRawMesh &rawMesh, bool flag=false );
-	bool ReadTextureCoordinate( std::ifstream &fin, const string &fileName, OUT sRawMesh &rawMesh );
+	bool ReadTextureCoordinate( std::ifstream &fin, const string &fileName, OUT sRawMesh &rawMesh, bool flag=false );
 	bool ReadAnimation(std::ifstream &fin, OUT sRawMesh &rawMesh, OUT sRawAni &rawAni );
 	bool ReadBone(std::ifstream &fin, OUT sRawMeshGroup &rawMeshes, OUT sRawAniGroup &rawAnies, bool flag=false );
 	bool ReadBoneInfo(std::ifstream &fin, OUT sRawMesh &rawMesh );
@@ -82,6 +83,10 @@ bool importer::ReadRawMeshFile( const string &fileName,
 	else if (version == "EXPORTER_V6")
 	{
 		return ReadRawMeshFileV6(fileName, rawMeshes, rawAnies);
+	}
+	else if (version == "EXPORTER_V7")
+	{
+		return ReadRawMeshFileV7(fileName, rawMeshes, rawAnies);
 	}
 	else
 	{
@@ -270,6 +275,53 @@ bool importer::ReadRawMeshFileV6( const string &fileName, OUT sRawMeshGroup &raw
 }
 
 
+bool importer::ReadRawMeshFileV7( const string &fileName, OUT sRawMeshGroup &rawMeshes, 
+	OUT sRawAniGroup &rawAnies )
+{
+	using namespace std;
+	ifstream fin(fileName.c_str());
+	if (!fin.is_open())
+		return false;
+
+	string exporterVersion;
+	fin >> exporterVersion;
+
+	string material, eq;
+	int mtrlCount;
+	fin >> material >> eq >> mtrlCount;
+
+	rawMeshes.mtrls.resize(mtrlCount);
+
+	for (int i=0; i < mtrlCount; ++i)
+	{
+		ReadMaterial(fin, fileName, rawMeshes.mtrls[ i]);
+	}
+
+	string geomObject;
+	int geomObjectCount;
+	fin >> geomObject >> eq >> geomObjectCount;
+
+	rawMeshes.meshes.reserve(geomObjectCount);
+
+	rawAnies.type = sRawAniGroup::MESH_ANI;
+
+	for (int i=0; i < geomObjectCount; ++i)
+	{
+		rawMeshes.meshes.push_back( sRawMesh() );
+		ReadVertexIndexNormal(fin, rawMeshes.meshes.back(), true);
+		ReadTextureCoordinate(fin, fileName, rawMeshes.meshes.back(), true);
+
+		rawAnies.anies.push_back( sRawAni() );
+		ReadAnimation(fin, rawMeshes.meshes.back(), rawAnies.anies.back());
+		ReadVertexWeight(fin, rawMeshes.meshes.back());
+	}
+
+	ReadBone(fin, rawMeshes, rawAnies, true);
+
+	return true;
+}
+
+
 // Read Vertex, Index, Normal Buffer
 // Normal 은 face 갯수만큼 존재해야 한다.
 bool importer::ReadVertexIndexNormal( std::ifstream &fin, OUT sRawMesh &rawMesh, bool flag )
@@ -347,7 +399,8 @@ bool importer::ReadVertexIndexNormal( std::ifstream &fin, OUT sRawMesh &rawMesh,
 
 
 // 텍스쳐 좌표를 읽어 온다.
-bool importer::ReadTextureCoordinate( std::ifstream &fin, const string &fileName, OUT sRawMesh &rawMesh )
+bool importer::ReadTextureCoordinate( std::ifstream &fin, const string &fileName, OUT sRawMesh &rawMesh,
+	bool flag) // flag=false
 {
 	const int vtxSize = rawMesh.vertices.size();
 
@@ -365,7 +418,8 @@ bool importer::ReadTextureCoordinate( std::ifstream &fin, const string &fileName
 		{
 			fin >> fnum1 >> fnum2;
 			texVertices[ i] = Vector3(fnum1, fnum2, 0);
-			rawMesh.tex[ i] = Vector3(fnum1, fnum2, 0);
+			if (vtxSize > i)
+				rawMesh.tex[ i] = Vector3(fnum1, fnum2, 0);
 		}
 
 		string strTexFace;
@@ -451,13 +505,16 @@ bool importer::ReadTextureCoordinate( std::ifstream &fin, const string &fileName
 /**/
 	}
 
-	// 텍스쳐 파일이름 로딩.
-	string textureTok, texFilePath;
-	fin >> textureTok >> eq;
-	std::getline(fin, texFilePath);
-	string  textureFileName = common::GetFilePathExceptFileName(fileName) + "\\" + 
-		common::trim(texFilePath);
-	rawMesh.texturePath = textureFileName;
+	if (!flag)
+	{
+		// 텍스쳐 파일이름 로딩.
+		string textureTok, texFilePath;
+		fin >> textureTok >> eq;
+		std::getline(fin, texFilePath);
+		string  textureFileName = common::GetFilePathExceptFileName(fileName) + "\\" + 
+			common::trim(texFilePath);
+		rawMesh.texturePath = textureFileName;
+	}
 
 	return true;
 }

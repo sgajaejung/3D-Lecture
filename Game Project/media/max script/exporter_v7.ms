@@ -3,6 +3,7 @@ global Outfile -- 저장될 file
 global g_FilePath
 global g_fEpsilon = 0.0001
 global g_nSampling = 1 -- 샘플링 간격 (default = 1)
+global g_TextureOptimize = true
 
 global g_varSetMeshes = #()
 global g_varSetBones = #()
@@ -276,6 +277,8 @@ fn GetLocalTM obj =
 
 fn CollectObject = 
 (
+	format "- CollectObject count = %\n" objects.count
+	
 	g_varSetMeshes = #()
 	
 	for i=1 to objects.count do
@@ -296,12 +299,14 @@ fn CollectObject =
 			--print (objects[i].name)
 			format "ignore object %\n" objects[i].name
 		)		
-		else if ((editable_mesh == (classof objects[i])) or 
-			(editable_poly == (classof objects[i])) or
-			(EditablePolyMesh  == (classof objects[i])) or
-			(PolyMeshObject  == (classof objects[i]))				
-			) then
+		else 		
 		(
+			--else if ((editable_mesh == (classof objects[i])) or 
+			--(editable_poly == (classof objects[i])) or
+			--(EditablePolyMesh  == (classof objects[i])) or
+			--(PolyMeshObject  == (classof objects[i]))				
+			--) then
+			
 			format "collect mesh %\n" objects[i].name
 			append g_varSetMeshes objects[i]
 		)
@@ -390,7 +395,7 @@ fn CollectVertex obj =
 (
 	varSetVertex= #()
 	
-	if (obj.numTVerts >= obj.numVerts) then
+	if (obj.numTVerts >= obj.numVerts) and g_TextureOptimize then
 	(
 		for i=1 to obj.numTVerts do
 		(
@@ -437,9 +442,10 @@ fn CollectIndex obj =
 (
 	varSetIndex = #()
 	
-
-	if (obj.numTVerts >= obj.numVerts) then
+	if (obj.numTVerts >= obj.numVerts) and g_TextureOptimize then
 	(
+		print "obj.numTVerts >= obj.numVerts"
+		
 		for i=1 to obj.numfaces do
 		(
 			local v = copy (getTVFace obj i)
@@ -524,7 +530,6 @@ fn WriteVtxNormTex obj =
 	WriteIndex obj
 	WriteNormal obj
 	WriteTVertTVFace obj
-	format "TEXTURE_FILE = texture file name\n" to:Outfile
 )
 
 
@@ -738,7 +743,7 @@ fn CollectVertexWeightFromSkin obj =
 	(
 		ConvertToMesh obj
 
-		if (obj.numTVerts >= obj.numVerts) then
+		if (obj.numTVerts >= obj.numVerts) and g_TextureOptimize then
 		(
 			for i=1 to obj.numTVerts do
 			(
@@ -780,9 +785,9 @@ fn CollectVertexWeightFromSkin obj =
 fn WriteVertexWeightFromSkin obj = 
 (
 	print "---------- Write Vertex Weight ----------"
-	print  obj.name
-	print  obj.modifiers[#skin]
-	print  obj.modifiers[#physique]	
+	format  "name = %\n"  obj.name
+	format  "skin modifier = %\n" obj.modifiers[#skin]
+	format  "physique modifier = %\n" obj.modifiers[#physique]	
 	
 	ret = undefined
 
@@ -815,7 +820,7 @@ fn ExporterStart =
 
 	Outfile = createfile g_FilePath
 	
-	format "EXPORTER_V6\n" to:Outfile
+	format "EXPORTER_V7\n" to:Outfile
 	
 	
 	-- Write Material
@@ -898,12 +903,22 @@ rollout ui "Exporter" width:387 height:266
 	-- 파일명 입력창
 	label lbl1 "파일명:" pos:[30,13] width:70 height:17
 	edittext editFilePath "" pos:[100,10] width:250 height:17 enabled:true
+	
+	-- 텍스쳐 좌표 최적화.
+	label lbl2 "Texture Optimize: " pos:[10,40] width:100 height:17
+	checkbox chkTextureOptimize " " pos:[120,40] width:17 height:17 checked:true
+	
 
 	-- UI 창이 열릴때 호출됨
 	on ui open do
 	(
 		editFilePath.text = "data.dat"
 	)
+	
+	on chkTextureOptimize changed state do
+	(
+		g_TextureOptimize = state
+	)	
 
 	-- DirectX Export
 	on btnRun pressed do
