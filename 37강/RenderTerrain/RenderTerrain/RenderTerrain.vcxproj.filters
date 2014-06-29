@@ -32,6 +32,10 @@
     <ClCompile Include="..\..\base\vertexbuffer.cpp">
       <Filter>base</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\base\Line.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -81,5 +85,9 @@
     <ClInclude Include="..\..\base\base.h">
       <Filter>base</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\base\Line.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility.h" />
   </ItemGroup>
 </Project>

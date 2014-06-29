@@ -285,8 +285,8 @@ void Render(int timeDelta)
 		g_pDevice->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, g_VtxBuff.GetVertexCount(), 
 			0, g_IdxBuff.GetFaceCount());
 
-		RenderAxis();		
-		g_pDevice->SetRenderState(D3DRS_LIGHTING, false);
+		RenderAxis();
+		g_pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
 
 		Vector3 orig, dir;
