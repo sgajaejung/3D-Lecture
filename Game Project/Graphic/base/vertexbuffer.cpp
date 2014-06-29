@@ -6,6 +6,9 @@ using namespace graphic;
 
 
 cVertexBuffer::cVertexBuffer() : 
+	m_fvf(0),
+	m_sizeOfVertex(0),
+	m_vertexCount(0),
 	m_pVtxBuff(NULL)
 {
 
