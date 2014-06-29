@@ -35,7 +35,7 @@ namespace graphic
 		vector<sVertexDiffuse> m_axis;
 
 		// Display FPS 
-		ID3DXFont *m_font;		
+		ID3DXFont *m_font;
 		string m_fpsText;
 		float m_elapseTime;
 		int m_fps;

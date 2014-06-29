@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{14F81F60-5DD9-4687-A381-CB582C8101A6}</ProjectGuid>
+    <ProjectGuid>{116D2885-2627-486C-B2D9-9FE0A28AE1AA}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>MultiTexture</RootNamespace>
+    <RootNamespace>AlphaBlending</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -88,7 +88,7 @@
     <ClCompile Include="..\..\math\quaternion.cpp" />
     <ClCompile Include="..\..\math\vector3.cpp" />
     <ClCompile Include="..\..\math\vector4.cpp" />
-    <ClCompile Include="MultiTexture.cpp" />
+    <ClCompile Include="AlphaBlending.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\base\base.h" />

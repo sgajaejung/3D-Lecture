@@ -25,6 +25,7 @@ namespace graphic {
 
 #include "../math/Math.h"
 
+#include "DxInit.h"
 #include "indexbuffer.h"
 #include "light.h"
 #include "material.h"
@@ -33,3 +34,4 @@ namespace graphic {
 #include "vertexformat.h"
 #include "line.h"
 #include "grid.h"
+#include "grid2.h"

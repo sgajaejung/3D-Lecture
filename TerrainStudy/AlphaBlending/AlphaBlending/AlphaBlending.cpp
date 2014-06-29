@@ -61,8 +61,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	LPSTR lpCmdLine, 
 	int nCmdShow)
 {
-	wchar_t className[32] = L"Multi Texture";
-	wchar_t windowName[32] = L"Multi Texture";
+	wchar_t className[32] = L"Alpha Blend";
+	wchar_t windowName[32] = L"Alpha Blend";
 
 	//윈도우 클레스 정보 생성
 	//내가 이러한 윈도를 만들겠다 라는 정보
@@ -134,8 +134,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 			const int elapseT = curT - oldT;
 			//if (elapseT > 15)
 			//{
-				oldT = curT;
-				Render(elapseT);
+			oldT = curT;
+			Render(elapseT);
 			//}
 		}
 	}

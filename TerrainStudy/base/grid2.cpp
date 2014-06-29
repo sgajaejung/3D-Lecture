@@ -1,21 +1,22 @@
 
 #include "base.h"
-#include "grid.h"
+#include "grid2.h"
 
 using namespace graphic;
 
 
-cGrid::cGrid()
+cGrid2::cGrid2()
 {
+	m_mtrl.InitWhite();
 }
 
-cGrid::~cGrid()
+cGrid2::~cGrid2()
 {
 
 }
 
 
-void cGrid::Create( const int rowCellCount, const int colCellCount, const float cellSize )
+void cGrid2::Create( const int rowCellCount, const int colCellCount, const float cellSize )
 {
 	// init member
 	m_rowCellCount = rowCellCount;
@@ -28,16 +29,16 @@ void cGrid::Create( const int rowCellCount, const int colCellCount, const float 
 	const int cellCnt = rowCellCount * colCellCount;
 	const int vtxCount= rowVtxCnt * colVtxCnt;
 
-	m_vtxBuff.Create( vtxCount, sizeof(sVertexDiffuse), sVertexDiffuse::FVF);
+	m_vtxBuff.Create( vtxCount, sizeof(sVertexNormTex), sVertexNormTex::FVF);
 	{
-		sVertexDiffuse *vertices = (sVertexDiffuse*)m_vtxBuff.Lock();
+		sVertexNormTex *vertices = (sVertexNormTex*)m_vtxBuff.Lock();
 		const float startx = -cellSize*(rowCellCount/2);
 		const float starty = cellSize*(colCellCount/2);
 		const float endx = startx + cellSize*rowCellCount;
 		const float endy = starty - cellSize*colCellCount;
 
-		const float uCoordIncrementSize = 1.0f / (float)colCellCount;
-		const float vCoordIncrementSize = 1.0f / (float)rowCellCount;
+		const float uCoordIncrementSize = 1.0f / (float)colCellCount * 8.f;
+		const float vCoordIncrementSize = 1.0f / (float)rowCellCount * 8.f;
 
 		int i=0;
 		for (float y=starty; y >= endy; y -= cellSize, ++i)
@@ -47,11 +48,13 @@ void cGrid::Create( const int rowCellCount, const int colCellCount, const float 
 			{
 				int index = (i * colVtxCnt) + k;
 				vertices[ index].p = Vector3(x, 0.1f, y);
-				vertices[ index].c = 0xffcccccc;
+				vertices[ index].n = Vector3(0,1,0);
+				vertices[ index].u = (float)k*uCoordIncrementSize;
+				vertices[ index].v = (float)i*vCoordIncrementSize;
 			}
 		}
 		m_vtxBuff.Unlock();
-	}	
+	}
 
 
 	m_idxBuff.Create( cellCnt*2 );
@@ -80,8 +83,10 @@ void cGrid::Create( const int rowCellCount, const int colCellCount, const float 
 }
 
 
-void cGrid::Render()
+void cGrid2::Render()
 {
+	m_mtrl.Bind();
+	m_tex.Bind(0);
 	m_vtxBuff.Bind();
 	m_idxBuff.Bind();
 	GetDevice()->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, m_vtxBuff.GetVertexCount(), 
