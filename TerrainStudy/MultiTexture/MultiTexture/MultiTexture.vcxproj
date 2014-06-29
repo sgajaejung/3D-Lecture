@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{D5BFF2E5-E183-4610-B649-8C61EAA803CA}</ProjectGuid>
+    <ProjectGuid>{14F81F60-5DD9-4687-A381-CB582C8101A6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>RenderTerrain</RootNamespace>
+    <RootNamespace>MultiTexture</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -82,12 +82,12 @@
     <ClCompile Include="..\..\base\material.cpp" />
     <ClCompile Include="..\..\base\texture.cpp" />
     <ClCompile Include="..\..\base\vertexbuffer.cpp" />
+    <ClCompile Include="..\..\etc\Utility.cpp" />
     <ClCompile Include="..\..\math\matrix44.cpp" />
     <ClCompile Include="..\..\math\quaternion.cpp" />
     <ClCompile Include="..\..\math\vector3.cpp" />
     <ClCompile Include="..\..\math\vector4.cpp" />
-    <ClCompile Include="RenderTerrain.cpp" />
-    <ClCompile Include="Utility.cpp" />
+    <ClCompile Include="MultiTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\base\base.h" />
@@ -100,12 +100,12 @@
     <ClInclude Include="..\..\base\texture.h" />
     <ClInclude Include="..\..\base\vertexbuffer.h" />
     <ClInclude Include="..\..\base\vertexformat.h" />
+    <ClInclude Include="..\..\etc\Utility.h" />
     <ClInclude Include="..\..\math\Math.h" />
     <ClInclude Include="..\..\math\matrix44.h" />
     <ClInclude Include="..\..\math\quaternion.h" />
     <ClInclude Include="..\..\math\vector3.h" />
     <ClInclude Include="..\..\math\vector4.h" />
-    <ClInclude Include="Utility.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
