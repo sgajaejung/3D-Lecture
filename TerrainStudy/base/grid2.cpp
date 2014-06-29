@@ -16,7 +16,8 @@ cGrid2::~cGrid2()
 }
 
 
-void cGrid2::Create( const int rowCellCount, const int colCellCount, const float cellSize )
+void cGrid2::Create( const int rowCellCount, const int colCellCount, const float cellSize,
+	const float textureUVFactor)
 {
 	// init member
 	m_rowCellCount = rowCellCount;
@@ -37,8 +38,8 @@ void cGrid2::Create( const int rowCellCount, const int colCellCount, const float
 		const float endx = startx + cellSize*rowCellCount;
 		const float endy = starty - cellSize*colCellCount;
 
-		const float uCoordIncrementSize = 1.0f / (float)colCellCount * 8.f;
-		const float vCoordIncrementSize = 1.0f / (float)rowCellCount * 8.f;
+		const float uCoordIncrementSize = 1.0f / (float)colCellCount * textureUVFactor;
+		const float vCoordIncrementSize = 1.0f / (float)rowCellCount * textureUVFactor;
 
 		int i=0;
 		for (float y=starty; y >= endy; y -= cellSize, ++i)
@@ -83,10 +84,10 @@ void cGrid2::Create( const int rowCellCount, const int colCellCount, const float
 }
 
 
-void cGrid2::Render()
+void cGrid2::Render(const int stage)
 {
 	m_mtrl.Bind();
-	m_tex.Bind(0);
+	m_tex.Bind(stage);
 	m_vtxBuff.Bind();
 	m_idxBuff.Bind();
 	GetDevice()->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, m_vtxBuff.GetVertexCount(), 

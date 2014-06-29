@@ -4,11 +4,13 @@
 
 using namespace graphic;
 
-cLine::cLine()
+cLine::cLine(const DWORD color) : // color=0
+	m_color(color)
 {
 }
 
-cLine::cLine(const Vector3 &p0, const Vector3 &p1, const float width)
+cLine::cLine(const Vector3 &p0, const Vector3 &p1, const float width, const DWORD color) :
+	m_color(color)
 {
 	SetLine(p0, p1, width);
 }
@@ -96,7 +98,10 @@ void cLine::InitCube()
 	WORD *ibuff = (WORD*)m_idxBuff.Lock();
 
 	for (int i=0; i < 8; ++i)
+	{
 		vbuff[ i].p = vertices[ i];
+		vbuff[ i].c = m_color;
+	}
 
 	for (int i=0; i < 36; ++i)
 		ibuff[ i] = indices[ i];

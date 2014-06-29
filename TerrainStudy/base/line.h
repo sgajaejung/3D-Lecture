@@ -8,8 +8,8 @@ namespace graphic
 	class cLine
 	{
 	public:
-		cLine();
-		cLine(const Vector3 &p0, const Vector3 &p1, const float width);
+		cLine(const DWORD color=0);
+		cLine(const Vector3 &p0, const Vector3 &p1, const float width, const DWORD color=0);
 		virtual ~cLine();
 
 		void Render();
@@ -26,6 +26,7 @@ namespace graphic
 		Vector3 m_p0;
 		Vector3 m_p1;
 		float m_width;
+		DWORD m_color;
 		Matrix44 m_tm;
 	};
 

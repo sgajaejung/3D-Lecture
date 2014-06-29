@@ -35,8 +35,13 @@ Vector3 g_lookAtPos(0,0,0);
 Matrix44 g_matProj;
 Matrix44 g_matView;
 
-graphic::cGrid2 g_grid1;
-graphic::cGrid2 g_grid2;
+graphic::cLine g_line( D3DCOLOR_XRGB(0,255,0) );
+graphic::cGrid2 g_grid;
+const int TEXTURE_SIZE = 100;
+const float CELL_SIZE = 50.f;
+const int COL_CELL_COUNT = 16;
+const int ROW_CELL_COUNT = 16;
+
 
 
 LPDIRECT3DDEVICE9 graphic::GetDevice()
@@ -54,6 +59,13 @@ void GetRay(int sx, int sy, Vector3 &orig, Vector3 &dir);
 bool IntersectTriangle( const D3DXVECTOR3& orig, const D3DXVECTOR3& dir,
 	D3DXVECTOR3& v0, D3DXVECTOR3& v1, D3DXVECTOR3& v2,
 	FLOAT* t, FLOAT* u, FLOAT* v );
+bool Pick(int x, int y);
+void GetRay(int sx, int sy, Vector3 &orig, Vector3 &dir);
+bool IntersectTriangle( const D3DXVECTOR3& orig, const D3DXVECTOR3& dir,
+	D3DXVECTOR3& v0, D3DXVECTOR3& v1, D3DXVECTOR3& v2,
+	OUT FLOAT* t, OUT FLOAT* u, OUT FLOAT* v );
+void Brush(const float u, const float v);
+void GetTextureUV(const Vector3 &pos, OUT float &u, OUT float &v);
 
 
 int APIENTRY WinMain(HINSTANCE hInstance, 
@@ -61,8 +73,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	LPSTR lpCmdLine, 
 	int nCmdShow)
 {
-	wchar_t className[32] = L"Multi Texture";
-	wchar_t windowName[32] = L"Multi Texture";
+	wchar_t className[32] = L"Paint Texture";
+	wchar_t windowName[32] = L"Paint Texture";
 
 	//윈도우 클레스 정보 생성
 	//내가 이러한 윈도를 만들겠다 라는 정보
@@ -132,11 +144,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		{
 			const int curT = timeGetTime();
 			const int elapseT = curT - oldT;
-			//if (elapseT > 15)
-			//{
-				oldT = curT;
-				Render(elapseT);
-			//}
+			oldT = curT;
+			Render(elapseT);
 		}
 	}
 
@@ -170,9 +179,10 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
 	case WM_LBUTTONDOWN:
 		{
-			//g_LButtonDown = true;
+			g_LButtonDown = true;
 			g_CurPos.x = LOWORD(lParam);
 			g_CurPos.y = HIWORD(lParam);
+			Pick(g_CurPos.x, g_CurPos.y);
 		}
 		break;
 
@@ -203,12 +213,12 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 			const int y = pos.y - g_CurPos.y;
 			g_CurPos = pos;
 
-			Matrix44 mat1;
-			mat1.SetRotationY( -x * 0.01f );
-			Matrix44 mat2;
-			mat2.SetRotationX( -y * 0.01f );
-
+			//Matrix44 mat1;
+			//mat1.SetRotationY( -x * 0.01f );
+			//Matrix44 mat2;
+			//mat2.SetRotationX( -y * 0.01f );
 			//g_LocalTm *= (mat1 * mat2);
+			Pick(pos.x, pos.y);
 		}
 		if (g_RButtonDown)
 		{
@@ -276,39 +286,27 @@ void Render(int timeDelta)
 
 		RenderFPS(timeDelta);
 
-
-		//---------------------------------------------------------------------------------------------------------
-		g_pDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
-		g_pDevice->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
-		g_pDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
-
-		g_pDevice->SetTextureStageState( 0, D3DTSS_TEXCOORDINDEX, 0 );
-		g_pDevice->SetTextureStageState( 1, D3DTSS_TEXCOORDINDEX, 0 );
-
-		g_pDevice->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_SELECTARG1 );
-		g_pDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
-		g_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_SELECTARG1 );
-		g_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
-
-		g_pDevice->SetTextureStageState( 1, D3DTSS_COLOROP, D3DTOP_MODULATE);
-		g_pDevice->SetTextureStageState( 1, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-		g_pDevice->SetTextureStageState( 1, D3DTSS_COLORARG2, D3DTA_CURRENT);
-		g_pDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-
-
 		Matrix44 tm = g_LocalTm;
 		g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&tm);
 
-		g_grid1.Render();
-		g_grid2.Render(1);
+		g_grid.Render();
 
 		g_pDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
-		//---------------------------------------------------------------------------------------------------------
-
 
 
 		RenderAxis();
 		g_pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+
+
+		{ // Render Line
+			Vector3 orig, dir;
+			GetRay( g_CurPos.x, g_CurPos.y, orig, dir );
+			Vector3 p0 = orig + Vector3(10,10,0);
+			Vector3 p1 = orig + dir * 200.f;
+			g_line.SetLine( p0, p1, 1 );
+			g_line.Render();
+		}
+
 
 		//랜더링 끝
 		g_pDevice->EndScene();
@@ -320,11 +318,8 @@ void Render(int timeDelta)
 
 bool InitVertexBuffer()
 {
-	g_grid1.Create(64, 64, 50.f);
-	g_grid1.GetTexture().Create( "../../media/grass_spring1.jpg");
-	g_grid2.Create(64, 64, 50.f);
-	g_grid2.GetTexture().Create( "../../media/alpha2.bmp");
-
+	g_grid.Create(ROW_CELL_COUNT, COL_CELL_COUNT, CELL_SIZE, 1.f);
+	g_grid.GetTexture().Create(TEXTURE_SIZE, TEXTURE_SIZE, D3DFMT_A8R8G8B8);
 
 	// 카메라, 투영행렬 생성
 	UpdateCamera();
@@ -345,3 +340,176 @@ void UpdateCamera()
 	graphic::GetDevice()->SetTransform(D3DTS_VIEW, (D3DXMATRIX*)&g_matView);
 }
 
+
+bool Pick(int x, int y)
+{
+	Vector3 orig, dir;
+	GetRay( x, y, orig, dir );
+
+	sVertexNormTex *vertices = (sVertexNormTex*)g_grid.GetVertexBuffer().Lock();
+	WORD *indices = (WORD*)g_grid.GetIndexBuffer().Lock();
+
+	const int size = g_grid.GetIndexBuffer().GetFaceCount()*3;
+	for( int i=0; i < size; i+=3 )
+	{
+		const Vector3 v1 = vertices[ indices[ i+0]].p;
+		const Vector3 v2 = vertices[ indices[ i+1]].p;
+		const Vector3 v3 = vertices[ indices[ i+2]].p;
+
+		float t, u, v;
+		if (IntersectTriangle(
+			*(D3DXVECTOR3*)&orig,
+			*(D3DXVECTOR3*)&dir,
+			*(D3DXVECTOR3*)&v1,
+			*(D3DXVECTOR3*)&v2,
+			*(D3DXVECTOR3*)&v3,
+			&t, &u, &v))
+		{
+			Vector3 pos = orig + dir*t;
+			float tu, tv;
+			GetTextureUV(pos, tu, tv);
+			Brush(tu, tv);
+		}
+	}
+
+	g_grid.GetVertexBuffer().Unlock();
+	g_grid.GetIndexBuffer().Unlock();
+	return true;
+}
+
+
+void GetRay(int sx, int sy, Vector3 &orig, Vector3 &dir)
+{
+	const float x =  ( (sx * 2.0F / WINSIZE_X ) - 1.0F );
+	const float y = -( (sy * 2.0F / WINSIZE_Y) - 1.0F );
+
+	Vector3 v;
+	v.x = x / g_matProj._11;
+	v.y = y / g_matProj._22;
+	v.z =  1.0F;
+
+	Matrix44 m = g_matView.Inverse();
+
+	dir.x = v.x * m._11 + v.y * m._21 + v.z * m._31;
+	dir.y = v.x * m._12 + v.y * m._22 + v.z * m._32;
+	dir.z = v.x * m._13 + v.y * m._23 + v.z * m._33;
+
+	orig.x = m._41;
+	orig.y = m._42;
+	orig.z = m._43;
+}
+
+
+bool IntersectTriangle( const D3DXVECTOR3& orig, const D3DXVECTOR3& dir,
+	D3DXVECTOR3& v0, D3DXVECTOR3& v1, D3DXVECTOR3& v2,
+	OUT FLOAT* t, OUT FLOAT* u, OUT FLOAT* v )
+{
+	// Find vectors for two edges sharing vert0
+	D3DXVECTOR3 edge1 = v1 - v0;
+	D3DXVECTOR3 edge2 = v2 - v0;
+
+	// Begin calculating determinant - also used to calculate U parameter
+	D3DXVECTOR3 pvec;
+	D3DXVec3Cross( &pvec, &dir, &edge2 );
+
+	// If determinant is near zero, ray lies in plane of triangle
+	FLOAT det = D3DXVec3Dot( &edge1, &pvec );
+
+	D3DXVECTOR3 tvec;
+	if( det > 0 )
+	{
+		tvec = orig - v0;
+	}
+	else
+	{
+		tvec = v0 - orig;
+		det = -det;
+	}
+
+	if( det < 0.0001f )
+		return FALSE;
+
+	// Calculate U parameter and test bounds
+	*u = D3DXVec3Dot( &tvec, &pvec );
+	if( *u < 0.0f || *u > det )
+		return FALSE;
+
+	// Prepare to test V parameter
+	D3DXVECTOR3 qvec;
+	D3DXVec3Cross( &qvec, &tvec, &edge1 );
+
+	// Calculate V parameter and test bounds
+	*v = D3DXVec3Dot( &dir, &qvec );
+	if( *v < 0.0f || *u + *v > det )
+		return FALSE;
+
+	// Calculate t, scale parameters, ray intersects triangle
+	*t = D3DXVec3Dot( &edge2, &qvec );
+	FLOAT fInvDet = 1.0f / det;
+	*t *= fInvDet;
+	*u *= fInvDet;
+	*v *= fInvDet;
+
+	return TRUE;
+}
+
+
+void Brush(const float u, const float v)
+{
+	D3DLOCKED_RECT lockrect;
+	g_grid.GetTexture().Lock(lockrect);
+
+	const float innerRadius = 10;
+	const float outterRadius = 30;
+	const float innerAlpha = 1.f;
+	const float outterAlpha = 0.4f;
+
+	BYTE *pbits = (BYTE*)lockrect.pBits;
+	for (int ay=0; ay < TEXTURE_SIZE; ++ay)
+	{
+		for (int ax=0; ax < TEXTURE_SIZE; ++ax)
+		{
+			float au = (float)ax / (float)TEXTURE_SIZE;
+			float av = (float)ay / (float)TEXTURE_SIZE;
+
+			float len = sqrt( ((au-u)*(au-u)) + ((av-v)*(av-v)) );
+			len *= (COL_CELL_COUNT * CELL_SIZE);
+
+			// A8R8G8B8 Format
+			DWORD *ppixel = (DWORD*)(pbits + (ax*4) + (lockrect.Pitch * ay));
+
+			if (len <= innerRadius)
+			{
+				int color = (int)(255.f * innerAlpha);
+				*ppixel = D3DCOLOR_XRGB(color, color, color);
+			}
+			else if (len <= outterRadius)
+			{
+				// 보간
+				const float width = outterRadius - innerRadius;
+				const float delta = 1.f - ((len - innerRadius) / width);
+				const int color = (int)(((innerAlpha - outterAlpha) * delta) * 255.f);
+
+				const int dest = *ppixel & 0xff;
+				if (color > dest)
+					*ppixel = D3DCOLOR_XRGB(color, color, color);
+			}
+		}
+	}
+
+	g_grid.GetTexture().Unlock();
+}
+
+
+void GetTextureUV(const Vector3 &pos, OUT float &u, OUT float &v)
+{
+	const float width = COL_CELL_COUNT * CELL_SIZE;
+	const float height = ROW_CELL_COUNT * CELL_SIZE;
+
+	float x = pos.x + width/2.f;
+	float z = pos.z + height/2.f;
+	z = height - z;
+
+	u = x / (float)width;
+	v = z / (float)height;
+}

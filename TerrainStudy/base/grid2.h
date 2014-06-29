@@ -12,8 +12,9 @@ namespace graphic
 		cGrid2();
 		virtual ~cGrid2();
 
-		void Create( const int rowCellCount, const int colCellCount, const float cellSize );
-		void Render();
+		void Create( const int rowCellCount, const int colCellCount, const float cellSize, 
+			const float textureUVFactor=8.f);
+		void Render(const int stage=0);
 
 		cVertexBuffer& GetVertexBuffer();
 		cIndexBuffer& GetIndexBuffer();
