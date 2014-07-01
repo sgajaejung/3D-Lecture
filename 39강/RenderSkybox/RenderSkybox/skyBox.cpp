@@ -136,14 +136,15 @@ void cSkyBox::Render()
 {
 	SetRenderState();
 
-	D3DXMATRIX matView, matViewSave, matWorld;
-	GetDevice()->GetTransform( D3DTS_VIEW, &matViewSave );
+	//mat matView, matViewSave, matWorld;
+	Matrix44 matView, matViewSave, matWorld;
+	GetDevice()->GetTransform( D3DTS_VIEW, (D3DXMATRIX*)&matViewSave );
 	matView = matViewSave;
 	matView._41 = 0.0f; matView._42 = -0.4f; matView._43 = 0.0f;
-	GetDevice()->SetTransform( D3DTS_VIEW, &matView );
+	GetDevice()->SetTransform( D3DTS_VIEW, (D3DXMATRIX*)&matView );
 	// Set a default world matrix
-	D3DXMatrixIdentity(&matWorld);
-	GetDevice()->SetTransform( D3DTS_WORLD, &matWorld);
+	Matrix44 mat;
+	GetDevice()->SetTransform( D3DTS_WORLD, (D3DXMATRIX*)&mat);
 
 	// render
 	m_vtxBuff.Bind();
@@ -153,6 +154,6 @@ void cSkyBox::Render()
 		GetDevice()->DrawPrimitive( D3DPT_TRIANGLESTRIP, i*4, 2 );
 	}
 
-	GetDevice()->SetTransform( D3DTS_VIEW, &matViewSave );
+	GetDevice()->SetTransform( D3DTS_VIEW, (D3DXMATRIX*)&matViewSave );
 }
 
