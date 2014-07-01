@@ -12,17 +12,12 @@
 using namespace graphic;
 
 
-
-cSkyBox::cSkyBox() : 
-	m_pVtxBuffer(NULL)
+cSkyBox::cSkyBox()
 {
-
 }
-
 
 cSkyBox::~cSkyBox()
 {
-	SAFE_RELEASE(m_pVtxBuffer);
 
 }
 
@@ -31,7 +26,7 @@ cSkyBox::~cSkyBox()
 // textureFilePath : 이 파일 경로에 skybox_top, skybox_front, skybox_back, 
 //				skybox_left, skybox_right, skybox_bottom.jpg 파일이 있어야 한다.
 //------------------------------------------------------------------------
-BOOL cSkyBox::Init(const string &textureFilePath)
+bool cSkyBox::Create(const string &textureFilePath)
 {
 	string textureFileName[] = 
 	{
@@ -41,29 +36,21 @@ BOOL cSkyBox::Init(const string &textureFilePath)
 
 	for (int i=0; i < MAX_FACE; ++i)
 	{
-		string fileName;
-		fileName = textureFilePath + "/" + textureFileName[ i];
+		string fileName = textureFilePath + "/" + textureFileName[ i];
 		m_textures[ i].Create( fileName );
-		//IDirect3DTexture9 *ptex = NULL;//CFileLoader::LoadTexture(fileName);
-		//if (!ptex)
-		//{
-		//	return FALSE;
-		//}
-		//m_pTexture[ i] = ptex;
 	}
 
 	if (!CreateVertexBuffer())
-		return FALSE;
+		return false;
 
-
-	return TRUE;
+	return true;
 }
 
 
 //------------------------------------------------------------------------
 // 
 //------------------------------------------------------------------------
-BOOL cSkyBox::CreateVertexBuffer()
+bool  cSkyBox::CreateVertexBuffer()
 {
 	// Example diagram of "front" quad
 	// The numbers are vertices
@@ -116,24 +103,13 @@ BOOL cSkyBox::CreateVertexBuffer()
 	};
 
 	const int vtxSize = 24;
-	GetDevice()->CreateVertexBuffer( vtxSize*sizeof(sVertexTex), 0, sVertexTex::FVF, 
-		D3DPOOL_MANAGED, &m_pVtxBuffer, NULL );
+	m_vtxBuff.Create( vtxSize, sizeof(sVertexTex), sVertexTex::FVF);
 
-	sVertexTex *pv;
-	m_pVtxBuffer->Lock( 0, sizeof(sVertexTex)*vtxSize, (void**)&pv, 0 );
+	sVertexTex *pv = (sVertexTex*)m_vtxBuff.Lock();
     memcpy( pv, SkyboxMesh, sizeof(sVertexTex) * 24 );
-	m_pVtxBuffer->Unlock();
+	m_vtxBuff.Unlock();
 
-	return TRUE;
-}
-
-
-//------------------------------------------------------------------------
-// 
-//------------------------------------------------------------------------
-void cSkyBox::Update(int elapseTime)
-{
-	
+	return true;
 }
 
 
@@ -170,8 +146,7 @@ void cSkyBox::Render()
 	GetDevice()->SetTransform( D3DTS_WORLD, &matWorld);
 
 	// render
-	GetDevice()->SetFVF(sVertexTex::FVF);
-	GetDevice()->SetStreamSource( 0, m_pVtxBuffer, 0, sizeof(sVertexTex));
+	m_vtxBuff.Bind();
 	for (int i = 0 ; i < MAX_FACE; i++)
 	{
 		m_textures[ i].Bind(0);
@@ -179,14 +154,5 @@ void cSkyBox::Render()
 	}
 
 	GetDevice()->SetTransform( D3DTS_VIEW, &matViewSave );
-}
-
-
-//------------------------------------------------------------------------
-// 
-//------------------------------------------------------------------------
-void cSkyBox::Clear()
-{
-	SAFE_RELEASE(m_pVtxBuffer);
 }
 

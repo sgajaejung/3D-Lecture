@@ -298,7 +298,7 @@ void Render(int timeDelta)
 bool InitVertexBuffer()
 {
 	g_grid.Create(64, 64, 50.f);
-	g_skybox.Init( "../../media/skybox" );
+	g_skybox.Create( "../../media/skybox" );
 
 
 	// 카메라, 투영행렬 생성
