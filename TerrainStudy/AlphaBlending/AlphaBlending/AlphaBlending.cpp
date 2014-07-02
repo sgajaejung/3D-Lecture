@@ -49,7 +49,6 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 bool InitVertexBuffer();
 void Render(int timeDelta);
 void UpdateCamera();
-bool Pick(int x, int y);
 void GetRay(int sx, int sy, Vector3 &orig, Vector3 &dir);
 bool IntersectTriangle( const D3DXVECTOR3& orig, const D3DXVECTOR3& dir,
 	D3DXVECTOR3& v0, D3DXVECTOR3& v1, D3DXVECTOR3& v2,
@@ -173,7 +172,6 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 			//g_LButtonDown = true;
 			g_CurPos.x = LOWORD(lParam);
 			g_CurPos.y = HIWORD(lParam);
-			Pick(g_CurPos.x, g_CurPos.y);
 		}
 		break;
 
@@ -325,116 +323,4 @@ void UpdateCamera()
 	dir.Normalize();
 	g_matView.SetView(g_camPos, dir, Vector3(0,1,0));
 	graphic::GetDevice()->SetTransform(D3DTS_VIEW, (D3DXMATRIX*)&g_matView);
-}
-
-
-bool Pick(int x, int y)
-{
-	Vector3 orig, dir;
-	GetRay( x, y, orig, dir );
-
-	sVertexNormTex *vertices = (sVertexNormTex*)g_grid.GetVertexBuffer().Lock();
-	WORD *indices = (WORD*)g_grid.GetIndexBuffer().Lock();
-
-	const int size = g_grid.GetIndexBuffer().GetFaceCount()*3;
-	for( int i=0; i < size; i+=3 )
-	{
-		const Vector3 v1 = vertices[ indices[ i+0]].p;
-		const Vector3 v2 = vertices[ indices[ i+1]].p;
-		const Vector3 v3 = vertices[ indices[ i+2]].p;
-
-		float t, u, v;
-		if (IntersectTriangle(
-			*(D3DXVECTOR3*)&orig,
-			*(D3DXVECTOR3*)&dir,
-			*(D3DXVECTOR3*)&v1,
-			*(D3DXVECTOR3*)&v2,
-			*(D3DXVECTOR3*)&v3,
-			&t, &u, &v))
-		{
-			//vertices[ indices[ i+0]].c = 0xffff0000;
-			//vertices[ indices[ i+1]].c = 0xffff0000;
-			//vertices[ indices[ i+2]].c = 0xffff0000;
-		}
-	}
-
-	g_grid.GetVertexBuffer().Unlock();
-	g_grid.GetIndexBuffer().Unlock();
-	return true;
-}
-
-
-void GetRay(int sx, int sy, Vector3 &orig, Vector3 &dir)
-{
-	const float x =  ( (sx * 2.0F / WINSIZE_X ) - 1.0F );
-	const float y = -( (sy * 2.0F / WINSIZE_Y) - 1.0F );
-
-	Vector3 v;
-	v.x = x / g_matProj._11;
-	v.y = y / g_matProj._22;
-	v.z =  1.0F;
-
-	Matrix44 m = g_matView.Inverse();
-
-	dir.x = v.x * m._11 + v.y * m._21 + v.z * m._31;
-	dir.y = v.x * m._12 + v.y * m._22 + v.z * m._32;
-	dir.z = v.x * m._13 + v.y * m._23 + v.z * m._33;
-
-	orig.x = m._41;
-	orig.y = m._42;
-	orig.z = m._43;
-}
-
-
-bool IntersectTriangle( const D3DXVECTOR3& orig, const D3DXVECTOR3& dir,
-	D3DXVECTOR3& v0, D3DXVECTOR3& v1, D3DXVECTOR3& v2,
-	FLOAT* t, FLOAT* u, FLOAT* v )
-{
-	// Find vectors for two edges sharing vert0
-	D3DXVECTOR3 edge1 = v1 - v0;
-	D3DXVECTOR3 edge2 = v2 - v0;
-
-	// Begin calculating determinant - also used to calculate U parameter
-	D3DXVECTOR3 pvec;
-	D3DXVec3Cross( &pvec, &dir, &edge2 );
-
-	// If determinant is near zero, ray lies in plane of triangle
-	FLOAT det = D3DXVec3Dot( &edge1, &pvec );
-
-	D3DXVECTOR3 tvec;
-	if( det > 0 )
-	{
-		tvec = orig - v0;
-	}
-	else
-	{
-		tvec = v0 - orig;
-		det = -det;
-	}
-
-	if( det < 0.0001f )
-		return FALSE;
-
-	// Calculate U parameter and test bounds
-	*u = D3DXVec3Dot( &tvec, &pvec );
-	if( *u < 0.0f || *u > det )
-		return FALSE;
-
-	// Prepare to test V parameter
-	D3DXVECTOR3 qvec;
-	D3DXVec3Cross( &qvec, &tvec, &edge1 );
-
-	// Calculate V parameter and test bounds
-	*v = D3DXVec3Dot( &dir, &qvec );
-	if( *v < 0.0f || *u + *v > det )
-		return FALSE;
-
-	// Calculate t, scale parameters, ray intersects triangle
-	*t = D3DXVec3Dot( &edge2, &qvec );
-	FLOAT fInvDet = 1.0f / det;
-	*t *= fInvDet;
-	*u *= fInvDet;
-	*v *= fInvDet;
-
-	return TRUE;
 }
