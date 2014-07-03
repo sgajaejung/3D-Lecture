@@ -1,12 +1,12 @@
 
 #include "stdafx.h"
-#include "bone.h"
+#include "bonemgr.h"
 #include "bonenode.h"
 
 using namespace  graphic;
 
 
-cBone::cBone(const int id, const sRawMeshGroup &rawMeshes) :
+cBoneMgr::cBoneMgr(const int id, const sRawMeshGroup &rawMeshes) :
 	m_root(NULL)
 ,	m_id(id)
 {
@@ -29,21 +29,21 @@ cBone::cBone(const int id, const sRawMeshGroup &rawMeshes) :
 
 }
 
-cBone::~cBone()
+cBoneMgr::~cBoneMgr()
 {
 	Clear();
 }
 
 
 // 에니메이션 설정.
-void cBone::SetAnimation( const sRawAniGroup &rawAnies, int nAniFrame )
+void cBoneMgr::SetAnimation( const sRawAniGroup &rawAnies, int nAniFrame )
 {
 	SetAnimationRec( m_root, rawAnies, nAniFrame );
 }
 
 
 // 애니메이션 설정.
-void cBone::SetAnimationRec( cBoneNode *node, const sRawAniGroup &rawAnies, int nAniFrame )
+void cBoneMgr::SetAnimationRec( cBoneNode *node, const sRawAniGroup &rawAnies, int nAniFrame )
 {
 	RET(!node);
 	RET(node->GetId() >= (int)rawAnies.anies.size());
@@ -57,41 +57,31 @@ void cBone::SetAnimationRec( cBoneNode *node, const sRawAniGroup &rawAnies, int 
 
 
 // 애니메이션
-bool cBone::Move(const float elapseTime)
+bool cBoneMgr::Move(const float elapseTime)
 {
-	return MoveRec(m_root, elapseTime);
-}
-
-
-bool cBone::MoveRec( cBoneNode *node, const float elapseTime)
-{
-	RETV(!node, false);
-	const bool reval = node->Move( elapseTime );
-	BOOST_FOREACH (auto p, node->GetChildren())
-		MoveRec((cBoneNode*)p, elapseTime );
-	return true;
+	RETV(!m_root, false);
+	return m_root->Move(elapseTime);
 }
 
 
 // 스켈레톤 출력.
-void cBone::Render(const Matrix44 &parentTm)
+void cBoneMgr::Render(const Matrix44 &parentTm)
 {
-	RenderRec(m_root, parentTm);
-}
-
-
-//  출력 (재귀)
-void cBone::RenderRec(cBoneNode *node, const Matrix44 &parentTm)
-{
-	RET(!node);
-	node->Render( parentTm );
-	BOOST_FOREACH (auto p, node->GetChildren())
-		RenderRec((cBoneNode*)p, parentTm );
+	RET(!m_root);
+	m_root->Render(parentTm);
 }
 
 
 // 동적으로 할당된 객체 제거.
-void cBone::Clear()
+void cBoneMgr::Clear()
 {
 	SAFE_DELETE(m_root);
+}
+
+
+// BoneNode 찾아서 리턴.
+cBoneNode* cBoneMgr::FindBone(const int id)
+{
+	RETV(!m_root, NULL);
+	return (cBoneNode*)m_root->FindNode(id);
 }

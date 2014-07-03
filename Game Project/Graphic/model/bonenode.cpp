@@ -140,6 +140,9 @@ bool cBoneNode::Move(const float elapseTime)
 	//if (m_pBox)
 	//	m_pBox->SetWorldTM(&m_pPalette[ m_nId]);
 
+	BOOST_FOREACH (auto p, m_children)
+		p->Move( elapseTime );
+
 	return true;
 }
 
@@ -148,4 +151,6 @@ void cBoneNode::Render(const Matrix44 &parentTm)
 {
 	RET(!m_mesh);
 	//m_mesh->Render(m_offset * m_accTM * parentTm);
+	BOOST_FOREACH (auto p, m_children)
+		p->Render( parentTm );
 }

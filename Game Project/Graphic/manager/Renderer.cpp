@@ -70,16 +70,17 @@ void cRenderer::RenderAxis()
 
 
 	// 가장 위에 출력되기 위해서 zbuffer 를 끈다.
-	graphic::GetDevice()->SetRenderState(D3DRS_ZENABLE, 0);
+	m_pDevice->SetRenderState(D3DRS_ZENABLE, 0);
 
 	m_pDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
+	m_pDevice->SetTexture(0, NULL);
 	Matrix44 identity;
 	m_pDevice->SetTransform( D3DTS_WORLD, (D3DXMATRIX*)&identity );
 	m_pDevice->SetFVF( sVertexDiffuse::FVF );
 	m_pDevice->DrawPrimitiveUP( D3DPT_LINELIST, 3, &m_axis[0], sizeof(sVertexDiffuse) );
 	m_pDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 
-	graphic::GetDevice()->SetRenderState(D3DRS_ZENABLE, 1);
+	m_pDevice->SetRenderState(D3DRS_ZENABLE, 1);
 }
 
 
@@ -107,6 +108,7 @@ void cRenderer::RenderGrid()
 	if (gridSize > 0)
 	{
 		m_pDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
+		m_pDevice->SetTexture(0, NULL);
 		Matrix44 identity;
 		m_pDevice->SetTransform( D3DTS_WORLD, (D3DXMATRIX*)&identity );
 		m_pDevice->SetFVF( sVertexDiffuse::FVF );
