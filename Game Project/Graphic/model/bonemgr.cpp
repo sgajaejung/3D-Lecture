@@ -10,14 +10,14 @@ cBoneMgr::cBoneMgr(const int id, const sRawMeshGroup &rawMeshes) :
 	m_root(NULL)
 ,	m_id(id)
 {
-	m_palette.resize(rawMeshes.bones.size());
+	m_palette.resize(rawMeshes.bones2.size());
 
-	vector<cBoneNode*> vec(rawMeshes.bones.size(), NULL);
-	for (u_int i=0; i < rawMeshes.bones.size(); ++i)
+	vector<cBoneNode*> vec(rawMeshes.bones2.size(), NULL);
+	for (u_int i=0; i < rawMeshes.bones2.size(); ++i)
 	{
-		const int id = rawMeshes.bones[ i].id;
-		const int parentId = rawMeshes.bones[ i].parentId;
-		cBoneNode *bone = new cBoneNode(id, m_palette, rawMeshes.bones[ i]);
+		const int id = rawMeshes.bones2[ i].id;
+		const int parentId = rawMeshes.bones2[ i].parentId;
+		cBoneNode *bone = new cBoneNode(id, m_palette, rawMeshes.bones2[ i]);
 		SAFE_DELETE(vec[ id]);
 		vec[ id] = bone;
 

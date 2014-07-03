@@ -7,7 +7,7 @@ namespace graphic
 	class cBoneNode : public cNode
 	{
 	public:
-		cBoneNode(const int id, vector<Matrix44> &palette, const sRawMesh &rawMesh);
+		cBoneNode(const int id, vector<Matrix44> &palette, const sRawBone &rawMesh);
 		virtual ~cBoneNode();
 
 		void SetAnimation( const sRawAni &rawAni, int nAniFrame, bool bLoop=false );

@@ -828,6 +828,9 @@ fn ExporterStart =
 		
 		format "EXPORTER_V8\n" to:Outfile
 		
+		format "MESH_EXPORT\n" to:Outfile
+		
+		
 		-- Write Material
 		print "---------- Write Material ----------"
 		WriteMaterial()
@@ -838,8 +841,6 @@ fn ExporterStart =
 		format "GEOMOBJECT_COUNT = %\n" g_varSetMeshes.count to:Outfile
 		for i=1 to g_varSetMeshes.count do
 		(
-			--print g_varSetMeshes[i].name 
-			
 			-- vertex, index값은 EditMesh모드일때만 얻어올수 있어서 ConvertToMesh 함수를
 			-- 사용했다. 문제는 EditMesh모드일때 VertexWeight값을 얻을 수 없어서,
 			-- Vertex, index값을 얻은 후 undo명령어로 이전상태로 바꾼후 얻어온다.
@@ -850,25 +851,15 @@ fn ExporterStart =
 			)
 			max undo
 
-			WriteAni g_varSetMeshes[ i]
-			WriteVertexWeightFromSkin g_varSetMeshes[ i]		
+			WriteVertexWeightFromSkin g_varSetMeshes[ i]
 		)
-	)
 		
-	
-	-- Write Bone	
-	if (g_WriteAni == true) then
-	(
-		Outfile = createfile g_AniFilePath
-		
-		format "EXPORTER_V8\n" to:Outfile		
 		
 		print "---------- Write Bone ----------"
 		format "BONEOBJECT_COUNT = %\n" g_varSetBones.count to:Outfile
 		for i=1 to g_varSetBones.count do
 		(
-			--print g_varSetBones[i].name 
-			
+			format "name=%, id=%\n" g_varSetBones[ i].name i
 			-- vertex, index값은 EditMesh모드일때만 얻어올수 있어서 ConvertToMesh 함수를
 			-- 사용했다. 문제는 EditMesh모드일때 VertexWeight값을 얻을 수 없어서,
 			-- Vertex, index값을 얻은 후 undo명령어로 이전상태로 바꾼후 얻어온다.
@@ -887,24 +878,53 @@ fn ExporterStart =
 			
 			-- Write Bone localTM, worldTM
 			WriteBoneTM g_varSetBones[ i] 
-			
-			
-			-- Write Animation
-			-- snapshot
-			DumpObjects g_varSetBones[ i] 
-			snapobj = FindObject (g_varSetBones[ i].name + "_snap")
-			if snapobj == undefined then 
-				continue
-			
-			WriteAni snapobj
 		)
+		
+		close Outfile
+	)
+		
+	
+	-- Write Animation
+	if (g_WriteAni == true) then
+	(
+		Outfile = createfile g_AniFilePath
+		
+		format "EXPORTER_V8\n" to:Outfile
+		
+		format "ANIMATION_EXPORT\n" to:Outfile
+		
+		if (g_varSetBones.count <= 0) then
+		(
+			print "---------- Write Mesh Animation ----------"
+			format "ANIMATION_COUNT = %\n" g_varSetMeshes.count to:Outfile
+			for i=1 to g_varSetMeshes.count do
+			(
+				WriteAni g_varSetMeshes[ i]
+			)
+		)
+		else
+		(
+			print "---------- Write Bone Animation ----------"
+			format "ANIMATION_COUNT = %\n" g_varSetBones.count to:Outfile
+			for i=1 to g_varSetBones.count do
+			(				
+				-- snapshot
+				DumpObjects g_varSetBones[ i] 
+				snapobj = FindObject (g_varSetBones[ i].name + "_snap")
+				if snapobj == undefined then 
+					continue
+				
+				WriteAni snapobj
+			)
+		)
+
+		close Outfile		
 	)
 
 	
 	if $ != undefined then deselect $
 	select $'*snap'
 	delete selection	
-	close Outfile
 )
 
 

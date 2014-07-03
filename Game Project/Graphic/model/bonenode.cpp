@@ -6,7 +6,7 @@
 using namespace graphic;
 
 
-cBoneNode::cBoneNode(const int id, vector<Matrix44> &palette, const sRawMesh &rawMesh) :
+cBoneNode::cBoneNode(const int id, vector<Matrix44> &palette, const sRawBone &rawBone) :
 	cNode(id)
 ,	m_track(NULL)
 ,	m_mesh(NULL)
@@ -21,10 +21,10 @@ cBoneNode::cBoneNode(const int id, vector<Matrix44> &palette, const sRawMesh &ra
 ,	m_isAni(false)
 ,	m_isLoop(false)
 {
-	m_offset = rawMesh.worldTm.Inverse();
-	m_localTM = rawMesh.localTm;
+	m_offset = rawBone.worldTm.Inverse();
+	m_localTM = rawBone.localTm;
 
-	m_mesh = new cMesh(id, rawMesh);
+	m_mesh = new cMesh(id, rawBone);
 
 }
 

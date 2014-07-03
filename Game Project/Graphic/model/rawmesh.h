@@ -14,6 +14,7 @@ namespace graphic
 		string texture;
 	};
 
+
 	struct sWeight
 	{
 		int bone;
@@ -27,7 +28,23 @@ namespace graphic
 		int size;
 		sWeight w[6];
 	};
+
 	
+	struct sRawBone
+	{
+		int id;
+		int parentId;
+		string name;
+		Matrix44 localTm;
+		Matrix44 worldTm;
+
+		// debug 용.
+		vector<Vector3> vertices;
+		vector<Vector3> normals; // vertex 갯수만큼 저장된다.
+		vector<Vector3> tex;
+		vector<int> indices;
+	};
+
 
 	struct sRawMesh
 	{
@@ -54,6 +71,7 @@ namespace graphic
 		vector<sMaterial> mtrls;
 		vector<sRawMesh> meshes;
 		vector<sRawMesh> bones;
+		vector<sRawBone> bones2;
 	};
 
 }

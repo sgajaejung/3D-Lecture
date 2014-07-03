@@ -18,7 +18,6 @@ using namespace common;
 #include "base/indexbuffer.h"
 #include "base/texture.h"
 #include "base/vertexformat.h"
-#include "base/vertexformat.h"
 #include "base/grid.h"
 #include "base/grid2.h"
 

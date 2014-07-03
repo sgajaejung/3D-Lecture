@@ -5,43 +5,57 @@
 using namespace graphic;
 
 
-cMesh::cMesh(const int id, const sRawMesh &raw) : 
+cMesh::cMesh(const int id, const sRawMesh &rawMesh) : 
 	cNode(id)
 {
-	// 버텍스 버퍼 생성.
-	const bool isTexture = !raw.tex.empty();
+	CreateMesh(rawMesh.vertices, rawMesh.normals, rawMesh.tex, rawMesh.indices);
+	m_mtrl.InitWhite();
+}
 
-	if (m_vtxBuff.Create(raw.vertices.size(), sizeof(sVertexNormTex), sVertexNormTex::FVF))
-	{
-		sVertexNormTex* vertices = (sVertexNormTex*)m_vtxBuff.Lock();
-		for (u_int i = 0; i < raw.vertices.size(); i++)
-		{
-			vertices[ i].p = raw.vertices[ i];
-			vertices[ i].n = raw.normals[ i];
-			if (isTexture)
-			{
-				vertices[ i].u = raw.tex[ i].x;
-				vertices[ i].v = raw.tex[ i].y;
-			}
-		}
-		m_vtxBuff.Unlock();
-	}
-
-	// 인덱스 버퍼 생성.
-	if (m_idxBuff.Create(raw.indices.size()))
-	{
-		WORD *indices = (WORD*)m_idxBuff.Lock();
-		for (u_int i = 0; i < raw.indices.size(); ++i)
-			indices[ i] = raw.indices[ i];
-		m_idxBuff.Unlock();
-	}
-
+cMesh::cMesh(const int id, const sRawBone &rawBone) : 
+	cNode(id)
+{
+	CreateMesh(rawBone.vertices, rawBone.normals, rawBone.tex, rawBone.indices);
 	m_mtrl.InitWhite();
 }
 
 cMesh::~cMesh()
 {
 
+}
+
+
+void cMesh::CreateMesh( const vector<Vector3> &vertices, 
+	const vector<Vector3> &normals, 
+	const vector<Vector3> &tex,
+	const vector<int> &indices )
+{
+	const bool isTexture = !tex.empty();
+
+	if (m_vtxBuff.Create(vertices.size(), sizeof(sVertexNormTex), sVertexNormTex::FVF))
+	{
+		sVertexNormTex* pv = (sVertexNormTex*)m_vtxBuff.Lock();
+		for (u_int i = 0; i < vertices.size(); i++)
+		{
+			pv[ i].p = vertices[ i];
+			pv[ i].n = normals[ i];
+			if (isTexture)
+			{
+				pv[ i].u = tex[ i].x;
+				pv[ i].v = tex[ i].y;
+			}
+		}
+		m_vtxBuff.Unlock();
+	}
+
+	// 인덱스 버퍼 생성.
+	if (m_idxBuff.Create(indices.size()))
+	{
+		WORD *pi = (WORD*)m_idxBuff.Lock();
+		for (u_int i = 0; i < indices.size(); ++i)
+			pi[ i] = indices[ i];
+		m_idxBuff.Unlock();
+	}
 }
 
 
