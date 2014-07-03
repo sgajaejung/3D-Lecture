@@ -27,6 +27,7 @@ namespace graphic
 	private:
 		int m_id;
 		cBoneNode *m_root;
+		vector<cBoneNode*> m_bones;
 		vector<Matrix44> m_palette;
 	};
 

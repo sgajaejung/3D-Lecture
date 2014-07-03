@@ -33,6 +33,19 @@ void cMaterial::Init(const Vector4 &ambient,
 }
 
 
+void cMaterial::Init(const D3DMATERIAL9 &mtrl)
+{
+	m_mtrl = mtrl;
+}
+
+
+void cMaterial::Init(const sMaterial &mtrl)
+{
+	Init(mtrl.ambient, mtrl.diffuse, mtrl.specular, mtrl.emissive);
+	m_mtrl.Power = mtrl.power;
+}
+
+
 void cMaterial::InitWhite()
 {
 	Init(Vector4(1,1,1,1), Vector4(1,1,1,1), Vector4(1,1,1,1));

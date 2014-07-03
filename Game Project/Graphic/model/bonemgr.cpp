@@ -10,21 +10,25 @@ cBoneMgr::cBoneMgr(const int id, const sRawMeshGroup &rawMeshes) :
 	m_root(NULL)
 ,	m_id(id)
 {
-	m_palette.resize(rawMeshes.bones2.size());
+	m_palette.resize(rawMeshes.bones.size());
 
-	vector<cBoneNode*> vec(rawMeshes.bones2.size(), NULL);
-	for (u_int i=0; i < rawMeshes.bones2.size(); ++i)
+	m_bones.resize(rawMeshes.bones.size(), NULL);
+
+	for (u_int i=0; i < rawMeshes.bones.size(); ++i)
 	{
-		const int id = rawMeshes.bones2[ i].id;
-		const int parentId = rawMeshes.bones2[ i].parentId;
-		cBoneNode *bone = new cBoneNode(id, m_palette, rawMeshes.bones2[ i]);
-		SAFE_DELETE(vec[ id]);
-		vec[ id] = bone;
+		const int id = rawMeshes.bones[ i].id;
+		const int parentId = rawMeshes.bones[ i].parentId;
+		if (m_root && (parentId < 0))
+			continue;
+
+		cBoneNode *bone = new cBoneNode(id, m_palette, rawMeshes.bones[ i]);
+		SAFE_DELETE(m_bones[ id]);
+		m_bones[ id] = bone;
 
 		if (-1 >=  parentId) // root
 			m_root = bone;
 		else
-			vec[ parentId]->InsertChild( bone );
+			m_bones[ parentId]->InsertChild( bone );
 	}
 
 }
@@ -72,16 +76,17 @@ void cBoneMgr::Render(const Matrix44 &parentTm)
 }
 
 
-// 동적으로 할당된 객체 제거.
-void cBoneMgr::Clear()
-{
-	SAFE_DELETE(m_root);
-}
-
-
 // BoneNode 찾아서 리턴.
 cBoneNode* cBoneMgr::FindBone(const int id)
 {
 	RETV(!m_root, NULL);
 	return (cBoneNode*)m_root->FindNode(id);
+}
+
+
+// 동적으로 할당된 객체 제거.
+void cBoneMgr::Clear()
+{
+	SAFE_DELETE(m_root);
+	m_bones.clear();
 }

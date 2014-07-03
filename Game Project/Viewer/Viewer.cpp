@@ -66,7 +66,7 @@ bool cViewer::OnInit()
 	m_filePath = "../media/mesh.dat";
 	m_model = new graphic::cModel();
 	m_model->Create( m_filePath );
-	m_texture.Create("../media/001 copy.jpg");
+	//m_texture.Create("../media/001 copy.jpg");
 	m_model->SetAnimation("../media/ani.ani");
 	//m_texture.Create("../media/강소라.jpg");
 
@@ -122,7 +122,7 @@ void cViewer::OnRender(const float elapseT)
 		graphic::GetRenderer()->RenderAxis();
 
 		m_model->SetTM(m_rotateTm);
-		m_texture.Bind(0);
+		//m_texture.Bind(0);
 		m_model->Render();
 
 		//랜더링 끝
@@ -163,9 +163,10 @@ void cViewer::MessageProc( UINT message, WPARAM wParam, LPARAM lParam)
 			dbg::Print( "%d %d", fwKeys, zDelta);
 
 			Vector3 dir = m_lookAtPos - m_camPos;
+			const float len = dir.Length();
 			dir.Normalize();
 
-			float zoomLen = 50;
+			float zoomLen = (len > 100)? 50 : (len/3.f);
 			if (fwKeys & 0x4)
 				zoomLen = 1;
 

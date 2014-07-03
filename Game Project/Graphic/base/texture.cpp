@@ -21,7 +21,15 @@ cTexture::~cTexture()
 bool cTexture::Create(const string &fileName)
 {
 	if (FAILED(D3DXCreateTextureFromFileA(GetDevice(), fileName.c_str(), &m_texture)))
-		return false;
+	{
+		string path = "../media/";
+		path += common::GetFileName(fileName);
+		
+		if (FAILED(D3DXCreateTextureFromFileA(GetDevice(), path.c_str(), &m_texture)))
+			return false;
+
+		return true;
+	}
 
 	return true;
 }

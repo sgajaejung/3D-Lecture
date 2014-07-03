@@ -12,6 +12,10 @@ namespace graphic
 		Vector4 emissive;
 		float power;
 		string texture;
+
+		sMaterial() {}
+		sMaterial(const sMaterial &rhs);
+		sMaterial& operator=(const sMaterial &rhs);
 	};
 
 
@@ -54,13 +58,8 @@ namespace graphic
 		vector<Vector3> tex;
 		vector<int> indices;
 		vector<sVertexWeight> weights;
+		sMaterial mtrl;
 		int mtrlId;
-		string texturePath;
-		
-		int id; // only bone
-		int parentId; // only bone
-		Matrix44 localTm; // only bone
-		Matrix44 worldTm; // only bone
 	};
 
 
@@ -70,8 +69,7 @@ namespace graphic
 		string name;
 		vector<sMaterial> mtrls;
 		vector<sRawMesh> meshes;
-		vector<sRawMesh> bones;
-		vector<sRawBone> bones2;
+		vector<sRawBone> bones;
 	};
 
 }

@@ -302,14 +302,14 @@ fn CollectObject =
 			--print (objects[i].name)
 			format "ignore object %\n" objects[i].name
 		)		
-		else 		
-		(
-			--else if ((editable_mesh == (classof objects[i])) or 
-			--(editable_poly == (classof objects[i])) or
-			--(EditablePolyMesh  == (classof objects[i])) or
-			--(PolyMeshObject  == (classof objects[i]))				
-			--) then
-			
+		--else 		
+		--(
+		else if ((editable_mesh == (classof objects[i])) or 
+			(editable_poly == (classof objects[i])) or
+			(EditablePolyMesh  == (classof objects[i])) or
+			(PolyMeshObject  == (classof objects[i]))				
+			) then
+		(			
 			format "collect mesh %\n" objects[i].name
 			append g_varSetMeshes objects[i]
 		)
@@ -841,6 +841,8 @@ fn ExporterStart =
 		format "GEOMOBJECT_COUNT = %\n" g_varSetMeshes.count to:Outfile
 		for i=1 to g_varSetMeshes.count do
 		(
+			format "write mesh name=%, id=%\n" g_varSetMeshes[ i].name i
+			
 			-- vertex, index값은 EditMesh모드일때만 얻어올수 있어서 ConvertToMesh 함수를
 			-- 사용했다. 문제는 EditMesh모드일때 VertexWeight값을 얻을 수 없어서,
 			-- Vertex, index값을 얻은 후 undo명령어로 이전상태로 바꾼후 얻어온다.

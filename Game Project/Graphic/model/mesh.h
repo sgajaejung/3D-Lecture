@@ -27,6 +27,7 @@ namespace graphic
 	protected:
 		bool m_isSkinned;
 		cMaterial m_mtrl;
+		cTexture m_texture;
 		cVertexBuffer m_vtxBuff;
 		cIndexBuffer m_idxBuff;
 	};

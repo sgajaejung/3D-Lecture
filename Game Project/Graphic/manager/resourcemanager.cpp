@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "resourcemanager.h"
 #include "../importer/modelimporter.h"
+#include "../base/material.h"
 
 
 using namespace graphic;
@@ -31,6 +32,14 @@ sRawMeshGroup* cResourceManager::LoadModel( const string &fileName )
 	{
 		delete meshes;
 		return NULL;
+	}
+
+	BOOST_FOREACH (auto &mesh, meshes->meshes)
+	{
+		if (mesh.mtrlId >= 0)
+		{
+			mesh.mtrl = meshes->mtrls[ mesh.mtrlId];
+		}
 	}
 
 	m_meshes[ fileName] = meshes;

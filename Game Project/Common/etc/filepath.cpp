@@ -19,3 +19,14 @@ std::string common::GetFilePathExceptFileName(const std::string &fileName)
 	return srcFileName;
 }
 
+
+/**
+ @brief fileName의 디렉토리 경로를 제외한 파일이름과 확장자를 리턴한다.
+ */
+std::string common::GetFileName(const std::string &fileName)
+{
+	char srcFileName[ MAX_PATH];
+	strcpy_s(srcFileName, MAX_PATH, fileName.c_str() );
+	char *name = PathFindFileNameA(srcFileName);
+	return name;
+}

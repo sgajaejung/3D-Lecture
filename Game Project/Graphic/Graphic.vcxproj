@@ -110,6 +110,7 @@
     <ClCompile Include="model\mesh.cpp" />
     <ClCompile Include="model\model.cpp" />
     <ClCompile Include="model\node.cpp" />
+    <ClCompile Include="model\rawmesh.cpp" />
     <ClCompile Include="model\rigidmesh.cpp" />
     <ClCompile Include="model\skinnedmesh.cpp" />
     <ClCompile Include="model\track.cpp" />

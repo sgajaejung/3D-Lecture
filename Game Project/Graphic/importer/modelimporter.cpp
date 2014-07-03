@@ -2,26 +2,6 @@
 #include "stdafx.h"
 #include "modelimporter.h"
 
-/*
-	EXPORTER_V1
-		- vertex, index, normal
-
-	EXPORTER_V2
-		- vertex, index, normal, texture
-
-	EXPORTER_V3
-	- vertex, index, normal, texture, animation
-
-	EXPORTER_V4
-	- vertex, index, normal, texture, animation, bone
-
-	EXPORTER_V5
-	- vertex, index, normal, texture, animation, bone, vertex weight
-
-	EXPORTER_V6
-	- vertex, index, normal, texture, animation, bone, vertex weight, material
-
-*/
 
 namespace graphic { namespace importer {
 
@@ -423,17 +403,6 @@ bool importer::ReadTextureCoordinate( std::ifstream &fin, const string &fileName
 /**/
 	}
 
-	if (!flag)
-	{
-		// 텍스쳐 파일이름 로딩.
-		string textureTok, texFilePath;
-		fin >> textureTok >> eq;
-		std::getline(fin, texFilePath);
-		string  textureFileName = common::GetFilePathExceptFileName(fileName) + "\\" + 
-			common::trim(texFilePath);
-		rawMesh.texturePath = textureFileName;
-	}
-
 	return true;
 }
 
@@ -523,14 +492,14 @@ bool importer::ReadBone(std::ifstream &fin, OUT sRawMeshGroup &rawMeshes )
 	int boneObjectCount;
 	fin >> boneObject >> eq >> boneObjectCount;
 
-	rawMeshes.bones2.reserve(boneObjectCount);
+	rawMeshes.bones.reserve(boneObjectCount);
 
 	for (int i=0; i < boneObjectCount; ++i)
 	{
-		rawMeshes.bones2.push_back( sRawBone() );
-		ReadVertexIndexNormalBone(fin, rawMeshes.bones2.back());
-		ReadBoneInfo(fin, rawMeshes.bones2.back());
-		ReadTM(fin, rawMeshes.bones2.back());
+		rawMeshes.bones.push_back( sRawBone() );
+		ReadVertexIndexNormalBone(fin, rawMeshes.bones.back());
+		ReadBoneInfo(fin, rawMeshes.bones.back());
+		ReadTM(fin, rawMeshes.bones.back());
 	}
 
 	return true;

@@ -9,7 +9,10 @@ cMesh::cMesh(const int id, const sRawMesh &rawMesh) :
 	cNode(id)
 {
 	CreateMesh(rawMesh.vertices, rawMesh.normals, rawMesh.tex, rawMesh.indices);
-	m_mtrl.InitWhite();
+	m_mtrl.Init( rawMesh.mtrl );
+
+	if (!rawMesh.mtrl.texture.empty())
+		m_texture.Create( rawMesh.mtrl.texture );
 }
 
 cMesh::cMesh(const int id, const sRawBone &rawBone) : 
@@ -70,6 +73,7 @@ bool cMesh::Move(const float elapseTime)
 void cMesh::Render(const Matrix44 &parentTm)
 {
 	m_mtrl.Bind();
+	m_texture.Bind(0);
 	m_vtxBuff.Bind();
 	m_idxBuff.Bind();
 

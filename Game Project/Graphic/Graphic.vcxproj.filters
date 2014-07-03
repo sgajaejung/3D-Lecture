@@ -130,6 +130,9 @@
     <ClCompile Include="model\bonemgr.cpp">
       <Filter>model</Filter>
     </ClCompile>
+    <ClCompile Include="model\rawmesh.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="model">
