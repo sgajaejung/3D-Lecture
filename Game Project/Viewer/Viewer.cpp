@@ -63,10 +63,11 @@ bool cViewer::OnInit()
 {
 	DragAcceptFiles(m_hWnd, TRUE);
 
-	m_filePath = "../media/data.dat";
+	m_filePath = "../media/mesh.dat";
 	m_model = new graphic::cModel();
 	m_model->Create( m_filePath );
 	m_texture.Create("../media/001 copy.jpg");
+	m_model->SetAnimation("../media/ani.ani");
 	//m_texture.Create("../media/°­¼Ò¶ó.jpg");
 
 	m_mtrl.InitWhite();

@@ -13,6 +13,7 @@ namespace graphic
 		virtual ~cModel();
 
 		bool Create(const string &modelName);
+		void SetAnimation( const string &aniFileName);
 		virtual bool Move(const float elapseTime);
 		virtual void Render();
 		void Clear();

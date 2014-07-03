@@ -29,18 +29,12 @@ bool cModel::Create(const string &modelName)
 
 	Clear();
 
-	const bool isSkinnedMesh = !rawMeshes->bones.empty();
+	const bool isSkinnedMesh = !rawMeshes->bones2.empty();
 
 	// 스키닝 애니메이션이면 Bone을 생성한다.
 	if (isSkinnedMesh)
 	{
 		m_bone = new cBoneMgr(0, *rawMeshes);
-
-		if (sRawAniGroup *rawAnies = cResourceManager::Get()->FindAni(modelName))
-		{
-			if (!rawAnies->anies.empty())
-				m_bone->SetAnimation(*rawAnies, 0);
-		}
 	}
 
 	// 메쉬 생성.
@@ -54,11 +48,6 @@ bool cModel::Create(const string &modelName)
 		else
 		{
 			p = new cRigidMesh(0, mesh);
-			if (sRawAniGroup *rawAnies = cResourceManager::Get()->FindAni(modelName))
-			{
-				if (!rawAnies->anies.empty())
-					((cRigidMesh*)p)->LoadAnimation(rawAnies->anies[0]);
-			}
 		}
 
 		if (p)
@@ -66,6 +55,25 @@ bool cModel::Create(const string &modelName)
 	}
 
 	return true;
+}
+
+
+void cModel::SetAnimation( const string &aniFileName)
+{
+	if (sRawAniGroup *rawAnies = cResourceManager::Get()->LoadAnimation(aniFileName))
+	{
+		if (m_bone)
+		{
+			m_bone->SetAnimation(*rawAnies, 0);
+		}
+		else
+		{
+			for (int i=0; i < m_meshes.size(); ++i)
+			{
+				((cRigidMesh*)m_meshes[ i])->LoadAnimation(rawAnies->anies[0]);
+			}
+		}
+	}
 }
 
 

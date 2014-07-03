@@ -7,8 +7,9 @@ namespace graphic
 	namespace importer 
 	{
 
-		bool ReadRawMeshFile( const string &fileName, 
-			OUT sRawMeshGroup &raw, OUT sRawAniGroup &rawAni );
+		bool ReadRawMeshFile( const string &fileName, OUT sRawMeshGroup &raw );
+
+		bool ReadRawAnimationFile( const string &fileName, OUT sRawAniGroup &rawAni );
 
 	}
 }
