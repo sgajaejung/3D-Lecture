@@ -141,6 +141,36 @@ BOOL CClientDlg::OnInitDialog()
 }
 
 
+//------------------------------------------------------------------------
+// 멀티바이트 문자를 유니코드로 변환
+//------------------------------------------------------------------------
+std::wstring str2wstr(const std::string &str)
+{
+	int len;
+	int slength = (int)str.length() + 1;
+	len = ::MultiByteToWideChar(CP_ACP, 0, str.c_str(), slength, 0, 0);
+	wchar_t* buf = new wchar_t[len];
+	::MultiByteToWideChar(CP_ACP, 0, str.c_str(), slength, buf, len);
+	std::wstring r(buf);
+	delete[] buf;
+	return r;
+}
+
+//------------------------------------------------------------------------
+// 유니코드를 멀티바이트 문자로 변환
+//------------------------------------------------------------------------
+std::string wstr2str(const std::wstring &wstr)
+{
+	const int slength = (int)wstr.length() + 1;
+	const int len = ::WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), slength, 0, 0, NULL, FALSE);
+	char* buf = new char[len];
+	::WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), slength, buf, len, NULL, FALSE);
+	std::string r(buf);
+	delete[] buf;
+	return r;
+}
+
+
 void CClientDlg::OnBnClickedOk()
 {
 	//CDialogEx::OnOK();
@@ -202,36 +232,6 @@ void CClientDlg::PacketProcess()
 }
 
 
-//------------------------------------------------------------------------
-// 멀티바이트 문자를 유니코드로 변환
-//------------------------------------------------------------------------
-std::wstring str2wstr(const std::string &str)
-{
-	int len;
-	int slength = (int)str.length() + 1;
-	len = ::MultiByteToWideChar(CP_ACP, 0, str.c_str(), slength, 0, 0);
-	wchar_t* buf = new wchar_t[len];
-	::MultiByteToWideChar(CP_ACP, 0, str.c_str(), slength, buf, len);
-	std::wstring r(buf);
-	delete[] buf;
-	return r;
-}
-
-//------------------------------------------------------------------------
-// 유니코드를 멀티바이트 문자로 변환
-//------------------------------------------------------------------------
-std::string wstr2str(const std::wstring &wstr)
-{
-	const int slength = (int)wstr.length() + 1;
-	const int len = ::WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), slength, 0, 0, NULL, FALSE);
-	char* buf = new char[len];
-	::WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), slength, buf, len, NULL, FALSE);
-	std::string r(buf);
-	delete[] buf;
-	return r;
-}
-
-
 void CClientDlg::ParsePacket(char buff[128])
 {
 	using namespace network;
@@ -244,8 +244,8 @@ void CClientDlg::ParsePacket(char buff[128])
 
 	case PROTOCOL::CHATTING:
 		{
-			sChatProtocol *protocol = (sChatProtocol*)buff;
-			wstring wstr = str2wstr(protocol->msg);
+			const sChatProtocol *protocol = (sChatProtocol*)buff;
+			const wstring wstr = str2wstr(protocol->msg);
 			m_ChatList.InsertString(m_ChatList.GetCount(), wstr.c_str());
 		}
 		break;
@@ -286,8 +286,8 @@ void CClientDlg::OnBnClickedButtonSend()
 	m_ChatInput.SetWindowText(L"");
 	UpdateData();
 
-	wstring wstr = text;
-	string str = wstr2str(wstr);
+	const wstring wstr = text;
+	const string str = wstr2str(wstr);
 
 	network::sChatProtocol chat;
 	ZeroMemory(&chat, sizeof(chat));
