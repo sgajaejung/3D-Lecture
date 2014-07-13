@@ -52,16 +52,10 @@ bool	network::LaunchClient(const std::string &ip, const int port, OUT SOCKET &ou
 	{
 		//clog::Error( clog::ERROR_CRITICAL, "connect() error ip=%s, port=%d\n", ip.c_str(), port );
 		closesocket(clientSocket);
-		//pClient->OnDisconnect();
 		return false;
 	}
 
 	out = clientSocket;
-	//pClient->SetIp(ip);
-	//pClient->SetPort(port);
-	//pClient->SetSocket(clientSocket);
-	//pClient->SetState(SESSIONSTATE_LOGIN);
-	//pClient->OnConnect();
 
 	return true;
 }
@@ -73,9 +67,6 @@ bool	network::LaunchClient(const std::string &ip, const int port, OUT SOCKET &ou
 //------------------------------------------------------------------------
 bool network::LaunchServer(const int port, OUT SOCKET &out)
 {
-	//if (!pSvr)
-	//	return false;
-
 	// 윈속을 시작하고 버전을 확인합니다
 	WORD wVersionRequested = MAKEWORD(1, 1);
 	WSADATA wsaData;
@@ -129,15 +120,11 @@ bool network::LaunchServer(const int port, OUT SOCKET &out)
 	{
 		//clog::Error( clog::ERROR_CRITICAL, "listen() error\n" );
 		closesocket(svrSocket);
-		//pSvr->OnDisconnect();
 		return false;
 	}
 
 	out = svrSocket;
-	//pSvr->SetSocket(svrSocket);
-	//pSvr->SetIp("127.0.0.1");
-	//pSvr->SetPort(port);
-	//pSvr->OnListen();
+
 	return true;
 }
 
