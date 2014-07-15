@@ -219,7 +219,7 @@ void CClientDlg::PacketProcess()
 	{
 		char buff[ 128];
 		const int result = recv( readSockets.fd_array[ 0], buff, sizeof(buff), 0);
-		if (result == SOCKET_ERROR || result == 0) // 받은 패킷사이즈가 0이면 서버와 끊겼다는 의미다.
+		if (result == SOCKET_ERROR || result == 0) // 받은 패킷사이즈가 0이면 서버와 접속이 끊겼다는 의미다.
 		{
 			m_ChatList.InsertString(m_ChatList.GetCount(), L"서버와 연결이 끊김" );
 			closesocket(m_socket);

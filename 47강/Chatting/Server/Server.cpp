@@ -253,7 +253,7 @@ void MainLoop(int timeDelta)
 
 			char buff[ 128];
 			const int result = recv(sockets.fd_array[ i], buff, sizeof(buff), 0);
-			if (result == SOCKET_ERROR || result == 0) // 받은 패킷사이즈가 0이면 서버와 끊겼다는 의미다.
+			if (result == SOCKET_ERROR || result == 0) // 받은 패킷사이즈가 0이면 서버와 접속이 끊겼다는 의미다.
 			{
 				g_clients.erase(sockets.fd_array[ i]);
 			}

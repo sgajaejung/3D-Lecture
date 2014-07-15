@@ -101,10 +101,7 @@ bool network::LaunchServer(const int port, OUT SOCKET &out)
 		return false;
 	}
 
-	int nLen;
-	nLen = sizeof(SOCKADDR);
 	char szBuf[256];
-
 	nRet = gethostname( szBuf, sizeof(szBuf) );
 	if (nRet == SOCKET_ERROR)
 	{
