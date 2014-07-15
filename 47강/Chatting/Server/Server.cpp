@@ -238,24 +238,20 @@ void MainLoop(int timeDelta)
 
 	AcceptClient();
 
-
 	const timeval t = {0, 10}; // 10 millisecond
 	fd_set readSockets;
 	MakeSessionFdset(readSockets);
-	const fd_set sockets = readSockets;
 
 	const int ret = select( readSockets.fd_count, &readSockets, NULL, NULL, &t );
 	if (ret != 0 && ret != SOCKET_ERROR)
 	{
-		for (u_int i=0; i < sockets.fd_count; ++i)
+		for (u_int i=0; i < readSockets.fd_count; ++i)
 		{
-			if (!FD_ISSET(sockets.fd_array[ i], &readSockets)) continue;
-
 			char buff[ 128];
-			const int result = recv(sockets.fd_array[ i], buff, sizeof(buff), 0);
+			const int result = recv(readSockets.fd_array[ i], buff, sizeof(buff), 0);
 			if (result == SOCKET_ERROR || result == 0) // 받은 패킷사이즈가 0이면 서버와 접속이 끊겼다는 의미다.
 			{
-				g_clients.erase(sockets.fd_array[ i]);
+				g_clients.erase(readSockets.fd_array[ i]);
 			}
 			else
 			{
