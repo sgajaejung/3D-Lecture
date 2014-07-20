@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{0369BFBC-6B33-4462-AE2E-74D6823F0AE8}</ProjectGuid>
+    <ProjectGuid>{CCCF1092-77E8-4FAB-9CC8-C268C7DF8B7B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Shader_Texture</RootNamespace>
-    <ProjectName>2.Shader_Texture</ProjectName>
+    <RootNamespace>Shader_Normal</RootNamespace>
+    <ProjectName>3.Shader_Normal</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -85,6 +85,7 @@
     <ClCompile Include="..\..\base\line.cpp" />
     <ClCompile Include="..\..\base\material.cpp" />
     <ClCompile Include="..\..\base\shader.cpp" />
+    <ClCompile Include="..\..\base\sphere.cpp" />
     <ClCompile Include="..\..\base\texture.cpp" />
     <ClCompile Include="..\..\base\vertexbuffer.cpp" />
     <ClCompile Include="..\..\etc\Utility.cpp" />
@@ -92,7 +93,7 @@
     <ClCompile Include="..\..\math\quaternion.cpp" />
     <ClCompile Include="..\..\math\vector3.cpp" />
     <ClCompile Include="..\..\math\vector4.cpp" />
-    <ClCompile Include="shader_texture.cpp" />
+    <ClCompile Include="Shader_Normal.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\base\base.h" />
@@ -106,6 +107,7 @@
     <ClInclude Include="..\..\base\line.h" />
     <ClInclude Include="..\..\base\material.h" />
     <ClInclude Include="..\..\base\shader.h" />
+    <ClInclude Include="..\..\base\sphere.h" />
     <ClInclude Include="..\..\base\texture.h" />
     <ClInclude Include="..\..\base\vertexbuffer.h" />
     <ClInclude Include="..\..\base\vertexformat.h" />

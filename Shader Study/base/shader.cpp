@@ -15,12 +15,6 @@ cShader::cShader() :
 
 cShader::~cShader()
 {
-	Clear();
-}
-
-
-void cShader::Clear()
-{
 	SAFE_RELEASE(m_effect);
 }
 
@@ -30,10 +24,16 @@ bool cShader::Create(const string &fileName, const string &technique)
 	// 쉐이더 파일 읽기
 	HRESULT hr;
 	LPD3DXBUFFER pErr;
-	if (FAILED(hr = D3DXCreateEffectFromFileA(GetDevice(), 
-		fileName.c_str(), 
-		NULL, NULL, D3DXSHADER_DEBUG , NULL, 
-		&m_effect, &pErr))) 
+	if (FAILED(hr = D3DXCreateEffectFromFileA(
+		GetDevice(), // IDirect3DDevice9 포인터
+		fileName.c_str(), // 이펙트 파일명 포인터
+		NULL,	// 전처리기 포인터
+		NULL,	// 옵션 인터페이스 포인터
+		D3DXSHADER_DEBUG , // D3DXSHADER 식별 컴파일 옵션
+		NULL,	// 공유 인수로 사용하는 ID3DXEffectPool 오브젝트 포인터
+		&m_effect, // 컴파일된 이펙트 파일이 저장될 버퍼
+		&pErr // 컴파일 에러가 저장될 버퍼
+		))) 
 	{
 			MessageBoxA( NULL, (LPCSTR)pErr->GetBufferPointer(), "ERROR", MB_OK);
 			//DXTRACE_ERR( "CreateEffectFromFile", hr );
@@ -49,7 +49,6 @@ bool cShader::Create(const string &fileName, const string &technique)
 void cShader::Begin()
 {
 	RET(!m_effect);
-
 	m_effect->Begin(NULL, 0);
 	m_effect->SetTechnique( m_hTechnique );
 }
@@ -58,7 +57,6 @@ void cShader::Begin()
 void cShader::BeginPass(int pass)
 {
 	RET(!m_effect);
-
 	m_effect->BeginPass(pass);
 }
 
@@ -66,7 +64,6 @@ void cShader::BeginPass(int pass)
 void cShader::EndPass()
 {
 	RET(!m_effect);
-
 	m_effect->EndPass();
 }
 
@@ -74,7 +71,6 @@ void cShader::EndPass()
 void cShader::End()
 {
 	RET(!m_effect);
-
 	m_effect->End();
 }
 

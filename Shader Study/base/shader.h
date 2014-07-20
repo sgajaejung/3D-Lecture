@@ -15,7 +15,6 @@ namespace graphic
 		void BeginPass(int pass);
 		void EndPass();
 		void End();
-		void Clear();
 
 		void SetMatrix(const string &key, const Matrix44 &mat);
 		void SetTexture(const string &key, cTexture &texture);
