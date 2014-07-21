@@ -1,4 +1,8 @@
 {
     "main window": "696 293 750 845",
-    "memory tree": "1 18 166 626"
+    "memory tree": "1 18 166 626",
+    "graphic::cModel#1":
+    {
+        "m_matTM": "931 212 400 400"
+    }
 }

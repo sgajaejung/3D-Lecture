@@ -14,12 +14,11 @@ namespace network
 		};
 	}
 
-
+#pragma pack(4)
 	struct sPacketHeader
 	{
-		PROTOCOL::TYPE protocol;
+		PROTOCOL::TYPE protocol;		
 	};
-
 
 	struct sLoginProtocol
 	{
@@ -28,11 +27,11 @@ namespace network
 		char pass[ 8];
 	};
 
-
 	struct sChatProtocol
 	{
 		sPacketHeader header;
 		char msg[ 64];
 	};
+#pragma pack()
 
 }

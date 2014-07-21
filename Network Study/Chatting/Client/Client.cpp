@@ -84,6 +84,8 @@ BOOL CClientApp::InitInstance()
 {
 	CWinApp::InitInstance();
 
+	int aa = sizeof(network::sChatProtocol);
+
 	CClientDlg *dlg;
 	dlg = new CClientDlg();
 	dlg->Create( CClientDlg::IDD );
@@ -297,7 +299,7 @@ void CClientDlg::OnBnClickedButtonSend()
 	char buff[ 128];
 	ZeroMemory(buff, sizeof(buff));
 	memcpy(buff, &chat, sizeof(chat));
-
+	int a = sizeof(buff);
 	const int result = send(m_socket, buff, sizeof(buff), 0);
 	if (result == INVALID_SOCKET)
 	{	

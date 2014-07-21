@@ -1,5 +1,5 @@
 
-// Dynamic Alpha blending
+// Alpha Blending Code
 
 #include <windows.h>
 #include <string>
@@ -36,21 +36,12 @@ Matrix44 g_matProj;
 Matrix44 g_matView;
 
 graphic::cLine g_line( D3DCOLOR_XRGB(0,255,0) );
-graphic::cGrid2 g_gridAlpha;
 graphic::cGrid2 g_grid;
-const int TEXTURE_SIZE = 200;
-const float CELL_SIZE = 200.f;
+const int TEXTURE_SIZE = 100;
+const float CELL_SIZE = 50.f;
 const int COL_CELL_COUNT = 16;
 const int ROW_CELL_COUNT = 16;
 
-
-struct sDataPack
-{
-	int textureColumn;
-	int textureRow;
-	char str[ 64];
-	BYTE *pBits;
-};
 
 
 LPDIRECT3DDEVICE9 graphic::GetDevice()
@@ -82,8 +73,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	LPSTR lpCmdLine, 
 	int nCmdShow)
 {
-	wchar_t className[32] = L"Dynamic Alpha";
-	wchar_t windowName[32] = L"Dynamic Alpha";
+	wchar_t className[32] = L"Paint Texture";
+	wchar_t windowName[32] = L"Paint Texture";
 
 	//윈도우 클레스 정보 생성
 	//내가 이러한 윈도를 만들겠다 라는 정보
@@ -157,27 +148,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 			Render(elapseT);
 		}
 	}
-
-
-
-	D3DLOCKED_RECT lockrect;
-	g_gridAlpha.GetTexture().Lock(lockrect);
-	BYTE *pbits = (BYTE*)lockrect.pBits;
-	const int imageByteSize = lockrect.Pitch * TEXTURE_SIZE;
-	FILE *fp = fopen("alpha.a", "wb");
-
-	sDataPack dp;
-	dp.textureColumn = TEXTURE_SIZE;
-	dp.textureRow = TEXTURE_SIZE;
-	strcpy( dp.str, "texture alpha" );
-	dp.pBits = NULL;
-	fwrite(&dp, 1, sizeof(dp), fp);
-	fwrite(pbits, imageByteSize, sizeof(BYTE), fp);
-
-	fclose(fp);
-	g_gridAlpha.GetTexture().Unlock();
-
-
 
 	if (g_pDevice)
 		g_pDevice->Release();
@@ -316,31 +286,10 @@ void Render(int timeDelta)
 
 		RenderFPS(timeDelta);
 
-		g_pDevice->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-		g_pDevice->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-		g_pDevice->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
-
-		g_pDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
-		g_pDevice->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
-		g_pDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
-
-		g_pDevice->SetTextureStageState( 0, D3DTSS_TEXCOORDINDEX, 0 );
-		g_pDevice->SetTextureStageState( 1, D3DTSS_TEXCOORDINDEX, 0 );
-
-		g_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_SELECTARG1 );
-		g_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
-
-		g_pDevice->SetTextureStageState( 1, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-		g_pDevice->SetTextureStageState( 1, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-		g_pDevice->SetTextureStageState( 1, D3DTSS_COLORARG2, D3DTOP_SELECTARG1);
-		g_pDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP, D3DTA_CURRENT);
-
-
 		Matrix44 tm = g_LocalTm;
 		g_pDevice->SetTransform(D3DTS_WORLD, (D3DXMATRIX*)&tm);
 
-		g_gridAlpha.Render();
-		g_grid.Render(1);
+		g_grid.Render();
 
 		g_pDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
 
@@ -369,27 +318,8 @@ void Render(int timeDelta)
 
 bool InitVertexBuffer()
 {
-	g_gridAlpha.Create(ROW_CELL_COUNT, COL_CELL_COUNT, CELL_SIZE, 1.f);
-	g_gridAlpha.GetTexture().Create(TEXTURE_SIZE, TEXTURE_SIZE, D3DFMT_A8R8G8B8);
 	g_grid.Create(ROW_CELL_COUNT, COL_CELL_COUNT, CELL_SIZE, 1.f);
-	g_grid.GetTexture().Create( "../../media/grass_spring1.jpg");
-
-
-	D3DLOCKED_RECT lockrect;
-	g_gridAlpha.GetTexture().Lock(lockrect);
-	BYTE *pbits = (BYTE*)lockrect.pBits;
-	const int imageByteSize = lockrect.Pitch * TEXTURE_SIZE;
-	FILE *fp = fopen("alpha.a", "rb");
-	if (fp)
-	{
-		sDataPack dp;
-		fread(&dp, 1, sizeof(dp), fp);
-		fread(pbits, imageByteSize, sizeof(BYTE), fp);
-		dp.pBits = pbits;
-		fclose(fp);
-	}
-	g_gridAlpha.GetTexture().Unlock();
-
+	g_grid.GetTexture().Create(TEXTURE_SIZE, TEXTURE_SIZE, D3DFMT_A8R8G8B8);
 
 	// 카메라, 투영행렬 생성
 	UpdateCamera();
@@ -416,10 +346,10 @@ bool Pick(int x, int y)
 	Vector3 orig, dir;
 	GetRay( x, y, orig, dir );
 
-	sVertexNormTex *vertices = (sVertexNormTex*)g_gridAlpha.GetVertexBuffer().Lock();
-	WORD *indices = (WORD*)g_gridAlpha.GetIndexBuffer().Lock();
+	sVertexNormTex *vertices = (sVertexNormTex*)g_grid.GetVertexBuffer().Lock();
+	WORD *indices = (WORD*)g_grid.GetIndexBuffer().Lock();
 
-	const int size = g_gridAlpha.GetIndexBuffer().GetFaceCount()*3;
+	const int size = g_grid.GetIndexBuffer().GetFaceCount()*3;
 	for( int i=0; i < size; i+=3 )
 	{
 		const Vector3 v1 = vertices[ indices[ i+0]].p;
@@ -442,8 +372,8 @@ bool Pick(int x, int y)
 		}
 	}
 
-	g_gridAlpha.GetVertexBuffer().Unlock();
-	g_gridAlpha.GetIndexBuffer().Unlock();
+	g_grid.GetVertexBuffer().Unlock();
+	g_grid.GetIndexBuffer().Unlock();
 	return true;
 }
 
@@ -527,11 +457,12 @@ bool IntersectTriangle( const D3DXVECTOR3& orig, const D3DXVECTOR3& dir,
 void Brush(const float u, const float v)
 {
 	D3DLOCKED_RECT lockrect;
-	g_gridAlpha.GetTexture().Lock(lockrect);
+	g_grid.GetTexture().Lock(lockrect);
 
 	const float innerRadius = 10;
-	const float outterRadius = 200;
+	const float outterRadius = 30;
 	const float innerAlpha = 1.f;
+	const float outterAlpha = 0.4f;
 
 	BYTE *pbits = (BYTE*)lockrect.pBits;
 	for (int ay=0; ay < TEXTURE_SIZE; ++ay)
@@ -550,23 +481,23 @@ void Brush(const float u, const float v)
 			if (len <= innerRadius)
 			{
 				int color = (int)(255.f * innerAlpha);
-				*ppixel = D3DCOLOR_ARGB(color, 0, 0, 0);
+				*ppixel = D3DCOLOR_XRGB(color, color, color);
 			}
 			else if (len <= outterRadius)
 			{
 				// 보간
 				const float width = outterRadius - innerRadius;
 				const float delta = 1.f - ((len - innerRadius) / width);
-				const int color = (int)(innerAlpha* delta * 255.f);
+				const int color = (int)(((innerAlpha - outterAlpha) * delta) * 255.f);
 
-				const int dest = *ppixel >> 24;
+				const int dest = *ppixel & 0xff;
 				if (color > dest)
-					*ppixel = D3DCOLOR_ARGB(color, 0, 0, 0);
+					*ppixel = D3DCOLOR_XRGB(color, color, color);
 			}
 		}
 	}
 
-	g_gridAlpha.GetTexture().Unlock();
+	g_grid.GetTexture().Unlock();
 }
 
 

@@ -18,6 +18,7 @@ namespace network
 	struct sPacketHeader
 	{
 		PROTOCOL::TYPE protocol;
+		int size;
 	};
 
 
