@@ -278,11 +278,11 @@ void Render(int timeDelta)
 		RenderFPS(timeDelta);
 		RenderAxis();
 
-		g_shader.Begin();
-		g_shader.BeginPass(0);
-
 		g_shader.SetMatrix("mWVP", g_LocalTm * g_matView * g_matProj);
 		g_shader.SetTexture("Tex", g_texture);
+
+		g_shader.Begin();
+		g_shader.BeginPass(0);
 
 		g_cube.Render(g_LocalTm);
 

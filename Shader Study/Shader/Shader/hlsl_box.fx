@@ -57,7 +57,7 @@ technique TShader
     pass P0
     {
         // ºŒ¿Ã¥ı
-        VertexShader = compile vs_1_1 VS_pass0();
-        PixelShader  = compile ps_2_0 PS_pass0();
+        VertexShader = compile vs_3_0 VS_pass0();
+        PixelShader  = compile ps_3_0 PS_pass0();
     }
 }
