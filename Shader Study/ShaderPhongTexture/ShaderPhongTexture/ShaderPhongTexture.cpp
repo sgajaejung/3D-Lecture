@@ -36,7 +36,8 @@ Matrix44 g_matProj;
 Matrix44 g_matView;
 
 graphic::cShader g_shader;
-LPD3DXMESH g_mesh;
+graphic::cSphere g_sphere;
+graphic::cTexture g_texture;
 
 LPDIRECT3DDEVICE9 graphic::GetDevice()
 {
@@ -290,7 +291,8 @@ void Render(int timeDelta)
 
 		g_shader.Begin();
 		g_shader.BeginPass(0);
-		g_mesh->DrawSubset(0);
+		g_texture.Bind(0);
+		g_sphere.Render(tm);
 		g_shader.EndPass();
 		g_shader.End();
 
@@ -305,9 +307,9 @@ void Render(int timeDelta)
 
 bool InitVertexBuffer()
 {
-	g_shader.Create("hlsl_box_normal_phong.fx", "TShader" );
-
-	D3DXCreateSphere(GetDevice(), 30, 20, 20,&g_mesh, NULL); 
+	g_shader.Create("hlsl_box_normal_phong_tex.fx", "TShader" );
+	g_texture.Create("../../media/강소라.jpg");
+	g_sphere.Create(30, 20, 20);
 
 
 	// 카메라, 투영행렬 생성

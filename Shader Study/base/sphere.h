@@ -8,7 +8,7 @@ namespace graphic
 	{
 	public:
 		cSphere();
-		cSphere(const float radius, const int numSegments, const int numSlices);
+		cSphere(const float radius, const int stacks, const int slices);
 		virtual ~cSphere();
 
 		void Create(const float radius, const int numSegments, const int numSlice);
