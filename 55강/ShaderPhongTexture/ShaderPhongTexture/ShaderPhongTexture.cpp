@@ -284,6 +284,7 @@ void Render(int timeDelta)
 		g_shader.SetVector("vLightDir", Vector3(0,-1,0));
 		g_shader.SetMatrix("mWVP", tm * g_matView * g_matProj);
 		g_shader.SetVector("vEyePos", g_camPos);
+		g_shader.SetTexture("Tex", g_texture);
 
 		Matrix44 mWIT = tm.Inverse();
 		mWIT.Transpose();
@@ -291,7 +292,6 @@ void Render(int timeDelta)
 
 		g_shader.Begin();
 		g_shader.BeginPass(0);
-		g_texture.Bind(0);
 		g_sphere.Render(tm);
 		g_shader.EndPass();
 		g_shader.End();

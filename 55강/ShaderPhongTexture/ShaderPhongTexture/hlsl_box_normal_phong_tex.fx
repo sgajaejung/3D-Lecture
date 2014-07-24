@@ -88,7 +88,7 @@ float4 PS_pass0(VS_OUTPUT In) : COLOR
 	float3 N = normalize(In.N);
 
 	Out = In.Diffuse + I_s * pow( max(0, dot(N,H)), 32);
-	Out *= tex2D(Samp, In.Tex);
+	//Out *= tex2D(Samp, In.Tex);
 
     return Out;
 }
