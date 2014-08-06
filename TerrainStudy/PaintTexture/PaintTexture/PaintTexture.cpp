@@ -462,7 +462,7 @@ void Brush(const float u, const float v)
 	const float innerRadius = 10;
 	const float outterRadius = 30;
 	const float innerAlpha = 1.f;
-	const float outterAlpha = 0.4f;
+	const float outterAlpha = 0.f;
 
 	BYTE *pbits = (BYTE*)lockrect.pBits;
 	for (int ay=0; ay < TEXTURE_SIZE; ++ay)
@@ -488,7 +488,7 @@ void Brush(const float u, const float v)
 				// º¸°£
 				const float width = outterRadius - innerRadius;
 				const float delta = 1.f - ((len - innerRadius) / width);
-				const int color = (int)(((innerAlpha - outterAlpha) * delta) * 255.f);
+				const int color = (int)((((innerAlpha - outterAlpha) * delta) + outterAlpha) * 255.f);
 
 				const int dest = *ppixel & 0xff;
 				if (color > dest)
