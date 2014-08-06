@@ -276,10 +276,14 @@ void Render(int timeDelta)
 		RenderFPS(timeDelta);
 
 		g_pDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
+		// 알파블렌딩 플래그를 On 한다.
 		g_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
+		// 첫 번째 알파 인자를 텍스쳐에 있다고 알려주고,
 		g_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1 );
+		// 알파 연산 없이 첫 번째 알파 채널을 그대로 이용하겠다고 알린다.
 		g_pDevice->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
 		g_pDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
+		// 알파 연산은 일반적인 연산으로 지정한다.
 
 
 		Matrix44 tm = g_LocalTm;

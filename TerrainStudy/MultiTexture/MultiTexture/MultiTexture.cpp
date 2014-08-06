@@ -278,12 +278,20 @@ void Render(int timeDelta)
 
 
 		//---------------------------------------------------------------------------------------------------------
+		// 원본 텍스쳐와 알파 텍스쳐를 modulate 연산으로 블렌딩하는 코드다.
+		// 첫 번째 스테이지에서 원본 텍스쳐를 출력하고, 두 번째 텍스쳐는 rgb값이 알파값인
+		// 텍스쳐다. 그래서 두개의 텍스쳐를 modulate 연산해서 출력하면 두 번째 텍스쳐가
+		// 알파 채널이 되어서 출력되게 된다.
 		g_pDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
 		g_pDevice->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
 		g_pDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
 
 		g_pDevice->SetTextureStageState( 0, D3DTSS_TEXCOORDINDEX, 0 );
 		g_pDevice->SetTextureStageState( 1, D3DTSS_TEXCOORDINDEX, 0 );
+		//1번 2번 텍스쳐 스테이지에서 uv 텍스쳐 좌표를 몇 번째 텍스쳐 좌표를 쓸 것인가를
+		//	설정하는 코드다. D3DFVF_TEX1 으로 설정된 uv 좌표라면 0 으로 설정해야 한다.
+		//	만약 텍스쳐 좌표를 하나 이상으로 설정된 상태라면, 해당하는 텍스쳐 좌표
+		//	인덱스를 설정해줘야한다.
 
 		g_pDevice->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_SELECTARG1 );
 		g_pDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );

@@ -366,6 +366,8 @@ bool Pick(int x, int y)
 			&t, &u, &v))
 		{
 			Vector3 pos = orig + dir*t;
+
+			//마우스 피킹을 통해서 3차원상에서 좌표를 얻었다면, 텍스쳐 uv 좌표로 변환한다.
 			float tu, tv;
 			GetTextureUV(pos, tu, tv);
 			Brush(tu, tv);
@@ -501,6 +503,7 @@ void Brush(const float u, const float v)
 }
 
 
+// 3차원 월드 상의 좌표를 텍스쳐 uv 좌표로 변환한다.
 void GetTextureUV(const Vector3 &pos, OUT float &u, OUT float &v)
 {
 	const float width = COL_CELL_COUNT * CELL_SIZE;

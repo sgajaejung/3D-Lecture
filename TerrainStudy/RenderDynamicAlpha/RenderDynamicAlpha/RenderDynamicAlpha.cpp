@@ -295,6 +295,8 @@ void Render(int timeDelta)
 		g_pDevice->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
 		g_pDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
 
+
+		// 첫 번째 이미지를 알파이미지로, 두 번째 이미지를 원본 이미지로 쓴다.
 		g_pDevice->SetTextureStageState( 0, D3DTSS_TEXCOORDINDEX, 0 );
 		g_pDevice->SetTextureStageState( 1, D3DTSS_TEXCOORDINDEX, 0 );
 
@@ -302,8 +304,6 @@ void Render(int timeDelta)
 		g_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
 
 		g_pDevice->SetTextureStageState( 1, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-		g_pDevice->SetTextureStageState( 1, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-		g_pDevice->SetTextureStageState( 1, D3DTSS_COLORARG2, D3DTOP_SELECTARG1);
 		g_pDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP, D3DTA_CURRENT);
 
 
