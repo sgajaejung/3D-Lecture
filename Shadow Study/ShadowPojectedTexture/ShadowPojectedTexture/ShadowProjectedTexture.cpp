@@ -39,6 +39,20 @@ graphic::cShader g_shader;
 graphic::cSphere g_sphere;
 graphic::cTexture g_texture;
 graphic::cGrid2 g_grid;
+Vector3 g_pos(0,0,0);
+
+
+LPDIRECT3DTEXTURE9 m_pShadowTex;
+LPDIRECT3DSURFACE9 m_pShadowSurf;
+LPDIRECT3DSURFACE9 m_pShadowTexZ;
+
+
+static const UINT MAP_SIZE = 256;
+// 단축매크로
+#define RS   graphic::GetDevice()->SetRenderState
+#define TSS  graphic::GetDevice()->SetTextureStageState
+#define SAMP graphic::GetDevice()->SetSamplerState
+
 
 LPDIRECT3DDEVICE9 graphic::GetDevice()
 {
@@ -278,29 +292,120 @@ void Render(int timeDelta)
 		RenderFPS(timeDelta);
 		RenderAxis();
 
-		GetDevice()->SetRenderState( D3DRS_LIGHTING, FALSE );
-		g_grid.Render();
+		
+		Matrix44 matIdentity;
 
+		//---------------------------------------------------------------
+		// 모델 출력 + 그림자.
+		LPDIRECT3DSURFACE9 pOldBackBuffer, pOldZBuffer;
+		D3DVIEWPORT9 oldViewport;
+
+		graphic::GetDevice()->GetRenderTarget(0, &pOldBackBuffer);
+		graphic::GetDevice()->GetDepthStencilSurface(&pOldZBuffer);
+		graphic::GetDevice()->GetViewport(&oldViewport);
+
+		graphic::GetDevice()->SetRenderTarget(0, m_pShadowSurf);
+		graphic::GetDevice()->SetDepthStencilSurface(m_pShadowTexZ);
+		// 뷰포트변경  x y  width    height   minz maxz
+		D3DVIEWPORT9 viewport = {0,0, MAP_SIZE,MAP_SIZE,0.0f,1.0f};
+		graphic::GetDevice()->SetViewport(&viewport);
+
+		// 그림자맵 클리어
+		graphic::GetDevice()->Clear(0L, NULL
+			, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER
+			, 0x00000000, 1.0f, 0L);
+
+		Vector3 lightPos = Vector3(500,1000,0);
+		Matrix44 matView;// 뷰 행렬
+		matView.SetView2( lightPos, g_pos, Vector3(0,1,0));
+		Matrix44 matProj;// 투영 행렬
+		matProj.SetProjection( D3DX_PI/2.5f, 1, 0.1f, 10000 );
 
 		Matrix44 matS;
 		matS.SetScale(Vector3(1,2,1));
 		Matrix44 tm = matS * g_LocalTm;
-
 		g_shader.SetVector("vLightDir", Vector3(0,-1,0));
-		g_shader.SetMatrix("mWVP", tm * g_matView * g_matProj);
-		g_shader.SetVector("vEyePos", g_camPos);
-		g_shader.SetTexture("Tex", g_texture);
-
-		Matrix44 mWIT = tm.Inverse();
-		mWIT.Transpose();
-		g_shader.SetMatrix("mWIT", mWIT);
+		g_shader.SetMatrix("mWVP", tm * matView * matProj);
 
 		g_shader.Begin();
-		g_shader.BeginPass(0);
+		g_shader.BeginPass(1);
 		g_sphere.Render(tm);
 		g_shader.EndPass();
 		g_shader.End();
 
+
+		//-----------------------------------------------------
+		// 렌더링타겟 복구
+		//-----------------------------------------------------
+		graphic::GetDevice()->SetRenderTarget(0, pOldBackBuffer);
+		graphic::GetDevice()->SetDepthStencilSurface(pOldZBuffer);
+		graphic::GetDevice()->SetViewport(&oldViewport);
+		pOldBackBuffer->Release();
+		pOldZBuffer->Release();
+		graphic::GetDevice()->SetTransform( D3DTS_VIEW, (D3DXMATRIX*)&g_matView );
+		graphic::GetDevice()->SetTransform( D3DTS_PROJECTION, (D3DXMATRIX*)&g_matProj );
+
+		g_shader.SetMatrix("mWVP", tm * g_matView * g_matProj);
+		g_shader.SetVector("vEyePos", g_camPos);
+		Matrix44 mWIT = tm.Inverse();
+		mWIT.Transpose();		
+		g_shader.SetMatrix("mWIT", mWIT);
+		g_shader.Begin();
+		g_shader.BeginPass(0);
+		//g_sphere.Render(tm);
+		g_shader.EndPass();
+		g_shader.End();
+
+
+
+		//------------------------------------------------------------------------
+		// 지형 출력.
+		//------------------------------------------------------------------------
+		D3DXMATRIX mTT;
+		mTT = D3DXMATRIX(0.5f, 0.0f, 0.0f, 0.0f
+			, 0.0f,-0.5f, 0.0f, 0.0f
+			, 0.0f, 0.0f, 1.0f, 0.0f
+			, 0.5f, 0.5f, 0.0f, 1.0f);
+		Matrix44 mT = *(Matrix44*)&mTT;
+
+		g_shader.SetMatrix("mWVP", matIdentity * g_matView * g_matProj);
+		g_shader.SetVector("vEyePos", g_camPos);
+		g_shader.SetMatrix( "mWIT", matIdentity);
+		g_shader.SetTexture("ShadowMap", m_pShadowTex);
+
+		Matrix44 m = matView * matProj * mT;
+		g_shader.SetMatrix( "mWVPT", m );
+
+		g_shader.Begin();
+		g_shader.BeginPass(2);
+		g_grid.Render();
+		g_shader.EndPass();
+		g_shader.End();	
+
+
+#if 1 // 디버그용 텍스처 출력
+		{
+			graphic::GetDevice()->SetTextureStageState(0,D3DTSS_COLOROP,	D3DTOP_SELECTARG1);
+			graphic::GetDevice()->SetTextureStageState(0,D3DTSS_COLORARG1,	D3DTA_TEXTURE);
+			graphic::GetDevice()->SetTextureStageState(1,D3DTSS_COLOROP,    D3DTOP_DISABLE);
+			float scale = 128.0f;
+			typedef struct {FLOAT p[4]; FLOAT tu, tv;} TVERTEX;
+
+			TVERTEX Vertex[4] = {
+				// x  y  z rhw tu tv
+				{0, scale, 0, 1, 0, 0,},
+				{scale, scale,0, 1, 1, 0,},
+				{scale, scale+scale,0, 1, 1, 1,},
+				{0, scale+scale,0, 1, 0, 1,},
+			};
+			graphic::GetDevice()->SetTexture( 0, m_pShadowTex );
+			graphic::GetDevice()->SetVertexShader(NULL);
+			graphic::GetDevice()->SetFVF( D3DFVF_XYZRHW | D3DFVF_TEX1 );
+			graphic::GetDevice()->SetPixelShader(0);
+			graphic::GetDevice()->DrawPrimitiveUP( D3DPT_TRIANGLEFAN, 2, Vertex, sizeof( TVERTEX ) );
+		}
+#endif
+		
 		//랜더링 끝
 		g_pDevice->EndScene();
 		//랜더링이 끝났으면 랜더링된 내용 화면으로 전송
@@ -313,8 +418,22 @@ bool InitVertexBuffer()
 {
 	g_shader.Create("hlsl_box_normal_phong_tex.fx", "TShader" );
 	g_texture.Create("../../media/강소라.jpg");
-	g_sphere.Create(30, 20, 20);
+	g_sphere.Create(100, 20, 20);
 	g_grid.Create(64, 64, 50);
+
+
+	// 텍스쳐 생성, 서피스 생성.
+	if (FAILED(graphic::GetDevice()->CreateTexture(MAP_SIZE, MAP_SIZE, 1, 
+		D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
+		D3DPOOL_DEFAULT, &m_pShadowTex, NULL)))
+		return false;
+	if (FAILED(m_pShadowTex->GetSurfaceLevel(0, &m_pShadowSurf)))
+		return false;
+	if (FAILED(graphic::GetDevice()->CreateDepthStencilSurface(
+		MAP_SIZE, MAP_SIZE, D3DFMT_D24S8, 
+		D3DMULTISAMPLE_NONE, 0, TRUE,
+		&m_pShadowTexZ, NULL)))
+		return false;
 
 
 	// 카메라, 투영행렬 생성

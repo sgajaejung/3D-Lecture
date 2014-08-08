@@ -27,13 +27,18 @@ void graphic::RenderAxis()
 		MakeAxis(500.f,  D3DXCOLOR(1,0,0,0),  D3DXCOLOR(0,1,0,0),  D3DXCOLOR(0,0,1,0), g_axis);
 
 	GetDevice()->SetRenderState( D3DRS_ZENABLE, FALSE);
+
+	DWORD lighting;
+	GetDevice()->GetRenderState( D3DRS_LIGHTING, &lighting );
 	GetDevice()->SetRenderState( D3DRS_LIGHTING, FALSE );
+
 	Matrix44 identity;
 	GetDevice()->SetTransform( D3DTS_WORLD, (D3DXMATRIX*)&identity );
 	GetDevice()->SetTexture(0, NULL);
 	GetDevice()->SetFVF( sVertexDiffuse::FVF );
 	GetDevice()->DrawPrimitiveUP( D3DPT_LINELIST, 3, &g_axis[0], sizeof(sVertexDiffuse) );
-	GetDevice()->SetRenderState( D3DRS_LIGHTING, TRUE );
+
+	GetDevice()->SetRenderState( D3DRS_LIGHTING, lighting );
 	GetDevice()->SetRenderState( D3DRS_ZENABLE, TRUE);
 }
 

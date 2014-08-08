@@ -100,6 +100,14 @@ void cShader::SetTexture(const string &key, cTexture &texture)
 		MessageBoxA( NULL, "cShader::SetTexture Error", "ERROR", MB_OK);
 	}
 }
+void cShader::SetTexture(const string &key, IDirect3DTexture9 *texture)
+{
+	RET(!m_effect);
+	if (FAILED(m_effect->SetTexture( key.c_str(), texture)))
+	{
+		MessageBoxA( NULL, "cShader::SetTexture Error", "ERROR", MB_OK);
+	}
+}
 void cShader::SetFloat(const string &key, float val)
 {
 	RET(!m_effect);

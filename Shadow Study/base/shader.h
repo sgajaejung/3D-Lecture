@@ -18,6 +18,7 @@ namespace graphic
 
 		void SetMatrix(const string &key, const Matrix44 &mat);
 		void SetTexture(const string &key, cTexture &texture);
+		void SetTexture(const string &key, IDirect3DTexture9 *texture);
 		void SetFloat(const string &key, float val);
 		void SetVector(const string &key, const Vector3 &vec );
 		void CommitChanges();

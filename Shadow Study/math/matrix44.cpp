@@ -145,6 +145,14 @@ void Matrix44::SetView( const Vector3& pos, const Vector3& dir0, const Vector3& 
 }
 
 
+void Matrix44::SetView2( const Vector3& pos, const Vector3& lookAt, const Vector3& up0)
+{
+	Vector3 dir = lookAt - pos;
+	dir.Normalize();
+	SetView(pos, dir, up0);
+}
+
+
 void Matrix44::SetProjection(	const float fov, const float aspect, const float nearPlane, const float farPlane )
 {
 	float fH = cosf(fov / 2.f) / sinf(fov / 2.f);
