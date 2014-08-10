@@ -2,11 +2,13 @@
 // -------------------------------------------------------------
 // 전역변수
 // -------------------------------------------------------------
-float4x4 mWVP;		// 로컬에서 투영공간으로의 좌표변환
+float4x4 mWorld;		// 월드 행렬
+float4x4 mVP;		// 로컬에서 투영공간으로의 좌표변환
 float4x4 mWIT;
 float4x4 mWVPT;
 float3 vLightDir;
 float3 vEyePos;
+
 
 // 광원 밝기.
 float4 I_a = {0.2f, 0.2f, 0.2f, 0.0f}; // ambient
@@ -29,8 +31,8 @@ sampler Samp = sampler_state
     MagFilter = LINEAR;
     MipFilter = NONE;
 
-    AddressU = Clamp;
-    AddressV = Clamp;
+    AddressU = Wrap;
+    AddressV = Wrap;
 };
 
 
@@ -45,8 +47,8 @@ sampler ShadowMapSamp = sampler_state
     MagFilter = LINEAR;
     MipFilter = NONE;
 
-	AddressU = Clamp;
-	AddressV = Clamp;
+    AddressU = Clamp;
+    AddressV = Clamp;
 };
 
 
@@ -72,12 +74,11 @@ struct VS_SHADOW_OUTPUT
 	float4 Diffuse : COLOR0;
 };
 
-
 // -------------------------------------------------------------
 // 정점셰이더에서 픽셀셰이더로 넘기는 데이터
 // 모델 + 그림자.
 // -------------------------------------------------------------
-struct VS_OUTPUT_SHADOW
+struct VS_OUTPUT2
 {
     float4 Pos	 : POSITION;
 	float4 Diffuse : COLOR0;
@@ -103,6 +104,7 @@ VS_OUTPUT VS_pass0(
     VS_OUTPUT Out = (VS_OUTPUT)0;        // 출력데이터
     
     // 좌표변환
+	float4x4 mWVP = mul(mWorld, mVP);
 	Out.Pos = mul( Pos, mWVP );
 
 	// 정점 색
@@ -151,7 +153,9 @@ VS_SHADOW_OUTPUT VS_pass1(
     VS_SHADOW_OUTPUT Out = (VS_SHADOW_OUTPUT)0;  // 출력데이터
     
     // 좌표변환
+	float4x4 mWVP = mul(mWorld, mVP);
 	Out.Pos = mul( Pos, mWVP );
+
 	Out.Diffuse = float4(1,1,1,1);
 
     return Out;
@@ -160,18 +164,18 @@ VS_SHADOW_OUTPUT VS_pass1(
 
 
 // -------------------------------------------------------------
-// 2패스:정점셰이더, 포그 출력, 그림자 출력.
+// 3패스:정점셰이더, 포그 출력, 그림자 출력.
 // -------------------------------------------------------------
-VS_OUTPUT_SHADOW VS_pass2(
+VS_OUTPUT2 VS_pass2(
       float4 Pos : POSITION,          // 모델정점
 	  float3 Normal : NORMAL,		// 법선벡터
 	  float2 Tex : TEXCOORD0
 )
 {
-    VS_OUTPUT_SHADOW Out = (VS_OUTPUT_SHADOW)0;        // 출력데이터
+    VS_OUTPUT2 Out = (VS_OUTPUT2)0;        // 출력데이터
     
     // 좌표변환
-	//float4x4 mWVP = mul(mWorld, mVP);
+	float4x4 mWVP = mul(mWorld, mVP);
 	Out.Pos = mul( Pos, mWVP );
 
 	// 법선 벡터 계산.
@@ -186,9 +190,9 @@ VS_OUTPUT_SHADOW VS_pass2(
 }
 
 // -------------------------------------------------------------
-// 2패스:픽셀셰이더, 포그 출력.
+// 3패스:픽셀셰이더, 포그 출력.
 // -------------------------------------------------------------
-float4 PS_pass2(VS_OUTPUT_SHADOW In) : COLOR
+float4 PS_pass2(VS_OUTPUT2 In) : COLOR
 {
 	float4 Out;
 
@@ -200,13 +204,11 @@ float4 PS_pass2(VS_OUTPUT_SHADOW In) : COLOR
 				+ I_d * K_d * max(0, dot(N,L));
 				+ I_s * pow( max(0, dot(N,H)), 16);
 
-	//float4 decale = tex2D(Samp, In.Tex);
-	//Out = Color * decale;
-	Out = Color;
+	float4 decale = tex2D(Samp, In.Tex);
+	Out = Color * decale;
 
 	float4 shadow = tex2Dproj( ShadowMapSamp, In.TexShadow );
-	//Out = Out * saturate(Color - (0.8f*shadow));
-	Out = shadow;
+	Out = Out * saturate(Color - (0.8f*shadow));
 
 	//float distance = length(In.Eye);
 	//float l = saturate((distance-vFog.x) / (vFog.y - vFog.x));

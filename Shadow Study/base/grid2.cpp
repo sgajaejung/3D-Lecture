@@ -93,3 +93,53 @@ void cGrid2::Render(const int stage)
 	GetDevice()->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, m_vtxBuff.GetVertexCount(), 
 		0, m_idxBuff.GetFaceCount());
 }
+
+
+void cGrid2::RenderShader(cShader &shader)
+{
+	Matrix44 matIdentity;
+	shader.SetMatrix( "mWorld", matIdentity);
+
+	m_mtrl.Bind(shader);
+	m_tex.Bind(shader, "Tex");
+
+	shader.Begin();
+	shader.BeginPass();
+
+	m_vtxBuff.Bind();
+	m_idxBuff.Bind();
+	GetDevice()->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, m_vtxBuff.GetVertexCount(), 
+		0, m_idxBuff.GetFaceCount());
+
+	shader.EndPass();
+	shader.End();
+}
+
+
+// 법선 벡터를 다시 계산한다.
+void cGrid2::CalculateNormals()
+{
+	sVertexNormTex *vertices = (sVertexNormTex*)m_vtxBuff.Lock();
+	WORD *indices = (WORD*)m_idxBuff.Lock();
+	for (int i=0; i < m_idxBuff.GetFaceCount()*3; i+=3)
+	{
+		sVertexNormTex &p1 = vertices[ indices[ i]];
+		sVertexNormTex &p2 = vertices[ indices[ i+1]];
+		sVertexNormTex &p3 = vertices[ indices[ i+2]];
+
+		Vector3 v1 = p2.p - p1.p;
+		Vector3 v2 = p3.p - p1.p;
+		v1.Normalize();
+		v2.Normalize();
+		Vector3 n = v1.CrossProduct(v2);
+		n.Normalize();
+		p1.n = n;
+		p2.n = n;
+		p3.n = n;
+	}
+
+	m_vtxBuff.Unlock();
+	m_idxBuff.Unlock();
+}
+
+

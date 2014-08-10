@@ -33,9 +33,21 @@ void cMaterial::Init(const Vector4 &ambient,
 }
 
 
+void cMaterial::Init(const D3DMATERIAL9 &mtrl)
+{
+	m_mtrl = mtrl;
+}
+
+
 void cMaterial::InitWhite()
 {
 	Init(Vector4(1,1,1,1), Vector4(1,1,1,1), Vector4(1,1,1,1));
+}
+
+
+void cMaterial::InitBlack()
+{
+	Init(Vector4(0,0,0,1), Vector4(0,0,0,1), Vector4(0,0,0,1));
 }
 
 
@@ -54,4 +66,9 @@ void cMaterial::InitBlue()
 void cMaterial::Bind()
 {
 	graphic::GetDevice()->SetMaterial(&m_mtrl);
+}
+
+void cMaterial::Bind(cShader &shader)
+{
+
 }

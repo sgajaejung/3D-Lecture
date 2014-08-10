@@ -9,6 +9,7 @@ using namespace graphic;
 cShader::cShader() :
 	m_effect(NULL) 
 ,	m_hTechnique(NULL)
+,	m_renderPass(0)
 {
 }
 
@@ -19,7 +20,7 @@ cShader::~cShader()
 }
 
 
-bool cShader::Create(const string &fileName, const string &technique)
+bool cShader::Create(const string &fileName, const string &technique, const bool showMsgBox)//showMsgBox=true
 {
 	// 쉐이더 파일 읽기
 	HRESULT hr;
@@ -42,7 +43,8 @@ bool cShader::Create(const string &fileName, const string &technique)
 		else
 		{
 			string msg = fileName + " 파일이 존재하지 않습니다.";
-			MessageBoxA( NULL, msg.c_str(), "ERROR", MB_OK);
+			if (showMsgBox)
+				MessageBoxA( NULL, msg.c_str(), "ERROR", MB_OK);
 		}
 
 		//DXTRACE_ERR( "CreateEffectFromFile", hr );
@@ -63,10 +65,10 @@ void cShader::Begin()
 }
 
 
-void cShader::BeginPass(int pass)
+void cShader::BeginPass(int pass) // pass=-1
 {
 	RET(!m_effect);
-	m_effect->BeginPass(pass);
+	m_effect->BeginPass( (pass == -1)? m_renderPass : pass );
 }
 
 
@@ -84,6 +86,15 @@ void cShader::End()
 }
 
 
+void cShader::SetInt(const string &key, const int val )
+{
+	RET(!m_effect);
+	if (FAILED(m_effect->SetInt( key.c_str(), val)))
+	{
+		MessageBoxA( NULL, "cShader::SetInt Error", "ERROR", MB_OK);
+	}	
+}
+
 void cShader::SetMatrix(const string &key, const Matrix44 &mat)
 {
 	RET(!m_effect);
@@ -92,6 +103,8 @@ void cShader::SetMatrix(const string &key, const Matrix44 &mat)
 		MessageBoxA( NULL, "cShader::SetMatrix Error", "ERROR", MB_OK);
 	}
 }
+
+
 void cShader::SetTexture(const string &key, cTexture &texture)
 {
 	RET(!m_effect);
@@ -108,6 +121,7 @@ void cShader::SetTexture(const string &key, IDirect3DTexture9 *texture)
 		MessageBoxA( NULL, "cShader::SetTexture Error", "ERROR", MB_OK);
 	}
 }
+
 void cShader::SetFloat(const string &key, float val)
 {
 	RET(!m_effect);
@@ -116,6 +130,8 @@ void cShader::SetFloat(const string &key, float val)
 		MessageBoxA( NULL, "cShader::SetFloat Error", "ERROR", MB_OK);
 	}	
 }
+
+
 void cShader::SetVector(const string &key, const Vector3 &vec )
 {
 	RET(!m_effect);
@@ -124,6 +140,17 @@ void cShader::SetVector(const string &key, const Vector3 &vec )
 		MessageBoxA( NULL, "cShader::SetVector Error", "ERROR", MB_OK);
 	}	
 }
+
+
+void cShader::SetMatrixArray(const string &key, const Matrix44 *mat, const int count )
+{
+	RET(!m_effect);
+	if (FAILED(m_effect->SetMatrixArray(key.c_str(), (D3DXMATRIX*)mat, count)))
+	{
+		MessageBoxA( NULL, "cShader::SetMatrixArray Error", "ERROR", MB_OK);
+	}
+}
+
 
 void cShader::CommitChanges()
 {

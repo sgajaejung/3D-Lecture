@@ -39,7 +39,7 @@ graphic::cShader g_shader;
 graphic::cSphere g_sphere;
 graphic::cTexture g_texture;
 graphic::cGrid2 g_grid;
-Vector3 g_pos(0,0,0);
+Vector3 g_pos(100,100,100);
 
 
 LPDIRECT3DTEXTURE9 m_pShadowTex;
@@ -248,8 +248,9 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 		}	
 		else
 		{
-			g_CurPos.x = LOWORD(lParam);
-			g_CurPos.y = HIWORD(lParam);
+			const POINT pos = {LOWORD(lParam), HIWORD(lParam)};
+			g_CurPos.x = pos.x;
+			g_CurPos.y = pos.y;
 		}
 		break;
 
@@ -315,7 +316,7 @@ void Render(int timeDelta)
 			, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER
 			, 0x00000000, 1.0f, 0L);
 
-		Vector3 lightPos = Vector3(500,1000,0);
+		Vector3 lightPos = Vector3(500,500,0);
 		Matrix44 matView;// 뷰 행렬
 		matView.SetView2( lightPos, g_pos, Vector3(0,1,0));
 		Matrix44 matProj;// 투영 행렬
@@ -323,15 +324,14 @@ void Render(int timeDelta)
 
 		Matrix44 matS;
 		matS.SetScale(Vector3(1,2,1));
-		Matrix44 tm = matS * g_LocalTm;
+		Matrix44 matT;
+		matT.SetTranslate(g_pos);
+		Matrix44 tm = matS * g_LocalTm * matT;
 		g_shader.SetVector("vLightDir", Vector3(0,-1,0));
-		g_shader.SetMatrix("mWVP", tm * matView * matProj);
+		g_shader.SetMatrix("mVP", matView * matProj);
 
-		g_shader.Begin();
-		g_shader.BeginPass(1);
-		g_sphere.Render(tm);
-		g_shader.EndPass();
-		g_shader.End();
+		g_shader.SetRenderPass(1);
+		g_sphere.RenderShader(g_shader, tm);
 
 
 		//-----------------------------------------------------
@@ -345,17 +345,14 @@ void Render(int timeDelta)
 		graphic::GetDevice()->SetTransform( D3DTS_VIEW, (D3DXMATRIX*)&g_matView );
 		graphic::GetDevice()->SetTransform( D3DTS_PROJECTION, (D3DXMATRIX*)&g_matProj );
 
-		g_shader.SetMatrix("mWVP", tm * g_matView * g_matProj);
+		g_shader.SetMatrix("mVP", g_matView * g_matProj);
 		g_shader.SetVector("vEyePos", g_camPos);
 		Matrix44 mWIT = tm.Inverse();
 		mWIT.Transpose();		
 		g_shader.SetMatrix("mWIT", mWIT);
-		g_shader.Begin();
-		g_shader.BeginPass(0);
-		//g_sphere.Render(tm);
-		g_shader.EndPass();
-		g_shader.End();
 
+		g_shader.SetRenderPass(0);
+		g_sphere.RenderShader(g_shader, tm);
 
 
 		//------------------------------------------------------------------------
@@ -368,7 +365,7 @@ void Render(int timeDelta)
 			, 0.5f, 0.5f, 0.0f, 1.0f);
 		Matrix44 mT = *(Matrix44*)&mTT;
 
-		g_shader.SetMatrix("mWVP", matIdentity * g_matView * g_matProj);
+		g_shader.SetMatrix("mVP", g_matView * g_matProj);
 		g_shader.SetVector("vEyePos", g_camPos);
 		g_shader.SetMatrix( "mWIT", matIdentity);
 		g_shader.SetTexture("ShadowMap", m_pShadowTex);
@@ -376,11 +373,9 @@ void Render(int timeDelta)
 		Matrix44 m = matView * matProj * mT;
 		g_shader.SetMatrix( "mWVPT", m );
 
-		g_shader.Begin();
-		g_shader.BeginPass(2);
-		g_grid.Render();
-		g_shader.EndPass();
-		g_shader.End();	
+		g_shader.SetRenderPass(2);
+		g_grid.RenderShader(g_shader);
+	
 
 
 #if 1 // 디버그용 텍스처 출력
@@ -420,6 +415,8 @@ bool InitVertexBuffer()
 	g_texture.Create("../../media/강소라.jpg");
 	g_sphere.Create(100, 20, 20);
 	g_grid.Create(64, 64, 50);
+	g_grid.GetTexture().Create( "../../media/grass_spring2.jpg" );
+
 
 
 	// 텍스쳐 생성, 서피스 생성.

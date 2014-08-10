@@ -68,10 +68,16 @@ bool cTexture::CreateEx(const string &fileName)
 
 void cTexture::Bind(int stage)
 {
-	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-	GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
+	GetDevice()->SetSamplerState(stage, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	GetDevice()->SetSamplerState(stage, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	GetDevice()->SetSamplerState(stage, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
 	GetDevice()->SetTexture(stage, m_texture);
+}
+
+
+void cTexture::Bind(cShader &shader, const string &key)
+{
+	shader.SetTexture(key, *this);
 }
 
 

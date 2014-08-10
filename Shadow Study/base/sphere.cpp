@@ -36,6 +36,22 @@ void cSphere::Render(const Matrix44 &tm)
 }
 
 
+void cSphere::RenderShader(cShader &shader, const Matrix44 &tm)
+{
+	Matrix44 mat = m_tm * tm;
+	shader.SetMatrix( "mWorld", mat);
+	m_vtxBuff.Bind();
+	m_idxBuff.Bind();
+
+	shader.Begin();
+	shader.BeginPass();
+	GetDevice()->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, 
+		m_vtxBuff.GetVertexCount(), 0, m_idxBuff.GetFaceCount());
+	shader.EndPass();
+	shader.End();
+}
+
+
 void cSphere::Create(const float radius, const int stacks, const int slices)
 {
 	if (m_vtxBuff.GetVertexCount() > 0)

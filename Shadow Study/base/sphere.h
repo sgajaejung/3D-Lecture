@@ -16,7 +16,7 @@ namespace graphic
 		const Matrix44& GetTransform() const;
 
 		void Render(const Matrix44 &tm);
-
+		void RenderShader(cShader &shader, const Matrix44 &tm);
 
 	protected:
 

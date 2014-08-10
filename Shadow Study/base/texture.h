@@ -11,6 +11,7 @@ namespace graphic
 		bool Create(const string &fileName, bool isSizePow2=true);
 		bool Create(const int width, const int height, const D3DFORMAT format);
 		void Bind(int stage);
+		void Bind(cShader &shader, const string &key);
 		void Lock(D3DLOCKED_RECT &out);
 		void Unlock();
 		IDirect3DTexture9* GetTexture();

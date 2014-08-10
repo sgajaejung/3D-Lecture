@@ -3,6 +3,8 @@
 
 namespace graphic
 {
+	struct sMaterial;
+	class cShader;
 
 	class cMaterial
 	{
@@ -16,12 +18,22 @@ namespace graphic
 			const Vector4 &emmisive=Vector4(0,0,0,1),
 			const float pow=0);
 
+		void Init(const D3DMATERIAL9 &mtrl);
+
+		D3DMATERIAL9& GetMtrl();
+
 		void InitWhite();
+		void InitBlack();
 		void InitRed();
 		void InitBlue();
 		void Bind();
+		void Bind(cShader &shader);
 
+
+	private:
 		D3DMATERIAL9 m_mtrl;
 	};
 
+
+	inline D3DMATERIAL9& cMaterial::GetMtrl() { return m_mtrl; }
 }
