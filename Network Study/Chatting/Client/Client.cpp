@@ -57,6 +57,7 @@ public:
 	CEditChat m_ChatInput;
 public:
 	afx_msg void OnBnClickedButtonSend();
+	CString m_Id;
 };
 
 
@@ -108,6 +109,7 @@ CClientDlg::CClientDlg(CWnd* pParent /*=NULL*/)
 	, m_Port(10000)
 	, m_socket(0)
 	, m_loop(true)
+	, m_Id(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -119,6 +121,7 @@ void CClientDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_PORT, m_Port);
 	DDX_Control(pDX, IDC_LIST_CHAT, m_ChatList);
 	DDX_Control(pDX, IDC_EDIT_CHAT, m_ChatInput);
+	DDX_Text(pDX, IDC_EDIT_ID, m_Id);
 }
 
 BEGIN_MESSAGE_MAP(CClientDlg, CDialogEx)
@@ -273,6 +276,26 @@ void CClientDlg::OnBnClickedButtonConnect()
 	if (network::LaunchClient(ip, m_Port, m_socket))
 	{
 		m_ChatList.InsertString(m_ChatList.GetCount(), L"立加 己傍");
+
+
+
+		network::sLoginProtocol login;
+		ZeroMemory(&login, sizeof(login));
+		login.header.protocol = network::PROTOCOL::LOGIN;
+
+		wstring wid = m_Id;
+		string str = wstr2str(wid);
+		strcpy_s(login.name, sizeof(login.name), str.c_str());		 
+
+		char buff[ 128];
+		ZeroMemory(buff, sizeof(buff));
+		memcpy(buff, &login, sizeof(login));
+
+		const int result = send(m_socket, buff, sizeof(buff), 0);
+		if (result == INVALID_SOCKET)
+		{	
+			m_ChatList.InsertString(m_ChatList.GetCount(), L"辑滚客 立加捞 谗辫");
+		}
 	}
 	else
 	{

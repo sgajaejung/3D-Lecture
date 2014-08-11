@@ -17,7 +17,8 @@ namespace network
 #pragma pack(4)
 	struct sPacketHeader
 	{
-		PROTOCOL::TYPE protocol;		
+		PROTOCOL::TYPE protocol;
+		char sendId[32];
 	};
 
 	struct sLoginProtocol
