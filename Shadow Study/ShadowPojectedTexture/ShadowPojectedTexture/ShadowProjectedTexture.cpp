@@ -316,7 +316,8 @@ void Render(int timeDelta)
 			, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER
 			, 0x00000000, 1.0f, 0L);
 
-		Vector3 lightPos = Vector3(500,500,0);
+		Vector3 lightPos = Vector3(500,800,0);
+		Vector3 lightDir = (g_pos - lightPos).Normal();
 		Matrix44 matView;// 뷰 행렬
 		matView.SetView2( lightPos, g_pos, Vector3(0,1,0));
 		Matrix44 matProj;// 투영 행렬
@@ -327,7 +328,7 @@ void Render(int timeDelta)
 		Matrix44 matT;
 		matT.SetTranslate(g_pos);
 		Matrix44 tm = matS * g_LocalTm * matT;
-		g_shader.SetVector("vLightDir", Vector3(0,-1,0));
+		g_shader.SetVector("vLightDir", lightDir);
 		g_shader.SetMatrix("mVP", matView * matProj);
 
 		g_shader.SetRenderPass(1);
