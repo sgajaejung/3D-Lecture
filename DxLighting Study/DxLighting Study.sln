@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "1. DirectionLight", "1. DirectionLight\1. DirectionLight.vcxproj", "{E0F5229F-63F1-4367-A28E-8CBB45BFD034}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E0F5229F-63F1-4367-A28E-8CBB45BFD034}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E0F5229F-63F1-4367-A28E-8CBB45BFD034}.Debug|Win32.Build.0 = Debug|Win32
+		{E0F5229F-63F1-4367-A28E-8CBB45BFD034}.Release|Win32.ActiveCfg = Release|Win32
+		{E0F5229F-63F1-4367-A28E-8CBB45BFD034}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
